@@ -6,25 +6,24 @@ import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.template.patches.shared.Constants.ANDROPODS_COMPATIBILITY
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 
-// AndroPods uses Google Play Billing (product ID "pro") with a volatile boolean m0:Z
-// on the PreferencesFragment (a2.l) as the runtime premium gate.
+// AndroPods uses Google Play Billing (product ID "pro") with a volatile boolean
+// on its PreferencesFragment as the runtime premium gate. Both the class and field
+// names are obfuscated and can change between otherwise compatible app versions.
 //
 // TWO-POINT PATCH:
 //
 // Point 1 — Constructor <init>()V (.registers 3 → locals v0, v1):
-//   m0 defaults to false. e0() fires synchronously during fragment creation before
-//   queryPurchasesAsync() returns → launch 1 always shows free UI without this patch.
-//   We inject m0=true before return-void. v0 last held a LK1/a reference but const/4
-//   safely overwrites its type slot to Integer — ART verifier allows this.
+//   The premium field defaults to false. The preference UI is populated synchronously
+//   before queryPurchasesAsync() returns, so launch 1 shows free UI without this patch.
+//   We inject premium=true before return-void. v0 is dead at that point and can safely
+//   be reused as a boolean scratch register.
 //
-// Point 2 — Purchase result handler Y(List<Purchase>)V (.registers 7 → locals v0-v4):
-//   Called when billing responds. Sets m0=true when "pro" is found in the purchase list.
-//   IMPORTANT: must use v0 (local), NOT p1 (the List<> reference parameter).
-//   Previous crash: "tried to get class from non-reference register v6 (type=BooleanConstant)"
-//   was caused by using p1 (reference type) as a boolean scratch — ART's verifier rejected
-//   the method because later instructions still expect p1 to be a List reference.
-//   Fix: use v0 (uninitialized local at offset 0, safe for const/4 → iput-boolean).
+// Point 2 — Purchase result handler Y(List<Purchase>)V:
+//   Called when billing responds. Sets the same field to true at method entry. v0 is
+//   immediately initialized by the original first instruction, so it is safe scratch.
 @Suppress("unused")
 val androPodsPremiumPatch = bytecodePatch(
     name = "Unlock Premium",
@@ -35,29 +34,55 @@ val androPodsPremiumPatch = bytecodePatch(
     compatibleWith(ANDROPODS_COMPATIBILITY)
 
     execute {
-        // Point 1: Set m0=true in constructor before return-void.
-        // v0 is safe here: const/4 overwrites the prior LK1/a reference type in v0's slot.
-        AndroPodsPremiumInitFingerprint.method.apply {
+        val purchaseResultMethod = AndroPodsPurchaseResultFingerprint.method
+        val fragmentClass = AndroPodsPurchaseResultFingerprint.classDef
+
+        // Resolve the premium field from the app's own successful-purchase write.
+        // Never hard-code the obfuscated owner (a2/l in 1.5.28, l20 in 1.5.30).
+        val premiumField = purchaseResultMethod.instructions
+            .asSequence()
+            .filter { it.opcode == Opcode.IPUT_BOOLEAN }
+            .mapNotNull { instruction ->
+                ((instruction as? ReferenceInstruction)?.reference as? FieldReference)
+            }
+            .singleOrNull { field -> field.definingClass == fragmentClass.type }
+            ?: throw PatchException(
+                "AndroPods: could not uniquely resolve the premium boolean field in " +
+                    "${fragmentClass.type}."
+            )
+        val premiumFieldDescriptor =
+            "${premiumField.definingClass}->${premiumField.name}:${premiumField.type}"
+
+        // Derive the constructor from the already fingerprinted purchase-handler class.
+        // The old independent fingerprint matched an unrelated no-arg constructor after
+        // AndroPods 1.5.30 changed its obfuscation and constructor implementation.
+        val constructor = fragmentClass.methods.singleOrNull { method ->
+            method.name == "<init>" &&
+                method.returnType == "V" &&
+                method.parameters.isEmpty()
+        } ?: throw PatchException(
+            "AndroPods: no unique no-argument constructor found in ${fragmentClass.type}."
+        )
+
+        // Point 1: Set premium=true in the fragment constructor before return-void.
+        constructor.apply {
             val returnIndex = instructions.indexOfLast { it.opcode == Opcode.RETURN_VOID }
             if (returnIndex < 0) throw PatchException("AndroPods: constructor return-void not found.")
             addInstructions(
                 returnIndex,
                 """
                     const/4 v0, 0x1
-                    iput-boolean v0, p0, La2/l;->m0:Z
+                    iput-boolean v0, p0, $premiumFieldDescriptor
                 """.trimIndent(),
             )
         }
 
-        // Point 2: Set m0=true at start of billing result handler.
-        // Use v0 (local) — safe because const/4 initializes it to Integer type.
-        // DO NOT use p1: it is declared as Ljava/util/List; and ART will reject a
-        // BooleanConstant being stored in a reference-typed register.
-        AndroPodsPurchaseResultFingerprint.method.addInstructions(
+        // Point 2: Keep premium=true whenever billing refreshes purchase state.
+        purchaseResultMethod.addInstructions(
             0,
             """
                 const/4 v0, 0x1
-                iput-boolean v0, p0, La2/l;->m0:Z
+                iput-boolean v0, p0, $premiumFieldDescriptor
             """.trimIndent(),
         )
     }

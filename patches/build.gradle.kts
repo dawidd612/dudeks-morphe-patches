@@ -2,12 +2,12 @@ group = "app.rushiranpise.morphe-patches"
 
 patches {
     about {
-        name = "Doom's Morphe Patches"
-        description = "New mask, same task. All patches answer to Doom."
-        source = "https://github.com/rushiranpise/morphe-patches"
-        author = "rushiranpise"
-        contact = "https://github.com/rushiranpise"
-        website = "https://morphe.software/add-source?github=rushiranpise/morphe-patches"
+        name = "Dudek's Morphe Patches"
+        description = "A maintained collection of Morphe patches for Android apps."
+        source = "https://github.com/dawidd612/dudeks-morphe-patches"
+        author = "dawidd612"
+        contact = "https://github.com/dawidd612"
+        website = "https://morphe.software/add-source?github=dawidd612/dudeks-morphe-patches"
         license = "GPLv3"
     }
 }
@@ -16,44 +16,6 @@ kotlin {
     compilerOptions {
         freeCompilerArgs.add("-Xcontext-parameters")
     }
-}
-
-val generatedSecretsDir = layout.buildDirectory.dir("generated/secrets/kotlin")
-
-sourceSets {
-    main {
-        kotlin.srcDir(generatedSecretsDir)
-    }
-}
-
-fun String.kotlinStringLiteral() = replace("\\", "\\\\").replace("\"", "\\\"")
-
-val generateSecrets by tasks.registering {
-    val sharedMapsApiKey = providers.environmentVariable("SHARED_MAPS_API_KEY")
-    inputs.property("SHARED_MAPS_API_KEY", sharedMapsApiKey.orElse(""))
-    outputs.dir(generatedSecretsDir)
-
-    doLast {
-        val outputDir = generatedSecretsDir.get().asFile.resolve("app/template/patches/shared")
-        outputDir.mkdirs()
-        outputDir.resolve("BuildSecrets.kt").writeText(
-            """
-            package app.template.patches.shared
-
-            internal object BuildSecrets {
-                const val SHARED_MAPS_API_KEY = "${sharedMapsApiKey.orNull.orEmpty().kotlinStringLiteral()}"
-            }
-            """.trimIndent(),
-        )
-    }
-}
-
-tasks.named("compileKotlin") {
-    dependsOn(generateSecrets)
-}
-
-tasks.named("sourcesJar") {
-    dependsOn(generateSecrets)
 }
 
 // Separate configuration so gson is available at runtime for the

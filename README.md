@@ -1,99 +1,59 @@
 <p align="center">
-<img src="patches-bundle.png" width="190">
+<img src="patches-bundle.png" width="190" alt="Morphe patches bundle">
 </p>
 
-# 👋🧩 Doom's Morphe Patches
+# 🧩 Dudek's Morphe Patches
+
 <p align="center">
 
-![GitHub Release](https://img.shields.io/github/v/release/rushiranpise/morphe-patches?style=for-the-badge)
-![License](https://img.shields.io/github/license/rushiranpise/morphe-patches?style=for-the-badge)
-![GitHub Stars](https://img.shields.io/github/stars/rushiranpise/morphe-patches?style=for-the-badge)
-![GitHub Forks](https://img.shields.io/github/forks/rushiranpise/morphe-patches?style=for-the-badge)
-![GitHub Issues](https://img.shields.io/github/issues/rushiranpise/morphe-patches?style=for-the-badge)
-![Active GitHub Discussions](https://img.shields.io/github/discussions-search/rushiranpise/morphe-patches?query=is%3Aopen&style=for-the-badge&label=active%20discussions)
+![GitHub Release](https://img.shields.io/github/v/release/dawidd612/dudeks-morphe-patches?style=for-the-badge)
+![Build](https://img.shields.io/github/actions/workflow/status/dawidd612/dudeks-morphe-patches/release.yml?style=for-the-badge&label=build)
+![License](https://img.shields.io/github/license/dawidd612/dudeks-morphe-patches?style=for-the-badge)
+![Issues](https://img.shields.io/github/issues/dawidd612/dudeks-morphe-patches?style=for-the-badge)
 
 </p>
-<br/>
 
 > [!NOTE]
->
-> *Just some patches I make in my free time, with a little(most :p) help from AI.*
->
-> Patch requests are always welcome, **but please read the [new announcement](https://github.com/rushiranpise/morphe-patches/discussions/71) before opening an issue!**
->
-> If you find this project useful and want to help support its development, consider [donating](#donate). :pray:
+> A practical collection of Android patches built for [Morphe](https://morphe.software). The repository starts with a repaired AndroPods patch and will grow as more apps and updates need support.
 
-<br/>
+## About
 
-This is my personal collection of patches that I use with **Morphe**.  
-Everything here is AI‑generated (mostly for fun and learning), then tested enough to not explode :p.
+This repository is maintained as an independent continuation of [rushiranpise/morphe-patches](https://github.com/rushiranpise/morphe-patches). The aim is straightforward: keep useful patches current, document compatibility clearly and fix breakage against real application bytecode.
 
-## Contents
+Patches can stop working when an app update changes obfuscated classes, methods or fields. Always use the version listed for a patch and keep the original APK available when reporting a problem.
 
-- [How to use these patches](#how-to-use-these-patches)
-- [Issues / requests](#issues--requests)
-- [Reporting bugs](#reporting-bugs)
-- [Patches list](#-patches-list)
-- [FAQ](#faq)
-- [Donate](#donate)
-- [Disclaimer](#disclaimer)
+## Add this source to Morphe
 
-## ❓ About
+Use the one-click link:
 
-## 🧠 Why AI‑generated?
+### [Add Dudek's Morphe Patches](https://morphe.software/add-source?github=dawidd612/dudeks-morphe-patches)
 
-Because I’m curious what LLMs can do with code diffs.  
-No magic, no secrets — just a hobby.
+Or add the repository manually as a patch source:
 
-## ⚠️ Very important disclaimer
+```text
+https://github.com/dawidd612/dudeks-morphe-patches
+```
 
-I do this in my spare time.
-Patches work *for me* on *my machine*.
-Test before using on anything important.
-Seriously...
+## Current highlight: AndroPods
 
-## 📬 Issues / requests
+The `Unlock Premium` patch for AndroPods `1.5.30` (`pro.vitalii.andropods`, version code `86`) no longer depends on a hard-coded obfuscated class or field. It finds the premium state through the app's purchase-result path and patches the constructor belonging to that same class.
 
-Found something broken? Have a new patch idea?
-Open an issue — I might get to it when I'm bored.
+This prevents the verifier crash caused by writing the old field from an unrelated constructor after the app's obfuscation layout changed.
 
-Useful links:
+## Reporting problems
 
-- [Bug report](https://github.com/rushiranpise/morphe-patches/issues/new?template=bug_report.yml)
-- [Patch broken after app update](https://github.com/rushiranpise/morphe-patches/issues/new?template=patch_broken_after_update.yml)
-- [Enhancement request](https://github.com/rushiranpise/morphe-patches/issues/new?template=enhancement_request.yml)
-- [App request discussion](https://github.com/rushiranpise/morphe-patches/discussions/new?category=app-requests)
+Open an issue and include:
 
-Before requesting a patch:
+- the app name and exact version;
+- the APK source and format;
+- the selected patch-source release;
+- the relevant Morphe log;
+- a short description of what happened after patching.
 
-- Search existing issues and discussions first.
-- Check whether the feature depends on server-side validation.
-- Include the app name, package name, and Play Store link when possible.
-- Do not request region-lock bypasses.
-
-## How to use these patches
-
-Click here to add these patches to Morphe: https://morphe.software/add-source?github=rushiranpise/morphe-patches
-
-Or manually add this repository URL as a patch source in Morphe: https://github.com/rushiranpise/morphe-patches
-
-The latest generated patch source release and channel are shown at the top of the [patches list](#-patches-list).
-
-## Reporting bugs
-
-See [Capture logs](#capture-logs) before opening a bug report.
-
-Bug reports must include:
-
-- Logs
-- App version
-- Patch source release used to create the patched APK, for example `stable v1.8.0` or `dev v1.8.0-dev.3`
-- APK source/type, for example `APKMirror APK arm64-v8a` or `APKPure XAPK`
-
-## 🩹 Patches list
+## Patch catalogue
 
 <!-- PATCHES_START -->
-> **[v1.22.0](https://github.com/rushiranpise/morphe-patches/releases/tag/v1.22.0)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**318 patches** across **229 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+> **[v1.22.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.22.0)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**318 patches** across **229 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
 
 | # | App | Patches | Version | Package |
 |---|---|---|---|---|
@@ -329,103 +289,45 @@ Bug reports must include:
 | 230 | [**Universal**](PATCHES.md#universal) | 7 | — | — |
 <!-- PATCHES_END -->
 
-### 📙 Contributing
+## Contributing
 
-Thank you for considering contributing to Rushi's Morphe Patches.  
-You can find the contribution guidelines [here](CONTRIBUTING.md).
+Fixes and new patches are welcome. Keep changes focused, use a conventional commit message and mention the exact app version used for verification. See [CONTRIBUTING.md](CONTRIBUTING.md) for the repository workflow.
 
-### 🛠️ Building
+## Building
 
-To build Rushi's Morphe Patches,
-you can follow the [Morphe documentation](https://github.com/MorpheApp/morphe-documentation).
+Use Java 21 and run:
 
-> **Note:** Not all apps can be patched. Server-side features (AI, cloud sync, server-validated subscriptions) cannot be bypassed.
+```shell
+./gradlew :patches:buildAndroid --no-daemon
+```
 
-## FAQ
+The release workflow builds the bundle, updates the generated patch index and attaches the `.mpp` source to the GitHub release.
 
-### How do I use this?
-Install [Morphe Manager](https://morphe.software), add this repo as a patch source, then select an app to patch.
+## Quick answers
 
-### Capture logs
+### Which APK should I use?
 
-Refer to [Morphe Documentation](https://github.com/MorpheApp/morphe-documentation/blob/main/docs/morphe-resources/questions.md#40-capture-logs). When opening a bug report, include the relevant logs, the patch source release you used (for example `stable v1.8.0` or `dev v1.8.0-dev.3`), and the APK source/type.
+Use a clean APK, XAPK or APKM matching the version shown in the catalogue. Avoid pre-modded packages when diagnosing a patch failure.
 
-### Help, why can't I log in with my Google account? Why doesn't Google Drive work?
-MicroG integration is needed for features that require Google Play Services.
-Patched apps are re-signed, which breaks Google Play Services authentication. This is a known limitation for all patched apps.
+### Why can an app update break a patch?
 
-### What APK version or format should I use?
-Use the suggested app versions. Download clean APK, XAPK, or APKM files from a reputable source, prefer `arm64-v8a` for modern phones, and avoid already-modded or repacked APKs when reporting bugs.
+Many Android applications are obfuscated. A new build can rename or restructure the code a patch targets even when the visible feature looks unchanged.
 
-### Can you make a patch for \[Super Cool App Goes Here\]?
-Maybe? Each patch is different, and many features use server-side functionality that cannot be modified. Before submitting a request, please check the existing open (and closed!) issues to reduce duplication.
+### Why can sign-in or cloud features fail after patching?
 
-### You haven't completed my patch request.. Did you not see it? / Did you forget? / Why do you hate me?
-I did see it. I haven't forgotten. We're good, bro. I'm a one-person "team" who does this stuff in my free time. If it's within my technical capabilities, I'll get around to it at some point.
-
-## ❤️ Donate
-
-Donations are **completely optional**. There is no requirement to contribute using the project, reporting bugs, sharing feedback, and helping the community are already greatly appreciated.
-
-I'm a **full-time student** (read: perpetually broke 😅). Maintaining these patches comes with costs like AI subscription bills, late-night debugging sessions, and way too much coffee.
-
-If you find this project useful and would like to support its development, a small donation would genuinely help me keep things running (and keep the AI subscriptions active).
-
-<details>
-<summary><strong>Show donation methods</strong></summary>
-
-<br>
-
-### 🎁 Google Play Gift Card
-
-1. Visit **https://play.google.com/store/giftcards**
-2. Select a gift card value or enter a custom amount.
-3. Choose **Email** as the delivery method.
-4. Send it to **rushiranpise17@gmail.com**.
-5. Optionally include your name and a short gift message.
-
-### 🇮🇳 Google Pay (UPI)
-
-`rushiranpise17-2@okaxis`
-
-### 💳 PayPal
-
-`rushiforai@gmail.com`
-
-### 🇺🇸 Zelle
-
-`rushiranpise17@gmail.com`
-
-</details>
-
-Even a small amount makes a difference. Thank you for supporting the project! 🙏
-
-## 📩 Developers
-
-If you're an app developer and have concerns about a patch, feel free to contact me or submit a takedown request.
-
-I'm happy to discuss issues and will review reasonable requests in good faith.
+Patched applications are re-signed. Services that verify the original signing certificate, or validate entitlements on a server, may reject the modified app.
 
 ## Disclaimer
 
-> **⚠️ Legal Notice**
->
-> This project is provided for **educational and research purposes only**. The patches in this repository modify third-party applications and may violate the terms of service of those applications.
->
-> - This project is **not affiliated** with any of the app developers listed above.
-> - Use these patches **at your own risk**. The author is not responsible for any consequences.
-> - If you are a developer or rights holder and believe this project infringes on your rights, please [submit a takedown request](https://github.com/rushiranpise/morphe-patches/issues/new?template=takedown-request.yml) and the relevant patches will be **promptly removed**.
-> - Users are encouraged to **support developers** by purchasing legitimate subscriptions if they find the apps useful.
+This project is provided for educational and research purposes. It is not affiliated with the application developers listed in the catalogue. Modifying an application may violate its terms of service; use these patches at your own risk and support developers whose apps you use.
 
-## ❤️ Credits
+## Credits
 
-Thanks to:
+- Original patch collection: [rushiranpise/morphe-patches](https://github.com/rushiranpise/morphe-patches)
+- Patch framework: [Morphe](https://github.com/MorpheApp/)
+- Patching ecosystem: [ReVanced](https://github.com/revanced)
+- Everyone who tests patches and submits useful logs
 
-- [Morphe](https://github.com/MorpheApp/)
-- [Revanced](https://github.com/revanced)
-- Contributors
-- Everyone who reports bugs and tests patches
+## License
 
-## 📜 License
-
-Rushi's Morphe Patches are licensed under the [GNU General Public License v3.0](LICENSE)
+Licensed under the [GNU General Public License v3.0](LICENSE).
