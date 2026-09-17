@@ -1,3 +1,9 @@
+## [1.22.3](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.22.2...v1.22.3) (2026-09-17)
+
+### 🐛 Bug Fixes
+
+* **andropods:** add distinct Morphe app metadata ([4517afa](https://github.com/dawidd612/dudeks-morphe-patches/commit/4517afac6d3bb50381556afdcf911b934d6f7b4d))
+
 ## [1.22.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.22.1...v1.22.2) (2026-09-17)
 
 ### 🐛 Bug Fixes
