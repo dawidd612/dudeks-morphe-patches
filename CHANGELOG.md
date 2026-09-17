@@ -1,3 +1,9 @@
+## [1.22.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.22.0...v1.22.1) (2026-09-17)
+
+### 🐛 Bug Fixes
+
+* **andropods:** resolve obfuscated premium gate dynamically ([960aa8b](https://github.com/dawidd612/dudeks-morphe-patches/commit/960aa8b96b81d8778571bc162fa43ff95fc3149e))
+
 ## [1.22.0](https://github.com/rushiranpise/morphe-patches/compare/v1.21.5...v1.22.0) (2026-09-15)
 
 ### 🐛 Bug Fixes

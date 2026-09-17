@@ -53,7 +53,7 @@ Open an issue and include:
 ## Patch catalogue
 
 <!-- PATCHES_START -->
-> **[v1.22.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.22.0)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**318 patches** across **229 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+> **[v1.22.1](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.22.1)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**318 patches** across **229 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
 
 | # | App | Patches | Version | Package |
 |---|---|---|---|---|
