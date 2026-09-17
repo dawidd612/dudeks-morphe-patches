@@ -132,7 +132,7 @@ val AMPERE_COMPATIBILITY = Compatibility(
     )
 
 val ANDROPODS_COMPATIBILITY = Compatibility(
-        name = "AndroPods",
+        name = "AndroPods (Dudek Fix)",
         packageName = "pro.vitalii.andropods",
         apkFileType = ApkFileType.XAPK,
         appIconColor = 0x1DA1F2,

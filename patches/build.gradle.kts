@@ -3,7 +3,7 @@ group = "app.rushiranpise.morphe-patches"
 patches {
     about {
         name = "Dudek's Morphe Patches"
-        description = "A maintained collection of Morphe patches for Android apps."
+        description = "Independent Morphe patches maintained by Dudek and verified against real APK builds."
         source = "https://github.com/dawidd612/dudeks-morphe-patches"
         author = "dawidd612"
         contact = "https://github.com/dawidd612"

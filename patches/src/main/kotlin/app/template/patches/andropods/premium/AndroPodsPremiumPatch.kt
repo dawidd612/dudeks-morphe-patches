@@ -5,6 +5,8 @@ import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.template.patches.shared.Constants.ANDROPODS_COMPATIBILITY
+import app.template.patches.shared.killPairIpFull
+import app.template.patches.shared.returnEarly
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
@@ -26,14 +28,21 @@ import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 //   immediately initialized by the original first instruction, so it is safe scratch.
 @Suppress("unused")
 val androPodsPremiumPatch = bytecodePatch(
-    name = "Unlock Premium",
-    description = "Unlocks AndroPods Pro: voice call integration, assistant control, " +
-        "ear detection auto-pause/resume, and all premium preferences.",
+    name = "AndroPods Pro + Play Fix",
+    description = "Keeps Pro features enabled and disables the Google Play license screen " +
+        "that blocks re-signed builds of AndroPods 1.5.30.",
     default = true,
 ) {
     compatibleWith(ANDROPODS_COMPATIBILITY)
 
     execute {
+        // PairIP's public entry point is invoked by its Application wrapper before the
+        // AndroPods UI starts. No-op it so a re-signed APK never requests the Google Play
+        // paywall PendingIntent. The full helper also disables delayed/repeated checks,
+        // installer verification, response handling, and the shutdown failsafe.
+        AndroPodsPairIpCheckLicenseFingerprint.method.returnEarly()
+        killPairIpFull()
+
         val purchaseResultMethod = AndroPodsPurchaseResultFingerprint.method
         val fragmentClass = AndroPodsPurchaseResultFingerprint.classDef
 
