@@ -19,7 +19,7 @@ https://github.com/dawidd612/dudeks-morphe-patches
 ## Supported app
 
 <!-- PATCHES_START -->
-> **[v1.22.3](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.22.3)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**1 patch** across **1 app**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+> **[v1.23.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.23.0)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**1 patch** across **1 app**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
 
 | # | App | Patches | Version | Package |
 |---|---|---|---|---|

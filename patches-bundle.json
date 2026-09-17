@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-17T12:58:21",
-  "description": "AndroPods-only Morphe patch source maintained by Dudek.",
-  "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.22.3/patches-1.22.3.mpp",
+  "created_at": "2026-09-17T13:26:00",
+  "description": "## [1.23.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.22.3...v1.23.0) (2026-09-17)\n\n### ✨ New Features\n\n* **repo:** focus source on AndroPods only ([ca5b2f1](https://github.com/dawidd612/dudeks-morphe-patches/commit/ca5b2f18574a4f37644f39b0b6f8a5dfb760ed91))",
+  "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.23.0/patches-1.23.0.mpp",
   "signature_download_url": "",
-  "version": "1.22.3"
+  "version": "1.23.0"
 }

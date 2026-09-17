@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.22.3** (`main`) - **1 patch** across **1 app** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.23.0** (`main`) - **1 patch** across **1 app** - back to [README](README.md)
 
 ---
 
