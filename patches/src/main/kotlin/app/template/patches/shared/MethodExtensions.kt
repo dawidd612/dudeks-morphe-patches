@@ -1,5 +1,6 @@
 package app.template.patches.shared
 
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
 import com.android.tools.smali.dexlib2.builder.BuilderTryBlock
@@ -40,6 +41,11 @@ fun MutableMethod.clearBody() {
     repeat(n) { impl.removeInstruction(0) }
 }
 
+fun MutableMethod.replaceBody(body: String) {
+    clearBody()
+    addInstructions(0, body)
+}
+
 private val tryBlocksField: Field? = run {
     MutableMethodImplementation::class.java.declaredFields
         .firstOrNull { f ->
@@ -52,40 +58,4 @@ private val tryBlocksField: Field? = run {
                 arg.typeName.startsWith("${BuilderTryBlock::class.java.name}<")
         }
         ?.apply { isAccessible = true }
-}
-
-
-
-
-/**
- * Grows the method's register count to [needed] if it is currently smaller.
- *
- * `MutableMethodImplementation.registerCount` is a `private final int`.  Growing
- * it is required when injecting smali code that uses scratch registers beyond
- * the method's original `.registers N`.
- *
- * Smali register semantics for non-static methods with P parameters:
- *   total = locals + (1 + P)   ← 1 for `this`
- *   p0 = v[total - 1 - P], p1 = v[total - P], …
- * Increasing `registerCount` by 1 pushes p0 one slot higher so existing
- * parameter references (p0/p1/…) remain correct — ART re-derives them from
- * the count at verification time.
- *
- * Only bump count BEFORE calling [clearBody] + [addInstructions]; bumping
- * after addInstructions has no effect on already-assembled instruction bytes.
- *
- * Implemented via reflection on the private field — survives dexlib2/morphe
- * internal renames as long as the field type remains `int`.
- */
-fun MutableMethod.ensureRegisters(needed: Int) {
-    val impl = implementation ?: return
-    if (impl.registerCount >= needed) return
-    val field = MutableMethodImplementation::class.java.declaredFields
-        .firstOrNull { it.type == Int::class.javaPrimitiveType }
-        ?.apply { isAccessible = true }
-        ?: throw app.morphe.patcher.patch.PatchException(
-            "MutableMethodImplementation has no int field (registerCount). " +
-                "dexlib2 internal layout changed?",
-        )
-    field.setInt(impl, needed)
 }

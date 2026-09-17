@@ -162,10 +162,12 @@ def index_row(index, app_name, package_name, count, labels):
 
 def build_readme_section():
     """Build the compact app index table for the README."""
+    patch_word = "patch" if total == 1 else "patches"
+    app_word = "app" if len(sorted_packages) == 1 else "apps"
     lines = [
         f"> **[v{ver}](https://github.com/{owner}/{repo}/releases/tag/v{ver})**"
         f"&nbsp;&nbsp;&middot;&nbsp;&nbsp;`{branch}`&nbsp;&nbsp;&middot;&nbsp;&nbsp;"
-        f"**{total} patches** across **{len(sorted_packages)} apps**"
+        f"**{total} {patch_word}** across **{len(sorted_packages)} {app_word}**"
         f"&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)",
         "",
         "| # | App | Patches | Version | Package |",
@@ -192,11 +194,13 @@ def build_readme_section():
 
 def build_patches_doc():
     """Build the full PATCHES.md reference with one section per app."""
+    patch_word = "patch" if total == 1 else "patches"
+    app_word = "app" if len(sorted_packages) == 1 else "apps"
     sections = [
         "# Patches",
         "",
-        f"> Generated from `patches-list.json` — **v{ver}** (`{branch}`) · "
-        f"**{total} patches** across **{len(sorted_packages)} apps** · "
+        f"> Generated from `patches-list.json` - **v{ver}** (`{branch}`) - "
+        f"**{total} {patch_word}** across **{len(sorted_packages)} {app_word}** - "
         f"back to [README](README.md)",
         "",
         "---",

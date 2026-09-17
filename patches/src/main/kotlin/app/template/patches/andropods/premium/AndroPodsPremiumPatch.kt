@@ -5,8 +5,8 @@ import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.PatchException
 import app.morphe.patcher.patch.bytecodePatch
 import app.template.patches.shared.Constants.ANDROPODS_COMPATIBILITY
-import app.template.patches.shared.killPairIpFull
-import app.template.patches.shared.returnEarly
+import app.template.patches.shared.disableAndroPodsPairIp
+import app.template.patches.shared.replaceBody
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
@@ -40,8 +40,8 @@ val androPodsPremiumPatch = bytecodePatch(
         // AndroPods UI starts. No-op it so a re-signed APK never requests the Google Play
         // paywall PendingIntent. The full helper also disables delayed/repeated checks,
         // installer verification, response handling, and the shutdown failsafe.
-        AndroPodsPairIpCheckLicenseFingerprint.method.returnEarly()
-        killPairIpFull()
+        AndroPodsPairIpCheckLicenseFingerprint.method.replaceBody("return-void")
+        disableAndroPodsPairIp()
 
         val purchaseResultMethod = AndroPodsPurchaseResultFingerprint.method
         val fragmentClass = AndroPodsPurchaseResultFingerprint.classDef

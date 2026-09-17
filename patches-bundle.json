@@ -1,6 +1,6 @@
 {
   "created_at": "2026-09-17T12:58:21",
-  "description": "## [1.22.3](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.22.2...v1.22.3) (2026-09-17)\n\n### 🐛 Bug Fixes\n\n* **andropods:** add distinct Morphe app metadata ([4517afa](https://github.com/dawidd612/dudeks-morphe-patches/commit/4517afac6d3bb50381556afdcf911b934d6f7b4d))",
+  "description": "AndroPods-only Morphe patch source maintained by Dudek.",
   "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.22.3/patches-1.22.3.mpp",
   "signature_download_url": "",
   "version": "1.22.3"

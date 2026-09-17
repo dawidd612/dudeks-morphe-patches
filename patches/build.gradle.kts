@@ -1,9 +1,9 @@
-group = "app.rushiranpise.morphe-patches"
+group = "pl.dudek.andropods.patches"
 
 patches {
     about {
         name = "Dudek's Morphe Patches"
-        description = "Independent Morphe patches maintained by Dudek and verified against real APK builds."
+        description = "Focused AndroPods fixes for Morphe, maintained and tested by Dudek."
         source = "https://github.com/dawidd612/dudeks-morphe-patches"
         author = "dawidd612"
         contact = "https://github.com/dawidd612"

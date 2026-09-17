@@ -3,7 +3,7 @@ description: Request removal of a patch (for rights holders / developers)
 title: "[Takedown] "
 labels: ["takedown", "priority"]
 assignees:
-  - rushiranpise
+  - dawidd612
 body:
   - type: markdown
     attributes:
