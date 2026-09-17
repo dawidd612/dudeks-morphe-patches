@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` — **v1.22.1** (`main`) · **318 patches** across **229 apps** · back to [README](README.md)
+> Generated from `patches-list.json` — **v1.22.2** (`main`) · **318 patches** across **229 apps** · back to [README](README.md)
 
 ---
 
@@ -191,13 +191,13 @@
 
 ---
 
-## AndroPods (pro.vitalii.andropods)
+## AndroPods (Dudek Fix) (pro.vitalii.andropods)
 
 **Supported versions:** `1.5.30`
 
 | Patch | Details |
 |---|---|
-| **Unlock Premium** | Unlocks AndroPods Pro: voice call integration, assistant control, ear detection auto-pause/resume, and all premium preferences. |
+| **AndroPods Pro + Play Fix** | Keeps Pro features enabled and disables the Google Play license screen that blocks re-signed builds of AndroPods 1.5.30. |
 
 ---
 

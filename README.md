@@ -53,7 +53,7 @@ Open an issue and include:
 ## Patch catalogue
 
 <!-- PATCHES_START -->
-> **[v1.22.1](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.22.1)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**318 patches** across **229 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+> **[v1.22.2](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.22.2)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**318 patches** across **229 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
 
 | # | App | Patches | Version | Package |
 |---|---|---|---|---|
@@ -74,7 +74,7 @@ Open an issue and include:
 | 15 | [**Amazon Shopping**](PATCHES.md#amazon-shopping-comamazonmshopandroidshopping) | 8 | `32.17.0.100` | [`com.amazon.mShop.android.shopping`](https://play.google.com/store/apps/details?id=com.amazon.mShop.android.shopping) |
 | 16 | [**AmoledPix**](PATCHES.md#amoledpix-comandroholicamoledpix) | 1 | `7.3` | [`com.androholic.amoledpix`](https://play.google.com/store/apps/details?id=com.androholic.amoledpix) |
 | 17 | [**Ampere**](PATCHES.md#ampere-comgombosdevampere) | 1 | `v4.37.0` | [`com.gombosdev.ampere`](https://play.google.com/store/apps/details?id=com.gombosdev.ampere) |
-| 18 | [**AndroPods**](PATCHES.md#andropods-provitaliiandropods) | 1 | `1.5.30` | [`pro.vitalii.andropods`](https://play.google.com/store/apps/details?id=pro.vitalii.andropods) |
+| 18 | [**AndroPods (Dudek Fix)**](PATCHES.md#andropods-dudek-fix-provitaliiandropods) | 1 | `1.5.30` | [`pro.vitalii.andropods`](https://play.google.com/store/apps/details?id=pro.vitalii.andropods) |
 | 19 | [**AnExplorer**](PATCHES.md#anexplorer-devdworksappsanexplorer) | 1 | `6.0.6` | [`dev.dworks.apps.anexplorer`](https://play.google.com/store/apps/details?id=dev.dworks.apps.anexplorer) |
 | 20 | [**Anime Depth Wallpapers**](PATCHES.md#anime-depth-wallpapers-comjndappanimedepthlivewallpaper) | 1 | `1.1.2` | [`com.jndapp.anime.depth.live.wallpaper`](https://play.google.com/store/apps/details?id=com.jndapp.anime.depth.live.wallpaper) |
 | 21 | [**APKMirror Installer**](PATCHES.md#apkmirror-installer-comapkmirrorhelperprod) | 1 | `2.0.3 (41-d04e542)` | [`com.apkmirror.helper.prod`](https://play.google.com/store/apps/details?id=com.apkmirror.helper.prod) |

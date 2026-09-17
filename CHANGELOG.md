@@ -1,3 +1,9 @@
+## [1.22.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.22.1...v1.22.2) (2026-09-17)
+
+### 🐛 Bug Fixes
+
+* **andropods:** bypass PairIP Play license screen ([1ec4a9f](https://github.com/dawidd612/dudeks-morphe-patches/commit/1ec4a9f4026cfb9031a749ac3c2c3a2536873ba3))
+
 ## [1.22.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.22.0...v1.22.1) (2026-09-17)
 
 ### 🐛 Bug Fixes
