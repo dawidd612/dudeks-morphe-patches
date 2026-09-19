@@ -1,17 +1,48 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.23.0",
+  "version": "1.24.0",
   "patches": [
     {
-      "name": "AndroPods Pro + Play Fix",
-      "description": "Keeps Pro features enabled and disables the Google Play license screen that blocks re-signed builds of AndroPods 1.5.30.",
+      "name": "Play Store Fix",
+      "description": "Removes the Google Play installation check that blocks patched APKs at startup.",
       "default": true,
       "dependencies": [],
       "compatiblePackages": [
         {
           "packageName": "pro.vitalii.andropods",
-          "name": "AndroPods (Dudek Fix)",
-          "description": "AndroPods 1.5.30 profile maintained by Dudek for stable Morphe-patched installs.",
+          "name": "AndroPods",
+          "description": "AirPods battery status and controls on Android.",
+          "apkFileType": "XAPK",
+          "appIconColor": "#1DA1F2",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "1.5.30",
+              "versionCodes": {
+                "ARM64_V8A": 86,
+                "ARMEABI_V7A": 86,
+                "X86_64": 86,
+                "X86": 86
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Premium",
+      "description": "Enables Pro features, including after a purchase status refresh.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "pro.vitalii.andropods",
+          "name": "AndroPods",
+          "description": "AirPods battery status and controls on Android.",
           "apkFileType": "XAPK",
           "appIconColor": "#1DA1F2",
           "signatures": null,

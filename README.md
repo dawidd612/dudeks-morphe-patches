@@ -19,7 +19,11 @@ Choose a supported app version, select the patches you want and patch a clean AP
 ## Patches
 
 <!-- PATCHES_START -->
-See [PATCHES.md](PATCHES.md) for the generated patch list.
+> **[v1.24.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.24.0)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**2 patches** across **1 app**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+
+| # | App | Patches | Version | Package |
+|---|---|---|---|---|
+| 1 | [**AndroPods**](PATCHES.md#andropods-provitaliiandropods) | 2 | `1.5.30` | [`pro.vitalii.andropods`](https://play.google.com/store/apps/details?id=pro.vitalii.andropods) |
 <!-- PATCHES_END -->
 
 ### AndroPods

@@ -1,3 +1,9 @@
+## [1.24.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.23.0...v1.24.0) (2026-09-19)
+
+### ✨ New Features
+
+* **andropods:** split Premium and Play Store patches ([39847c2](https://github.com/dawidd612/dudeks-morphe-patches/commit/39847c2494d610fbeed66b64fb0cc85025de337c))
+
 ## [1.23.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.22.3...v1.23.0) (2026-09-17)
 
 ### ✨ New Features
