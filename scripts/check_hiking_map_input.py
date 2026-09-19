@@ -13,6 +13,7 @@ from loguru import logger
 logger.remove()
 from androguard.core.apk import APK
 from androguard.core.dex import DEX
+from androguard.core.axml import AXMLPrinter
 
 
 def read_apk(path):
@@ -43,6 +44,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('input', help='Original XAPK or base APK')
     parser.add_argument('--patched', help='APK produced by Morphe, using FULL bytecode mode')
+    parser.add_argument('--hidden-prompts', action='store_true', help='Also check Hide Premium prompts')
     args = parser.parse_args()
     data = read_apk(args.input)
     apk = APK(data, raw=True)
@@ -66,6 +68,13 @@ def main():
     assert flow[index + 1][0] == 'move-result'
     assert 'Ljava/lang/Boolean;->valueOf(Z)' in flow[index + 2][1]
     assert not any(k[0].startswith('Lcom/pairip/') for k in original)
+    activity_key = ('Lpl/mapa_turystyczna/app/MapActivity;', 'onCreate', '(Landroid/os/Bundle;)V')
+    activity = instructions(original[activity_key])
+    gate = [i for i, (_, v) in enumerate(activity) if 'show_what_is_new_notification' in v]
+    assert len(gate) == 1
+    assert 'SharedPreferences;->getBoolean' in activity[gate[0] + 1][1]
+    assert activity[gate[0] + 2][0] == 'move-result'
+    assert activity[gate[0] + 3][0] == 'if-eqz'
     print('Input OK: 1.16.6 (153); both feature checks matched; no PairIP classes')
     print('Base APK SHA-256:', hashlib.sha256(data).hexdigest())
 
@@ -82,6 +91,31 @@ def main():
                           'Lpl/mapa_turystyczna/shared/premium/data/network/PremiumOrderResource;'):
                 assert instructions(method) == instructions(patched[key]), f'Account/order code changed: {key}'
         print('Output OK: both local checks patched; account/order model and repository unchanged')
+        if args.hidden_prompts:
+            output_activity = instructions(patched[activity_key])
+            output_gate = [i for i, (_, v) in enumerate(output_activity)
+                           if 'show_what_is_new_notification' in v]
+            assert len(output_gate) == 1
+            assert output_activity[output_gate[0] + 2] == (
+                'const/16', activity[gate[0] + 2][1] + ', 0')
+            assert output_activity[5] == ('const/16', 'v1, 102')
+            assert 'NotificationManager;->cancel(I)V' in output_activity[6][1]
+            # No changes to any method outside the two checks and onCreate.
+            changed = {key for key in original
+                       if instructions(original[key]) != instructions(patched[key])}
+            assert changed == {access_key, flow_key, activity_key}, changed
+            with ZipFile(args.patched) as archive:
+                menu = AXMLPrinter(archive.read('res/menu/navigation.xml')).get_xml_obj()
+            android = '{http://schemas.android.com/apk/res/android}'
+            # aapt stores resource references as numeric IDs in compiled XML.
+            premium_id = apk.get_android_resources().get_res_id_by_key(
+                'pl.mapa_turystyczna.app', 'id', 'action_premium')
+            entries = [item for item in menu.iter('item')
+                       if int(item.get(android + 'id').lstrip('@'), 16) == premium_id]
+            assert len(entries) == 1
+            assert entries[0].get(android + 'visible') == 'false'
+            print('Prompts OK: trial notification disabled and cancelled; Premium menu hidden; '
+                  'all other methods unchanged')
 
 
 if __name__ == '__main__':

@@ -2,11 +2,19 @@
 
 Package: `pl.mapa_turystyczna.app`  
 Supported input: **1.16.6 (153)**, XAPK  
-Patch: **Local Premium**, opt-in
+Patches: **Local Premium** and **Hide Premium prompts**, opt-in
 
 The patch changes the local access check used by navigation, offline map controls and advertising, plus the Premium boolean emitted to the UI. It does not create an order, change account data or send a purchase/activation request. Downloading maps still depends on the server accepting the request.
 
 The subscription screen can still show the account's real status. This is intentional: the account model also drives purchase verification and refresh handling. Forcing its active flag when there is no order makes that code dereference a null order.
+
+## Hide Premium prompts
+
+Removes the Premium entry from the navigation drawer and stops the trial offer notification. Opening the patched app also clears an offer already in the notification tray.
+
+This patch includes Local Premium as a dependency. Its access checks also suppress the trial dialogs for offline maps and routes, and the Premium offers in the advertising banner. Recording, navigation, download and app update notifications are unaffected. Account and billing data are not changed.
+
+Rebuild a clean XAPK with **Hide Premium prompts** selected, install it and open the app once to clear the old notification.
 
 ## Google Play
 
@@ -16,7 +24,7 @@ The inspected build has no PairIP `LicenseClient` or `VMRunner`. Installer check
 
 This patch is experimental and disabled by default. Compilation and patching checks do not replace a device test. Check launch, navigation, the offline map list and an actual map download, both signed out and signed in. Refresh the account and restart the app. Record any download error separately from UI access.
 
-Only the two local feature checks are modified. Billing, account verification and the Premium order model remain unchanged.
+Local Premium modifies only the two local feature checks. Billing, account verification and the Premium order model remain unchanged.
 
 Verified on 2026-09-19 with bundle **1.25.0** and Morphe Desktop **1.16.0**:
 

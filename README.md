@@ -29,7 +29,7 @@ Choose a supported app version, select the patches you want and patch a clean AP
 
 ### Mapa Turystyczna
 
-Version **1.16.6 (153)**, XAPK. **Local Premium** changes the local feature checks used by navigation, offline map controls and ads. It is experimental and disabled by default; it does not activate Premium on your account. See [notes and testing](docs/hiking-map.md).
+Version **1.16.6 (153)**, XAPK. **Local Premium** changes the local feature checks used by navigation, offline map controls and ads. It is experimental and disabled by default; it does not activate Premium on your account. **Hide Premium prompts** removes the trial notification and Premium menu entry, and includes Local Premium. See [notes and testing](docs/hiking-map.md).
 
 ### AndroPods
 
