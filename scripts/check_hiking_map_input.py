@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check the supported input and, optionally, Morphe's patched output.
 
-Requires androguard 4.1.3. No APKs or account data are uploaded.
+Requires androguard 4.1.4. No APKs or account data are uploaded.
 """
 import argparse
 import hashlib
