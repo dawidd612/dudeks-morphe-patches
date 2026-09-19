@@ -26,6 +26,10 @@ Choose a supported app version, select the patches you want and patch a clean AP
 | 1 | [**AndroPods**](PATCHES.md#andropods-provitaliiandropods) | 2 | `1.5.30` | [`pro.vitalii.andropods`](https://play.google.com/store/apps/details?id=pro.vitalii.andropods) |
 <!-- PATCHES_END -->
 
+### Mapa Turystyczna
+
+Version **1.16.6 (153)**, XAPK. **Local Premium** changes the local feature checks used by navigation, offline map controls and ads. It is experimental and disabled by default; it does not activate Premium on your account. See [notes and testing](docs/hiking-map.md).
+
 ### AndroPods
 
 Use version **1.5.30**, version code **86**, in XAPK format.
