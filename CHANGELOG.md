@@ -1,3 +1,9 @@
+## [1.25.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.24.0...v1.25.0) (2026-09-19)
+
+### ✨ New Features
+
+* **hikingmap:** add opt-in local Premium patch for 1.16.6 ([74afd22](https://github.com/dawidd612/dudeks-morphe-patches/commit/74afd22cf632fbc33eb8601e89fb141a63d14742))
+
 ## [1.24.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.23.0...v1.24.0) (2026-09-19)
 
 ### ✨ New Features
