@@ -19,12 +19,12 @@ Choose a supported app version, select the patches you want and patch a clean AP
 ## Patches
 
 <!-- PATCHES_START -->
-> **[v1.25.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.25.0)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**3 patches** across **2 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+> **[v1.26.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.26.0)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**4 patches** across **2 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
 
 | # | App | Patches | Version | Package |
 |---|---|---|---|---|
 | 1 | [**AndroPods**](PATCHES.md#andropods-provitaliiandropods) | 2 | `1.5.30` | [`pro.vitalii.andropods`](https://play.google.com/store/apps/details?id=pro.vitalii.andropods) |
-| 2 | [**Mapa Turystyczna**](PATCHES.md#mapa-turystyczna-plmapa_turystycznaapp) | 1 | `1.16.6` | [`pl.mapa_turystyczna.app`](https://play.google.com/store/apps/details?id=pl.mapa_turystyczna.app) |
+| 2 | [**Mapa Turystyczna**](PATCHES.md#mapa-turystyczna-plmapa_turystycznaapp) | 2 | `1.16.6` | [`pl.mapa_turystyczna.app`](https://play.google.com/store/apps/details?id=pl.mapa_turystyczna.app) |
 <!-- PATCHES_END -->
 
 ### Mapa Turystyczna

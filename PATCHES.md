@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.25.0** (`main`) - **3 patches** across **2 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.26.0** (`main`) - **4 patches** across **2 apps** - back to [README](README.md)
 
 ---
 
@@ -21,6 +21,7 @@
 
 | Patch | Details |
 |---|---|
+| **Hide Premium prompts** | Hides Premium offers and the menu entry. Removes the trial notification on launch. |
 | **Local Premium** | Enables local Premium checks for navigation, offline map controls and ads. Does not activate a subscription on your account. Experimental; device testing needed. |
 
 ---

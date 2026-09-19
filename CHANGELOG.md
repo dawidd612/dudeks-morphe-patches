@@ -1,3 +1,9 @@
+## [1.26.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.25.0...v1.26.0) (2026-09-19)
+
+### ✨ New Features
+
+* **hikingmap:** hide Premium offers and trial notifications ([c35c361](https://github.com/dawidd612/dudeks-morphe-patches/commit/c35c36107762942799923a68a7919c1c2b55fea4))
+
 ## [1.25.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.24.0...v1.25.0) (2026-09-19)
 
 ### ✨ New Features

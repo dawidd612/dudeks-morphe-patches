@@ -1,7 +1,41 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.25.0",
+  "version": "1.26.0",
   "patches": [
+    {
+      "name": "Hide Premium prompts",
+      "description": "Hides Premium offers and the menu entry. Removes the trial notification on launch.",
+      "default": false,
+      "dependencies": [
+        "BytecodePatch",
+        "ResourcePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "pl.mapa_turystyczna.app",
+          "name": "Mapa Turystyczna",
+          "description": "Hiking routes, trail maps and GPS navigation.",
+          "apkFileType": "XAPK",
+          "appIconColor": "#62A744",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "1.16.6",
+              "versionCodes": {
+                "ARM64_V8A": 153,
+                "ARMEABI_V7A": 153,
+                "X86_64": 153,
+                "X86": 153
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
     {
       "name": "Local Premium",
       "description": "Enables local Premium checks for navigation, offline map controls and ads. Does not activate a subscription on your account. Experimental; device testing needed.",
