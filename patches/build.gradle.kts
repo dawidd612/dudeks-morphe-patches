@@ -3,7 +3,7 @@ group = "pl.dudek.andropods.patches"
 patches {
     about {
         name = "Dudek's Morphe Patches"
-        description = "Focused AndroPods fixes for Morphe, maintained and tested by Dudek."
+        description = "App patches by Dudek, for use with Morphe."
         source = "https://github.com/dawidd612/dudeks-morphe-patches"
         author = "dawidd612"
         contact = "https://github.com/dawidd612"
@@ -29,7 +29,7 @@ dependencies {
 
 tasks {
     register<JavaExec>("generatePatchesList") {
-        description = "Build patch with patch list"
+        description = "Generate patch metadata from the compiled bundle"
 
         dependsOn(build)
 

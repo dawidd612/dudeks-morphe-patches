@@ -6,8 +6,8 @@ import app.morphe.patcher.patch.Compatibility
 
 object Constants {
     val ANDROPODS_COMPATIBILITY = Compatibility(
-        name = "AndroPods (Dudek Fix)",
-        description = "AndroPods 1.5.30 profile maintained by Dudek for stable Morphe-patched installs.",
+        name = "AndroPods",
+        description = "AirPods battery status and controls on Android.",
         packageName = "pro.vitalii.andropods",
         apkFileType = ApkFileType.XAPK,
         appIconColor = 0x1DA1F2,

@@ -4,63 +4,57 @@
 [![Build](https://img.shields.io/github/actions/workflow/status/dawidd612/dudeks-morphe-patches/release.yml?label=build)](https://github.com/dawidd612/dudeks-morphe-patches/actions/workflows/release.yml)
 [![License](https://img.shields.io/github/license/dawidd612/dudeks-morphe-patches)](LICENSE)
 
-Small, focused patch source for AndroPods. There are no unrelated app patches in this repository.
+My collection of Android app patches for [Morphe](https://morphe.software). Each patch can be selected separately; supported versions are listed below.
 
-## Add to Morphe
+## Installation
 
-[Add Dudek's Morphe Patches](https://morphe.software/add-source?github=dawidd612/dudeks-morphe-patches)
-
-If the button does not open Morphe, add this repository manually:
+[Add this source to Morphe](https://morphe.software/add-source?github=dawidd612/dudeks-morphe-patches), or add the repository manually:
 
 ```text
 https://github.com/dawidd612/dudeks-morphe-patches
 ```
 
-## Supported app
+Choose a supported app version, select the patches you want and patch a clean APK or XAPK. After a source update, rebuild the app to apply the changes.
+
+## Patches
 
 <!-- PATCHES_START -->
-> **[v1.23.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.23.0)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**1 patch** across **1 app**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
-
-| # | App | Patches | Version | Package |
-|---|---|---|---|---|
-| 1 | [**AndroPods (Dudek Fix)**](PATCHES.md#andropods-dudek-fix-provitaliiandropods) | 1 | `1.5.30` | [`pro.vitalii.andropods`](https://play.google.com/store/apps/details?id=pro.vitalii.andropods) |
+See [PATCHES.md](PATCHES.md) for the generated patch list.
 <!-- PATCHES_END -->
 
-Use the clean AndroPods `1.5.30` XAPK with version code `86`. Other releases are not marked as compatible.
+### AndroPods
 
-## What the patch fixes
+Use version **1.5.30**, version code **86**, in XAPK format.
 
-`AndroPods Pro + Play Fix` handles two separate checks in the app:
+| Patch | What it does |
+| --- | --- |
+| Premium | Enables Pro features and keeps them enabled when billing refreshes. |
+| Play Store Fix | Removes the startup check that asks you to install the app from Google Play. |
 
-- it keeps the local Pro state enabled after the billing state is refreshed;
-- it disables the PairIP installer and ownership flow that shows the "Get this app from Play" screen after Morphe signs the rebuilt package.
+Both are selected by default. Play Store Fix also works without Premium. Premium alone does not remove the installation check.
 
-The premium field is resolved from AndroPods' own purchase-result method instead of relying on an obfuscated class or field name. This makes the patch less fragile when those names differ between builds.
+### Android blocks overlay access
 
-## Updating an existing install
+If Android displays "App was denied access" when you enable "Display over other apps", open **Settings > Apps > AndroPods > More (three dots) > Allow restricted settings**. Confirm the prompt, then return to the overlay setting and enable it.
 
-Refresh this source in Morphe, patch a clean copy of the supported XAPK and install the newly generated package. An APK created with an older patch release will not update itself.
+Only allow this for an APK you trust. The restriction belongs to Android, so neither patch grants the permission or removes the system prompt. Menu names vary by device; see [Google's instructions](https://support.google.com/android/answer/12623953). If the option is missing, include your phone model and Android version in a bug report.
 
-## Problems
+## Bugs and contributions
 
-Open an [issue](https://github.com/dawidd612/dudeks-morphe-patches/issues) and include:
+[Open an issue](https://github.com/dawidd612/dudeks-morphe-patches/issues) with the app version, Android and Morphe versions, source release, selected patches and logs. For crashes, include a crash log if you can.
 
-- the AndroPods version and version code;
-- where the clean XAPK came from;
-- the Morphe version and this source's release number;
-- the complete patching log;
-- a screenshot or short description of the runtime problem.
+New patches and fixes are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Building
+## Build
 
-The project uses Java 21 and the Morphe patch Gradle plugin.
+Requires Java 21 and access to the Morphe Gradle dependencies.
 
 ```shell
 ./gradlew :patches:buildAndroid --no-daemon
 ```
 
-Releases are built by GitHub Actions and include the `.mpp` bundle, patch metadata and SHA-256 checksums.
+[Releases](https://github.com/dawidd612/dudeks-morphe-patches/releases) contain the `.mpp` bundle, metadata and SHA-256 checksums. GitHub Actions builds and publishes them from `main`.
 
-## License and attribution
+## Credits and license
 
-The repository is licensed under [GPL-3.0](LICENSE). The patch infrastructure originated from the Morphe patch template and earlier GPL-licensed community work; retained notices remain in the relevant files. This project is maintained separately and is not affiliated with the AndroPods developer or the Morphe project.
+Based on [rushiranpise/morphe-patches](https://github.com/rushiranpise/morphe-patches) and the Morphe patch tooling. Licensed under [GPL-3.0](LICENSE); see [NOTICE](NOTICE) for retained terms. Maintained independently of Morphe and the patched app developers.

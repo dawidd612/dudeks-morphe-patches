@@ -1,9 +1,9 @@
 # Contributing
 
-This source is intentionally limited to AndroPods. Pull requests for unrelated applications will not be accepted here.
+Bug fixes and patches for additional apps are welcome. Keep each patch focused on one feature or problem, with its own name and description in Morphe.
 
-For a bug report, include the exact AndroPods version and version code, the original package format and source, the Morphe release used, and the complete patching or crash log.
+Include the supported app versions and explain how you tested the change. Test against a clean APK or XAPK, both on its own and with the other patches for that app. If a change needs a system setting or a particular installer, document it.
 
-Keep code changes narrow and test them against a clean supported XAPK. Use conventional commit messages such as `fix(andropods): ...` or `feat(andropods): ...` so the release workflow can select the correct version bump.
+For bug reports, include the app version and version code, package source, Android version, Morphe version, patch source version, selected patches and the relevant logs.
 
-Submit pull requests against the `dev` branch. GPL and third-party notices must be preserved when code is reused or modified.
+Use conventional commit messages (`fix(andropods): ...`, `feat(app): ...`) so the release workflow can choose the version bump. Submit pull requests against `dev` and preserve licenses and attribution for reused code.

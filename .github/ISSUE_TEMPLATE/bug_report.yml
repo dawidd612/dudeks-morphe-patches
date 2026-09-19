@@ -14,7 +14,7 @@ body:
         Before creating a new bug report, please keep the following in mind:
 
         - Check the existing issues before submitting a duplicate report.
-        - This repository supports AndroPods only.
+        - Check that your app version is listed as supported.
   - type: textarea
     id: bug_description
     attributes:
@@ -81,7 +81,7 @@ body:
     id: acknowledgements
     attributes:
       label: Acknowledgements
-      description: Your bug report will be closed if you don't follow the checklist below.
+      description: Check these before submitting.
       options:
         - label: I have checked all open and closed bug reports and this is not a duplicate.
           required: true
