@@ -26,11 +26,11 @@ This patch is experimental and disabled by default. Compilation and patching che
 
 Local Premium modifies only the two local feature checks. Billing, account verification and the Premium order model remain unchanged.
 
-Verified on 2026-09-19 with bundle **1.25.0** and Morphe Desktop **1.16.0**:
+Verified on 2026-09-19 with bundle **1.26.0** and Morphe Desktop **1.16.0**:
 
 - GitHub Actions compiled and published the bundle successfully.
-- Morphe merged the supplied XAPK, applied Local Premium, rebuilt all DEX files in FULL mode and signed the APK. No patch failed.
-- The output check confirmed both feature changes and unchanged account/order classes and Premium repository.
+- Morphe merged the supplied XAPK, applied Hide Premium prompts with its Local Premium dependency, rebuilt resources and all DEX files in FULL mode and signed the APK. No patch failed.
+- The output check confirmed both feature changes, the disabled trial notification gate, cancellation of notification 102 and the hidden Premium menu item. Every other method matched the original APK, including account/order handling and the other notification paths.
 - Launch, navigation and server responses have not been tested on a device. This build also uses Google Maps; certificate restrictions on its API key, if configured by the developer, may affect a re-signed APK. No API key or signature spoofing is included.
 
 Input XAPK SHA-256: `27d7083a9a6a58fdd580ea0c764fb0ba1a9a810f397580cbee492f8dbe3639f2`  
@@ -40,5 +40,5 @@ To repeat the DEX checks after patching in FULL mode:
 
 ```shell
 python -m pip install androguard==4.1.4
-python scripts/check_hiking_map_input.py original.xapk --patched patched.apk
+python scripts/check_hiking_map_input.py original.xapk --patched patched.apk --hidden-prompts
 ```
