@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-20T16:03:53",
-  "description": "## [1.27.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.26.0...v1.27.0) (2026-09-20)\n\n### ✨ New Features\n\n* **instagram:** keep DM scroll position when replying ([92de396](https://github.com/dawidd612/dudeks-morphe-patches/commit/92de396ac6eb88e75ebff4da20ed6ca022b05a2d))",
-  "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.27.0/patches-1.27.0.mpp",
+  "created_at": "2026-09-20T19:37:48",
+  "description": "## [1.27.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.27.0...v1.27.1) (2026-09-20)\n\n### 🐛 Bug Fixes\n\n* **instagram:** preserve reply resize offset and enable Polish setting by default ([fbeddcf](https://github.com/dawidd612/dudeks-morphe-patches/commit/fbeddcfafc9b152b4644081ad9ea5cba3f3a86df))",
+  "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.27.1/patches-1.27.1.mpp",
   "signature_download_url": "",
-  "version": "1.27.0"
+  "version": "1.27.1"
 }

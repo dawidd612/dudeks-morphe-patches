@@ -19,7 +19,7 @@ Choose a supported app version, select the patches you want and patch a clean AP
 ## Patches
 
 <!-- PATCHES_START -->
-> **[v1.27.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.27.0)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**5 patches** across **3 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+> **[v1.27.1](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.27.1)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**5 patches** across **3 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
 
 | # | App | Patches | Version | Package |
 |---|---|---|---|---|

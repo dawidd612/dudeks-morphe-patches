@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.27.0",
+  "version": "1.27.1",
   "patches": [
     {
       "name": "Hide Premium prompts",
@@ -39,8 +39,10 @@
     {
       "name": "Keep DM scroll position",
       "description": "Prevents Instagram Direct from jumping to the newest message after replying to an older message. Requires Piko Add settings in the same patching run.",
-      "default": false,
-      "dependencies": [],
+      "default": true,
+      "dependencies": [
+        "ResourcePatch"
+      ],
       "compatiblePackages": [
         {
           "packageName": "com.instagram.android",

@@ -1,3 +1,9 @@
+## [1.27.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.27.0...v1.27.1) (2026-09-20)
+
+### 🐛 Bug Fixes
+
+* **instagram:** preserve reply resize offset and enable Polish setting by default ([fbeddcf](https://github.com/dawidd612/dudeks-morphe-patches/commit/fbeddcfafc9b152b4644081ad9ea5cba3f3a86df))
+
 ## [1.27.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.26.0...v1.27.0) (2026-09-20)
 
 ### ✨ New Features
