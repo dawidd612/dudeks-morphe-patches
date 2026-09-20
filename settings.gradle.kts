@@ -19,3 +19,10 @@ pluginManagement {
 plugins {
     id("app.morphe.patches") version "1.3.3"
 }
+
+settings {
+    extensions {
+        defaultNamespace = "pl.dudek.extension"
+        proguardFiles(rootProject.projectDir.resolve("extensions/proguard-rules.pro").toString())
+    }
+}
