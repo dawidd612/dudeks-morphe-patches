@@ -2,7 +2,7 @@ name: Verify Instagram add-on
 
 on:
   push:
-    branches: [feature/instagram-dm-keep-scroll-position]
+    branches: [feature/instagram-dm-keep-scroll-position, fix/instagram-dm-scroll-offset]
   pull_request:
     paths:
       - 'extensions/**'
