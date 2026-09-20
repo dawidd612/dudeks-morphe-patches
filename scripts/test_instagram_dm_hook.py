@@ -10,6 +10,67 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = {
+    "android/view/ViewTreeObserver.java": """
+package android.view;
+public class ViewTreeObserver {
+    public interface OnPreDrawListener { boolean onPreDraw(); }
+    public java.util.List<OnPreDrawListener> listeners = new java.util.ArrayList<>();
+    public void addOnPreDrawListener(OnPreDrawListener l) { listeners.add(l); }
+    public void removeOnPreDrawListener(OnPreDrawListener l) { listeners.remove(l); }
+    public boolean isAlive() { return true; }
+    public void draw() { for (OnPreDrawListener l : new java.util.ArrayList<>(listeners)) l.onPreDraw(); }
+}
+""",
+    "android/view/View.java": """
+package android.view;
+public class View {
+    public interface OnAttachStateChangeListener {
+        void onViewAttachedToWindow(View v); void onViewDetachedFromWindow(View v);
+    }
+    public int top, height, width, paddingTop, paddingBottom;
+    public Object parent;
+    public boolean attached = true, focus = true;
+    public ViewTreeObserver observer = new ViewTreeObserver();
+    public java.util.List<OnAttachStateChangeListener> attach = new java.util.ArrayList<>();
+    public int getTop() { return top; } public int getBottom() { return top + height; }
+    public int getHeight() { return height; } public int getWidth() { return width; }
+    public int getPaddingTop() { return paddingTop; } public int getPaddingBottom() { return paddingBottom; }
+    public Object getParent() { return parent; }
+    public boolean isAttachedToWindow() { return attached; } public boolean hasWindowFocus() { return focus; }
+    public ViewTreeObserver getViewTreeObserver() { return observer; }
+    public void addOnAttachStateChangeListener(OnAttachStateChangeListener l) { attach.add(l); }
+    public void removeOnAttachStateChangeListener(OnAttachStateChangeListener l) { attach.remove(l); }
+    public void detach() {
+        attached = false;
+        for (OnAttachStateChangeListener l : new java.util.ArrayList<>(attach)) l.onViewDetachedFromWindow(this);
+    }
+}
+""",
+    "androidx/recyclerview/widget/RecyclerView.java": """
+package androidx.recyclerview.widget;
+import android.view.View;
+public class RecyclerView extends View {
+    public int state, scrollCalls;
+    public java.util.List<View> children = new java.util.ArrayList<>();
+    public int getScrollState() { return state; }
+    public int getChildCount() { return children.size(); }
+    public View getChildAt(int i) { return children.get(i); }
+    public void scrollBy(int x, int y) { scrollCalls++; for (View child : children) child.top -= y; }
+}
+""",
+    "app/morphe/extension/instagram/utils/IgStr.java": """
+package app.morphe.extension.instagram.utils;
+public class IgStr {
+    public static boolean polish;
+    public static String str(String key) {
+        if (key.endsWith("_title")) return polish ?
+            "Zachowuj pozycję przewijania podczas odpowiadania" : "Keep scroll position when replying";
+        return polish ? "Pozostań w bieżącym miejscu rozmowy po odpowiedzi na starszą wiadomość." :
+            "Stay at the current position in a conversation after replying to an older message.";
+    }
+}
+""",
+
     "android/preference/Preference.java": """
 package android.preference;
 public class Preference { public String key, title, summary; }
@@ -65,9 +126,65 @@ public class HookTest {
     static void check(boolean condition, String message) {
         if (!condition) throw new AssertionError(message);
     }
+    static androidx.recyclerview.widget.RecyclerView list() {
+        androidx.recyclerview.widget.RecyclerView list = new androidx.recyclerview.widget.RecyclerView();
+        list.height = 800; list.width = 400;
+        android.view.View a = new android.view.View(); a.top = -40; a.height = 300; a.parent = list;
+        android.view.View b = new android.view.View(); b.top = 260; b.height = 300; b.parent = list;
+        list.children.add(a); list.children.add(b);
+        return list;
+    }
+    static void layoutTests() {
+        KeepDmScrollPosition.preserveReplyLayout(null);
+        KeepDmScrollPosition.preserveReplyLayout(new android.view.View());
+        for (int delta : new int[] {48, -48, 1, 0}) {
+            androidx.recyclerview.widget.RecyclerView v = list();
+            KeepDmScrollPosition.preserveReplyLayout(v);
+            v.height += delta;
+            for (android.view.View child : v.children) child.top += delta;
+            v.observer.draw();
+            check(v.children.get(0).top == -40, "pixel offset restored: " + delta);
+            check(v.scrollCalls == (delta == 0 ? 0 : 1), "one correction");
+            v.height += 30; for (android.view.View child : v.children) child.top += 30;
+            v.observer.draw();
+            check(v.children.get(0).top == -10, "later layouts untouched");
+            check(v.attach.isEmpty() && v.observer.listeners.isEmpty(), "listeners released");
+        }
+        for (int scenario = 0; scenario < 10; scenario++) {
+            androidx.recyclerview.widget.RecyclerView v = list();
+            KeepDmScrollPosition.preserveReplyLayout(v);
+            v.height += 48; for (android.view.View child : v.children) child.top += 48;
+            switch (scenario) {
+                case 0: v.state = 1; break; // dragging
+                case 1: v.state = 2; break; // fling
+                case 2: v.children.get(0).parent = null; break; // anchor recycled
+                case 3: v.children.get(1).top += 12; break; // independent dataset change
+                case 4: v.width++; break; // orientation/window change
+                case 5: v.focus = false; break;
+                case 6: v.detach(); break; // navigation / fragment teardown
+                case 7: v.height -= 48; break; // scroll without viewport resize
+                case 8: v.top++; break;
+                case 9: v.paddingBottom++; break;
+            }
+            v.observer.draw();
+            check(v.scrollCalls == 0, "excluded movement " + scenario);
+            check(v.attach.isEmpty() && v.observer.listeners.isEmpty(), "cleanup " + scenario);
+        }
+        androidx.recyclerview.widget.RecyclerView v = list();
+        v.children.remove(1); // a large Reel can be the only visible item
+        KeepDmScrollPosition.preserveReplyLayout(v);
+        v.height += 48; v.children.get(0).top += 48; v.observer.draw();
+        check(v.children.get(0).top == -40, "single large Reel");
+        v = list(); v.state = 1;
+        KeepDmScrollPosition.preserveReplyLayout(v);
+        check(v.observer.listeners.isEmpty(), "do not arm while dragging");
+        v = list(); v.attached = false;
+        KeepDmScrollPosition.preserveReplyLayout(v);
+        check(v.observer.listeners.isEmpty(), "do not arm detached view");
+    }
     public static void main(String[] args) {
         Object reply = new Object();
-        check(!KeepDmScrollPosition.shouldKeepPosition(reply, false), "default must be off");
+        check(KeepDmScrollPosition.shouldKeepPosition(reply, false), "default must be on");
         for (boolean enabled : new boolean[] {false, true}) {
             SharedPref.value = enabled;
             check(!KeepDmScrollPosition.shouldKeepPosition(null, false), "plain message in history");
@@ -87,7 +204,13 @@ public class HookTest {
         check(screen.additions == 1, "duplicate preference");
         check(screen.preference.key.equals("dudeks_keep_dm_scroll_position"), "preference key");
         check(screen.preference.title.equals("Keep scroll position when replying"), "preference title");
-        System.out.println("PASS: default, eight send decisions, preference failure, null UI and duplicate UI");
+        app.morphe.extension.instagram.utils.IgStr.polish = true;
+        PreferenceScreen polish = new PreferenceScreen();
+        KeepDmScrollPosition.addPreference(polish, helper);
+        check(polish.preference.title.equals("Zachowuj pozycję przewijania podczas odpowiadania"), "Polish title");
+        check(polish.preference.summary.startsWith("Pozostań"), "Polish summary");
+        layoutTests();
+        System.out.println("PASS: default on, send decisions, preferences, localization and one-frame resize anchoring");
     }
 }
 """,

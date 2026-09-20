@@ -25,7 +25,7 @@ private fun checkShape(value: Boolean, message: String) {
 val keepDmScrollPositionPatch = bytecodePatch(
     name = "Keep DM scroll position",
     description = "Prevents Instagram Direct from jumping to the newest message after replying to an older message. Requires Piko Add settings in the same patching run.",
-    default = false,
+    default = true,
 ) {
     compatibleWith(Compatibility(
         name = "Instagram",
@@ -38,6 +38,7 @@ val keepDmScrollPositionPatch = bytecodePatch(
             isExperimental = true,
         )),
     ))
+    dependsOn(keepDmScrollPositionResources)
     extendWith("extensions/instagram.mpe")
 
     execute {
@@ -85,6 +86,11 @@ val keepDmScrollPositionPatch = bytecodePatch(
                 method.calls().any { it.name == "findFirstVisibleItemPosition" }
         }
 
+        // This public, unobfuscated AndroidX API is used only on the supplied Direct list.
+        checkShape(classDefBy("Landroidx/recyclerview/widget/RecyclerView;").methods.any {
+            it.name == "getScrollState" && it.parameterTypes.isEmpty() && it.returnType == "I"
+        }, "RecyclerView scroll-state API changed")
+
         // Reuse only the two registers about to be overwritten by int-to-long.
         // No added registers, reflection, obfuscated names or global scroll interception.
         val low = delay.registerA
@@ -103,8 +109,11 @@ val keepDmScrollPositionPatch = bytecodePatch(
                 move-object/from16 v$high, p3
                 invoke-static {v$high, v$low}, $HOOK->shouldKeepPosition(Ljava/lang/Object;Z)Z
                 move-result v$low
-                if-nez v$low, :dudeks_keep_position
+                if-eqz v$low, :dudeks_normal_scroll
+                invoke-static {v${post.registerC}}, $HOOK->preserveReplyLayout(Landroid/view/View;)V
+                goto :dudeks_keep_position
             """.trimIndent(),
+            ExternalLabel("dudeks_normal_scroll", completed.getInstruction(postIndex - 1)),
             ExternalLabel("dudeks_keep_position", completed.getInstruction(postIndex + 1)),
         )
     }
@@ -115,6 +124,10 @@ val keepDmScrollPositionPatch = bytecodePatch(
     finalize {
         val builder = mutableClassDefByOrNull(SCREEN_BUILDER)
             ?: throw PatchException("Keep DM scroll position requires Piko 'Add settings'. Select it in the same Morphe patching run.")
+        checkShape(classDefBy("Lapp/morphe/extension/instagram/utils/IgStr;").methods.any {
+            it.name == "str" && it.parameterTypes == listOf("Ljava/lang/String;") &&
+                it.returnType == "Ljava/lang/String;"
+        }, "Piko string resource API changed")
         val screen = builder.fields.single { it.type == "Landroid/preference/PreferenceScreen;" }
         val helper = builder.fields.single { it.type == HELPER }
         val dm = builder.methods.single { it.name == "dmSection" && it.parameterTypes.isEmpty() && it.returnType == "V" }

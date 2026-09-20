@@ -2,7 +2,7 @@
 
 This is a Piko add-on for the official `com.instagram.android`, not Instagram Lite.
 Select this patch and Piko **Add settings** in the same Morphe patching run.
-The preference appears under **Piko Settings > Direct Messages** and defaults to off.
+The preference appears under **Piko Settings > Direct Messages** and defaults to on (existing saved choices are preserved).
 Patching without Piko settings fails explicitly. Compile-only Piko API stubs are not packaged into the app.
 
 ## Why the thread jumps
@@ -14,12 +14,38 @@ which scrolls the thread's RecyclerView to adapter position 0 (the newest item).
 
 The patch guards only that scheduling call. With the preference on, a non-null reply
 item and Instagram's own at-latest predicate returning false, the forced scroll is
-not scheduled. All remaining send-completion work still runs. There is no anchor
-snapshot, delayed restoration, listener, reflection, or global RecyclerView change.
-No message content, identifier, view or thread state is retained by the extension.
+not scheduled. All remaining send-completion work still runs.
 
-This design leaves Instagram's dataset anchoring in control. It does not promise to
-prevent layout movement from keyboard changes, media resizing, deletions or pagination.
+### Small movement after sending
+
+The original fix stopped the explicit scroll but left viewport resizing untouched.
+Later in the same callback (`X/03NH.APW`, `0x00b2` onward), Instagram hides composer
+UI and performs composer cleanup. The reverse-layout branch of
+`LinearLayoutManager.onLayoutChildren` chooses an end anchor and adds the orientation
+helper's total-space change to its coordinate. Growing the viewport can therefore
+move existing rows down even when no scroll-to-position runnable was scheduled.
+This is a separate layout path, not another global scroll call to block.
+
+The reply-only guard now also snapshots the top visible child (and a second when
+available), their top offsets and the list geometry. Before the next draw it removes
+its listeners, then compensates with RecyclerView's native `scrollBy(0, heightChange)`
+**only if** the same children remain attached and each has moved by exactly that
+height change. This preserves the existing top offset without using a stale adapter
+index or interpreting an obfuscated message ID. A large Reel with only one visible
+child is supported. No message contents or identifiers are read or retained.
+
+This is intentionally limited to the immediate reply/composer resize: unchanged
+height, independently moving rows, dragging/flinging, width/top/padding changes,
+loss of window focus and fragment detachment are excluded. Listeners are removed
+at the first pre-draw or detach; there is no timer, persistent scroll lock, reflection,
+or global RecyclerView modification. Native dataset anchoring still handles inserts.
+Asynchronous media resizing or later animation frames are not forced back to an
+old position. Phone verification is needed to confirm that this accounts for all
+of the movement on the user's build; the initial jump fix was confirmed by the user.
+
+Settings use Piko `IgStr.str` and Android `values`/`values-pl` resources. English is
+the fallback. Both patch selection and the preference default are enabled, while
+an explicitly saved false preference remains false.
 
 ## Fingerprints and scope
 
@@ -70,8 +96,10 @@ already captures the at-latest predicate before updating the dataset.
 
 - Full `:patches:buildAndroid` build in GitHub Actions: passed (Kotlin, Java and extension DEX).
 - `python3 scripts/test_instagram_dm_hook.py`: passed. Tests the production Java hook
-  with small Android/Piko fakes: default off, eight combinations of reply/location/toggle,
-  unavailable preferences, null settings arguments and duplicate preference insertion.
+  with small Android/Piko fakes: default on, eight combinations of reply/location/toggle,
+  unavailable preferences, null/duplicate settings UI, Piko localization lookup, pixel
+  offset restoration for positive/negative/one-pixel resizes, one visible Reel, excluded
+  navigation/scroll/layout cases, and listener cleanup. These are host tests, not rendering tests.
 - Morphe Desktop `1.16.0`, Piko `3.9.0`, analyzed XAPK `384510833`: both **Add settings**
   and **Keep DM scroll position** applied successfully; full DEX and resource rebuild passed.
   This developer test used `--force` because the input variant differs from Piko's target.
@@ -79,7 +107,7 @@ already captures the at-latest predicate before updating the dataset.
   **Add settings** message; no output APK produced.
 - Decoded output confirms the conditional skips only the send callback's `postDelayed`.
   The Direct scroll controller and delayed runnable are instruction-for-instruction
-  unchanged. The extension includes only its hook and generated `R` class, not Piko stubs.
+  unchanged. Compile-only Piko and AndroidX stubs must not be packaged in the extension.
 - No physical-device test or ART runtime verification has been performed.
 
 ### On a phone
@@ -90,7 +118,9 @@ Keep the original app's signing-key requirements in mind when replacing a previo
 
 1. Choose a clean supported Instagram APKM. Select this patch and Piko **Add settings**
    together (multiple sources may require Morphe expert mode).
-2. Enable **Keep scroll position when replying** under Piko's Direct Messages settings.
+2. Check **Keep scroll position when replying** under Piko's Direct Messages settings.
+   It is on by default for a new preference; an existing saved off value stays off.
+   In Polish, look for **Zachowuj pozycję przewijania podczas odpowiadania**.
    If Piko asks to restart, restart the app.
 3. Scroll roughly 100 messages up, reply to an old Reel, and send. Check that the
    Reel remains around the same visible position after sending and after delivery.
