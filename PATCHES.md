@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.26.0** (`main`) - **4 patches** across **2 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.27.0** (`main`) - **5 patches** across **3 apps** - back to [README](README.md)
 
 ---
 
@@ -12,6 +12,16 @@
 |---|---|
 | **Play Store Fix** | Removes the Google Play installation check that blocks patched APKs at startup. |
 | **Premium** | Enables Pro features, including after a purchase status refresh. |
+
+---
+
+## Instagram (com.instagram.android)
+
+**Supported versions:** `experimental 439.0.0.37.89`
+
+| Patch | Details |
+|---|---|
+| **Keep DM scroll position** | Prevents Instagram Direct from jumping to the newest message after replying to an older message. Requires Piko Add settings in the same patching run. |
 
 ---
 

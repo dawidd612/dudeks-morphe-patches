@@ -1,3 +1,9 @@
+## [1.27.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.26.0...v1.27.0) (2026-09-20)
+
+### ✨ New Features
+
+* **instagram:** keep DM scroll position when replying ([92de396](https://github.com/dawidd612/dudeks-morphe-patches/commit/92de396ac6eb88e75ebff4da20ed6ca022b05a2d))
+
 ## [1.26.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.25.0...v1.26.0) (2026-09-19)
 
 ### ✨ New Features
