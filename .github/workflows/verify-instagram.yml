@@ -1,0 +1,35 @@
+name: Verify Instagram add-on
+
+on:
+  push:
+    branches: [feature/instagram-dm-keep-scroll-position]
+  pull_request:
+    paths:
+      - 'extensions/**'
+      - 'patches/**'
+      - '*gradle*'
+      - '.github/workflows/verify-instagram.yml'
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v5.7.0
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - name: Compile patches and Instagram extension
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ./gradlew :patches:buildAndroid --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dudeks-patches-instagram
+          path: patches/build/libs/*.mpp
+          if-no-files-found: error
