@@ -5,9 +5,9 @@ import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
-internal fun Method.calls() = implementation?.instructions.orEmpty().mapNotNull {
+internal fun Method.calls() = implementation?.instructions?.mapNotNull {
     (it as? ReferenceInstruction)?.reference as? MethodReference
-}
+}.orEmpty()
 
 internal object DirectTextSendFingerprint : Fingerprint(
     strings = listOf("DirectThreadFragment.sendTextMessage", "DirectSendHelperImpl.sendSideChatContextualQuery"),
