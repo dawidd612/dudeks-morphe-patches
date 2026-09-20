@@ -15,15 +15,22 @@ internal val keepDmScrollPositionResources = resourcePatch {
             ),
         )
         translations.forEach { (directory, strings) ->
-            get("res/$directory/dudeks_dm_scroll.xml").apply {
-                parentFile.mkdirs()
-                writeText("""
-                    <?xml version="1.0" encoding="utf-8"?>
-                    <resources>
-                        <string name="dudeks_keep_dm_scroll_position_title">${strings.first}</string>
-                        <string name="dudeks_keep_dm_scroll_position_summary">${strings.second}</string>
-                    </resources>
-                """.trimIndent())
+            // Use the canonical, tracked document so Morphe assigns new string IDs.
+            val path = "res/$directory/strings.xml"
+            get(path).apply {
+                if (!exists()) {
+                    parentFile.mkdirs()
+                    writeText("<?xml version=\"1.0\" encoding=\"utf-8\"?><resources/>")
+                }
+            }
+            document(path).use { document ->
+                val root = document.documentElement
+                listOf("title" to strings.first, "summary" to strings.second).forEach { (suffix, text) ->
+                    val element = document.createElement("string")
+                    element.setAttribute("name", "dudeks_keep_dm_scroll_position_$suffix")
+                    element.textContent = text
+                    root.appendChild(element)
+                }
             }
         }
     }
