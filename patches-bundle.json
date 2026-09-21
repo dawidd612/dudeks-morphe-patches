@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-20T19:37:48",
-  "description": "## [1.27.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.27.0...v1.27.1) (2026-09-20)\n\n### 🐛 Bug Fixes\n\n* **instagram:** preserve reply resize offset and enable Polish setting by default ([fbeddcf](https://github.com/dawidd612/dudeks-morphe-patches/commit/fbeddcfafc9b152b4644081ad9ea5cba3f3a86df))",
-  "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.27.1/patches-1.27.1.mpp",
+  "created_at": "2026-09-21T04:03:11",
+  "description": "## [1.27.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.27.1...v1.27.2) (2026-09-21)\n\n### 🐛 Bug Fixes\n\n* **instagram:** prevent reply viewport nudges and preserve the animated anchor ([bf40f0c](https://github.com/dawidd612/dudeks-morphe-patches/commit/bf40f0c0c05821ce72f4d40b1f4239b7426a8c68))",
+  "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.27.2/patches-1.27.2.mpp",
   "signature_download_url": "",
-  "version": "1.27.1"
+  "version": "1.27.2"
 }

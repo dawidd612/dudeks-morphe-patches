@@ -1,1 +1,1 @@
-dd179c6be9703204918d57b965f16ad50f969e9bcfb44af4b07ef50028ea3d55  patches/build/libs/patches-1.27.1.mpp
+6d298c500f33c036a2df5578261ac9cd25e99aced8725b071507bb859cb7912d  patches/build/libs/patches-1.27.2.mpp

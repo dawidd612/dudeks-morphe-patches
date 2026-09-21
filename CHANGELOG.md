@@ -1,3 +1,9 @@
+## [1.27.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.27.1...v1.27.2) (2026-09-21)
+
+### 🐛 Bug Fixes
+
+* **instagram:** prevent reply viewport nudges and preserve the animated anchor ([bf40f0c](https://github.com/dawidd612/dudeks-morphe-patches/commit/bf40f0c0c05821ce72f4d40b1f4239b7426a8c68))
+
 ## [1.27.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.27.0...v1.27.1) (2026-09-20)
 
 ### 🐛 Bug Fixes
