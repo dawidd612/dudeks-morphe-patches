@@ -35,6 +35,26 @@ A second regression reproduces a reverse hop when the row's layout position move
 but `translationY` temporarily masks that move. Compensating `getTop()` alone in that
 case creates a visible error that then settles with the item animation.
 
+Further DEX inspection found a second native scroll path in
+`DirectMessageListLinearLayoutManager.onLayoutChildren`: the traced section
+`DirectThreadScrollBottomIntoViewportLayoutHelper.afterLayoutChildren`. It examines
+a tagged first visible item, computes its bottom overflow and calls
+`scrollVerticallyBy` for a small overflow. In the analysis APK its helper `X/04Xe`
+constructs a 50 dp threshold; the scroll call is at original byte offset `0x0236`.
+This is independent of the delayed send-to-latest runnable and can bypass a
+resize-only correction. It is concrete native behavior; identifying it does not
+replace a device trace of the user's particular hop.
+
+The new `DirectViewportLayoutFingerprint` locates the traced method and validates
+its first-visible/missing-item gate, tagged-item checks, bottom padding calculation,
+scroll call and trace-cleanup exit. It reuses the register immediately overwritten
+by `const -1`, and takes the same exit used when no first item exists. The native
+weak RecyclerView reference is matched against the active old-reply snapshot.
+Only that list during a valid reply transition skips the bottom nudge. Other
+threads, the latest-message case, ordinary sends, expired state and manual scrolling
+retain the native helper. The top-anchoring helper and explicit navigation calls
+are unchanged. No obfuscated field or method name is hardcoded.
+
 The reply-only guard now snapshots the top visible child (and a second when
 available), their screen-space offsets, dimensions and the usable bottom edge of
 the list. For at most 1000 ms after that send callback it compares each pre-draw:
@@ -57,7 +77,8 @@ the list. For at most 1000 ms after that send callback it compares each pre-draw
 The observation window is a safety budget, not a hardcoded Instagram animation
 length. Its callback only removes listeners; it never performs a delayed jump.
 Detachment and an uptime deadline also clean up, including when drawing stops or
-timer delivery is delayed. Only the original reply send path creates this state.
+timer delivery is delayed. Only the original reply send path creates this state. A weak pointer connects it
+to the native Direct bottom-nudge guard; a new reply retires the previous snapshot.
 Nothing intercepts global RecyclerView scrolling. A large Reel with one visible
 child remains supported, and no message contents or IDs are read or retained.
 Dataset insert anchoring remains Instagram's responsibility. Unrelated movement
@@ -78,6 +99,9 @@ an explicitly saved false preference remains false.
   runnable's controller constructor parameter; verify its resumed-fragment check;
   identify the immediate/smooth RecyclerView scroll paths; and resolve the
   controller's first-visible/first-completely-visible at-latest predicate.
+- `DirectViewportLayoutFingerprint`: the Direct layout and bottom-viewport-helper
+  trace strings, a void method with two parameters, and the validated helper control
+  flow described above. The extra hook only skips its native bottom-nudge section.
 - Reuse only the two temporary registers immediately overwritten by the original
   `int-to-long`. Reject changed instruction shapes instead of guessing registers.
 - Piko settings are connected during patch finalization, after bundles have merged
@@ -132,9 +156,10 @@ already captures the at-latest predicate before updating the dataset.
 - Decoded output confirms the conditional skips only the send callback's `postDelayed`.
   The Direct scroll controller and delayed runnable are instruction-for-instruction
   unchanged. Compile-only Piko and AndroidX stubs must not be packaged in the extension.
-- The delayed-resize fix changes only the runtime layout observer and host tests;
-  bytecode fingerprints, injection point, resource integration and compatibility are unchanged.
-  No new physical-device test or ART runtime verification has been performed.
+- The follow-up adds a guarded native viewport-helper fingerprint and extends the
+  runtime layout observer. Resource integration and compatibility are unchanged.
+  Host tests also cover native guard scope, expired/missing references and thread
+  replacement. No new physical-device test or ART runtime verification has been performed.
 
 ### On a phone
 

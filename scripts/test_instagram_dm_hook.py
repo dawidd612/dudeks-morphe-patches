@@ -168,6 +168,26 @@ public class HookTest {
     static void layoutTests() {
         KeepDmScrollPosition.preserveReplyLayout(null);
         KeepDmScrollPosition.preserveReplyLayout(new android.view.View());
+        androidx.recyclerview.widget.RecyclerView scoped = list();
+        java.lang.ref.WeakReference<android.view.View> reference = new java.lang.ref.WeakReference<>(scoped);
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(reference), "no active reply, native nudge allowed");
+        KeepDmScrollPosition.preserveReplyLayout(scoped);
+        check(KeepDmScrollPosition.shouldSkipReplyLayoutScroll(reference), "reply-only native nudge guard");
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(null), "missing reference");
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(new java.lang.ref.WeakReference<>(null)), "cleared list");
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(new java.lang.ref.WeakReference<>(list())), "other thread unaffected");
+        scoped.state = 1;
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(reference), "manual scroll cancels native guard");
+        released(scoped);
+        scoped.state = 0;
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(reference), "native guard does not resume");
+        KeepDmScrollPosition.preserveReplyLayout(scoped);
+        androidx.recyclerview.widget.RecyclerView next = list();
+        KeepDmScrollPosition.preserveReplyLayout(next);
+        released(scoped);
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(reference), "new conversation retires old state");
+        next.expire(); released(next);
+
         // Regression: composer cleanup may happen after several unchanged draws.
         androidx.recyclerview.widget.RecyclerView v = list();
         KeepDmScrollPosition.preserveReplyLayout(v);

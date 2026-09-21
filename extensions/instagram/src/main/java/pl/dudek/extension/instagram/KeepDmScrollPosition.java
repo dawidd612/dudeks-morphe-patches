@@ -1,5 +1,6 @@
 package pl.dudek.extension.instagram;
 
+import java.lang.ref.WeakReference;
 import android.os.SystemClock;
 import android.preference.PreferenceScreen;
 import android.view.View;
@@ -15,7 +16,20 @@ public final class KeepDmScrollPosition {
     private static final String KEY = "dudeks_keep_dm_scroll_position";
     private static final BooleanSetting ENABLED = new BooleanSetting(KEY, true);
 
+    private static WeakReference<ReplyLayout> activeReply = new WeakReference<>(null);
+
     private KeepDmScrollPosition() {}
+
+    /** Only the Direct layout helper calls this, with its own weak list reference. */
+    public static boolean shouldSkipReplyLayoutScroll(WeakReference<?> listReference) {
+        ReplyLayout reply = activeReply.get();
+        if (reply == null || listReference == null || listReference.get() != reply.list) return false;
+        if (!reply.isValid()) {
+            reply.dispose();
+            return false;
+        }
+        return true;
+    }
 
     public static boolean shouldKeepPosition(Object repliedMessage, boolean atLatest) {
         if (repliedMessage == null || atLatest) return false;
@@ -93,6 +107,9 @@ public final class KeepDmScrollPosition {
 
         void listen() {
             if (!observer.isAlive()) return;
+            ReplyLayout previous = activeReply.get();
+            if (previous != null) previous.dispose();
+            activeReply = new WeakReference<>(this);
             observer.addOnPreDrawListener(this);
             list.addOnAttachStateChangeListener(this);
             // Release even if the view stays attached but stops drawing.
@@ -102,18 +119,22 @@ public final class KeepDmScrollPosition {
         private void dispose() {
             if (disposed) return;
             disposed = true;
+            if (activeReply.get() == this) activeReply.clear();
             if (observer.isAlive()) observer.removeOnPreDrawListener(this);
             list.removeOnAttachStateChangeListener(this);
             list.removeCallbacks(this);
         }
 
+        private boolean isValid() {
+            return !disposed && SystemClock.uptimeMillis() < deadline && list.isAttachedToWindow() &&
+                    list.hasWindowFocus() && list.getScrollState() == 0 &&
+                    first.getParent() == list && first.getHeight() == firstHeight &&
+                    (second == null || (second.getParent() == list && second.getHeight() == secondHeight)) &&
+                    list.getWidth() == width;
+        }
+
         @Override public boolean onPreDraw() {
-            if (disposed) return true;
-            if (SystemClock.uptimeMillis() >= deadline || !list.isAttachedToWindow() ||
-                    !list.hasWindowFocus() || list.getScrollState() != 0 ||
-                    first.getParent() != list || first.getHeight() != firstHeight ||
-                    (second != null && (second.getParent() != list || second.getHeight() != secondHeight)) ||
-                    list.getWidth() != width) {
+            if (!isValid()) {
                 dispose();
                 return true;
             }

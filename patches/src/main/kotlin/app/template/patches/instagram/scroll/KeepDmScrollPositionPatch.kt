@@ -12,10 +12,14 @@ import app.morphe.patcher.patch.SupportedAbi.ARM64_V8A
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.smali.ExternalLabel
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.NarrowLiteralInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OffsetInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.formats.Instruction35c
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
 private fun checkShape(value: Boolean, message: String) {
     if (!value) throw PatchException("Keep DM scroll position: $message")
@@ -116,6 +120,56 @@ val keepDmScrollPositionPatch = bytecodePatch(
             ExternalLabel("dudeks_normal_scroll", completed.getInstruction(postIndex - 1)),
             ExternalLabel("dudeks_keep_position", completed.getInstruction(postIndex + 1)),
         )
+
+        val layout = DirectViewportLayoutFingerprint.method
+        val layoutInstructions = layout.instructions.toList()
+        val section = layoutInstructions.indexOfFirst {
+            ((it as? ReferenceInstruction)?.reference as? StringReference)?.string ==
+                "DirectThreadScrollBottomIntoViewportLayoutHelper.afterLayoutChildren"
+        }
+        val visibleIndex = (section + 1 until layoutInstructions.size).first { index ->
+            ((layoutInstructions[index] as? ReferenceInstruction)?.reference as? MethodReference)?.name ==
+                "findFirstVisibleItemPosition"
+        }
+        val scratchIndex = visibleIndex + 2
+        val constant = layoutInstructions[scratchIndex]
+        val branchIndex = scratchIndex + 1
+        val branch = layoutInstructions[branchIndex]
+        checkShape(layoutInstructions[visibleIndex + 1].opcode == Opcode.MOVE_RESULT &&
+            constant.opcode == Opcode.CONST_4 &&
+            (constant as? NarrowLiteralInstruction)?.narrowLiteral == -1 && branch.opcode == Opcode.IF_EQ,
+            "viewport helper's missing-item gate changed")
+        val scratch = (constant as OneRegisterInstruction).registerA
+        val visible = (layoutInstructions[visibleIndex + 1] as OneRegisterInstruction).registerA
+        val operands = branch as TwoRegisterInstruction
+        checkShape(scratch != visible && setOf(operands.registerA, operands.registerB) == setOf(scratch, visible),
+            "viewport helper has no dead scratch register")
+        val addresses = layoutInstructions.runningFold(0) { offset, instruction -> offset + instruction.codeUnits }
+        val exitAddress = addresses[branchIndex] + (branch as OffsetInstruction).codeOffset
+        val exitIndex = addresses.indexOf(exitAddress)
+        checkShape(exitIndex > branchIndex && exitIndex < layoutInstructions.size,
+            "viewport helper exit is invalid")
+        val sectionCalls = layoutInstructions.subList(branchIndex, exitIndex).mapNotNull {
+            ((it as? ReferenceInstruction)?.reference as? MethodReference)
+        }
+        checkShape(sectionCalls.count { it.name == "scrollVerticallyBy" } == 1 &&
+            sectionCalls.any { it.name == "getPaddingBottom" } && sectionCalls.any { it.name == "getTag" },
+            "viewport helper no longer contains the expected tagged-item nudge")
+        val exitCall = (layoutInstructions[exitIndex] as? ReferenceInstruction)?.reference as? MethodReference
+        checkShape(exitCall?.definingClass == "Lcom/facebook/systrace/Systrace;" && exitCall.returnType == "Z",
+            "viewport helper exit no longer preserves trace cleanup")
+        val listReference = DirectViewportLayoutFingerprint.classDef.fields.single {
+            it.type == "Ljava/lang/ref/WeakReference;"
+        }
+        // Reuse the register overwritten by the original const -1. The native
+        // missing-item branch exits just this bottom-nudge helper, balancing tracing.
+        layout.addInstructionsWithLabels(scratchIndex, """
+            move-object/from16 v$scratch, p0
+            iget-object v$scratch, v$scratch, $listReference
+            invoke-static {v$scratch}, $HOOK->shouldSkipReplyLayoutScroll(Ljava/lang/ref/WeakReference;)Z
+            move-result v$scratch
+            if-nez v$scratch, :dudeks_skip_viewport_nudge
+        """.trimIndent(), ExternalLabel("dudeks_skip_viewport_nudge", layout.getInstruction(exitIndex)))
     }
 
     // Cross-bundle integration must run after Piko has merged its extensions.
