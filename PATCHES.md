@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.27.2** (`main`) - **5 patches** across **3 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.28.0** (`main`) - **6 patches** across **4 apps** - back to [README](README.md)
 
 ---
 
@@ -33,5 +33,15 @@
 |---|---|
 | **Hide Premium prompts** | Hides Premium offers and the menu entry. Removes the trial notification on launch. |
 | **Local Premium** | Enables local Premium checks for navigation, offline map controls and ads. Does not activate a subscription on your account. Experimental; device testing needed. |
+
+---
+
+## TikTok (com.zhiliaoapp.musically)
+
+**Supported versions:** `47.0.3`
+
+| Patch | Details |
+|---|---|
+| **Keep TikTok DM scroll position** | Keeps the conversation in place after replying to an older message or video. Compatible with kveld9 patches. / Zachowuje pozycję rozmowy po odpowiedzi na starszą wiadomość lub film. Zgodny z patchami kveld9. |
 
 ---

@@ -19,13 +19,14 @@ Choose a supported app version, select the patches you want and patch a clean AP
 ## Patches
 
 <!-- PATCHES_START -->
-> **[v1.27.2](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.27.2)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**5 patches** across **3 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+> **[v1.28.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.28.0)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**6 patches** across **4 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
 
 | # | App | Patches | Version | Package |
 |---|---|---|---|---|
 | 1 | [**AndroPods**](PATCHES.md#andropods-provitaliiandropods) | 2 | `1.5.30` | [`pro.vitalii.andropods`](https://play.google.com/store/apps/details?id=pro.vitalii.andropods) |
 | 2 | [**Instagram**](PATCHES.md#instagram-cominstagramandroid) | 1 | `experimental 439.0.0.37.89` | [`com.instagram.android`](https://play.google.com/store/apps/details?id=com.instagram.android) |
 | 3 | [**Mapa Turystyczna**](PATCHES.md#mapa-turystyczna-plmapa_turystycznaapp) | 2 | `1.16.6` | [`pl.mapa_turystyczna.app`](https://play.google.com/store/apps/details?id=pl.mapa_turystyczna.app) |
+| 4 | [**TikTok**](PATCHES.md#tiktok-comzhiliaoappmusically) | 1 | `47.0.3` | [`com.zhiliaoapp.musically`](https://play.google.com/store/apps/details?id=com.zhiliaoapp.musically) |
 <!-- PATCHES_END -->
 
 ### Mapa Turystyczna

@@ -1,3 +1,9 @@
+## [1.28.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.27.2...v1.28.0) (2026-09-21)
+
+### ✨ New Features
+
+* **tiktok:** keep DM scroll position with kveld9 patches ([#4](https://github.com/dawidd612/dudeks-morphe-patches/issues/4)) ([0bc3667](https://github.com/dawidd612/dudeks-morphe-patches/commit/0bc36679ef30220e26cc31278bce468b82a2059c))
+
 ## [1.27.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.27.1...v1.27.2) (2026-09-21)
 
 ### 🐛 Bug Fixes
