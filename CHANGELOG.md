@@ -1,3 +1,9 @@
+## [1.28.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.28.0...v1.28.1) (2026-09-21)
+
+### 🐛 Bug Fixes
+
+* **tiktok:** preserve history for all messages and composer resizes ([#5](https://github.com/dawidd612/dudeks-morphe-patches/issues/5)) ([8cf1415](https://github.com/dawidd612/dudeks-morphe-patches/commit/8cf1415c596d7ef2ff3483a1431d76c71295a3af))
+
 ## [1.28.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.27.2...v1.28.0) (2026-09-21)
 
 ### ✨ New Features

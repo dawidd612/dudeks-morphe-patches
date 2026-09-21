@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.28.0",
+  "version": "1.28.1",
   "patches": [
     {
       "name": "Hide Premium prompts",
@@ -68,7 +68,7 @@
     },
     {
       "name": "Keep TikTok DM scroll position",
-      "description": "Keeps the conversation in place after replying to an older message or video. Compatible with kveld9 patches. / Zachowuje pozycję rozmowy po odpowiedzi na starszą wiadomość lub film. Zgodny z patchami kveld9.",
+      "description": "Keeps your position while reading older messages, including after sending messages and replies. Compatible with kveld9 patches.",
       "default": true,
       "dependencies": [],
       "compatiblePackages": [

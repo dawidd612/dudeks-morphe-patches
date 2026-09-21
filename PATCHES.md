@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.28.0** (`main`) - **6 patches** across **4 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.28.1** (`main`) - **6 patches** across **4 apps** - back to [README](README.md)
 
 ---
 
@@ -42,6 +42,6 @@
 
 | Patch | Details |
 |---|---|
-| **Keep TikTok DM scroll position** | Keeps the conversation in place after replying to an older message or video. Compatible with kveld9 patches. / Zachowuje pozycję rozmowy po odpowiedzi na starszą wiadomość lub film. Zgodny z patchami kveld9. |
+| **Keep TikTok DM scroll position** | Keeps your position while reading older messages, including after sending messages and replies. Compatible with kveld9 patches. |
 
 ---
