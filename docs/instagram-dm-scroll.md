@@ -31,6 +31,9 @@ removed its listener on the very first pre-draw, including when no resize had
 happened yet. It also rejected padding changes outright. Host regression tests
 reproduce the first limitation with unchanged frames followed by a resize. This
 establishes a gap in our correction, not a device trace of the user's remaining hop.
+A second regression reproduces a reverse hop when the row's layout position moves
+but `translationY` temporarily masks that move. Compensating `getTop()` alone in that
+case creates a visible error that then settles with the item animation.
 
 The reply-only guard now snapshots the top visible child (and a second when
 available), their screen-space offsets, dimensions and the usable bottom edge of
@@ -38,9 +41,15 @@ the list. For at most 1000 ms after that send callback it compares each pre-draw
 
 - Unchanged rows: retain the anchor and update the bottom-edge baseline. Instagram
   may already have preserved the top anchor itself.
-- Rows moving uniformly by exactly the change in the usable bottom edge: compensate
-  with native `scrollBy(0, edgeChange)` before drawing. This covers deferred/multi-frame
-  resizing, bottom-padding changes and movement of the list within its window.
+- Layout positions moving uniformly by exactly the change in the usable bottom edge:
+  compensate the primary row's rendered displacement with native `scrollBy` before
+  drawing. This covers deferred/multi-frame resizing, bottom-padding changes and
+  movement of the list within its window.
+- A move animation masking that observed resize: include `translationY` in the primary
+  visual anchor. Allow its translation to settle towards the pre-send value. The
+  initial animation offset must oppose, and not exceed, the measured resize. Unrelated
+  animations are rejected. The second row corroborates layout movement; it can animate
+  differently from the primary row.
 - Any independent row movement, dragging/flinging, changed anchor dimensions,
   detached/replaced anchor views, width change or loss of focus: discard the snapshot
   permanently. If native scrolling is clamped, stop instead of chasing the anchor.
@@ -111,7 +120,7 @@ already captures the at-latest predicate before updating the dataset.
   with small Android/Piko fakes: default on, eight combinations of reply/location/toggle,
   unavailable preferences, null/duplicate settings UI, Piko localization lookup, pixel
   offset restoration for positive/negative/one-pixel resizes, delayed and animated resizes,
-  bottom insets, screen coordinates, one visible Reel, excluded navigation/scroll/layout
+  bottom insets, screen coordinates, fractional/unequal item animations, one visible Reel, excluded navigation/scroll/layout
   cases, rapid replies, timeout cleanup with no draws and delayed timer delivery.
   The delayed-resize regression fails against v1.27.1 and passes with the updated hook.
   These are host tests, not device rendering tests.

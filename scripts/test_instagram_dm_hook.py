@@ -36,6 +36,8 @@ public class View {
     }
     public int top, height, width, paddingTop, paddingBottom, screenOffset;
     public Object parent;
+    public float translationY;
+    public float getTranslationY() { return translationY; }
     public boolean attached = true, focus = true, acceptsPosts = true;
     public java.util.List<Runnable> callbacks = new java.util.ArrayList<>();
     public ViewTreeObserver observer = new ViewTreeObserver();
@@ -68,12 +70,15 @@ public class View {
 package androidx.recyclerview.widget;
 import android.view.View;
 public class RecyclerView extends View {
-    public int state, scrollCalls;
+    public int state, scrollCalls, scrollLimit = Integer.MAX_VALUE;
     public java.util.List<View> children = new java.util.ArrayList<>();
     public int getScrollState() { return state; }
     public int getChildCount() { return children.size(); }
     public View getChildAt(int i) { return children.get(i); }
-    public void scrollBy(int x, int y) { scrollCalls++; for (View child : children) child.top -= y; }
+    public void scrollBy(int x, int y) {
+        scrollCalls++; y = Math.max(-scrollLimit, Math.min(scrollLimit, y));
+        for (View child : children) child.top -= y;
+    }
 }
 """,
     "app/morphe/extension/instagram/utils/IgStr.java": """
@@ -171,6 +176,38 @@ public class HookTest {
         check(v.children.get(0).top == -40, "delayed reply resize preserves the Reel offset");
         v.expire(); released(v);
 
+        // ItemAnimator can initially mask the layout shift with a translation,
+        // then settle it over subsequent frames. Preserve what is actually drawn.
+        v = list(); KeepDmScrollPosition.preserveReplyLayout(v);
+        v.height += 48;
+        for (android.view.View child : v.children) { child.top += 48; child.translationY = -48; }
+        v.observer.draw();
+        check(v.children.get(0).top + v.children.get(0).translationY == -40,
+                "resize animation must not introduce a reverse hop");
+        for (float translation : new float[] {-36.5f, -24.25f, -12f, 0f}) {
+            for (android.view.View child : v.children) child.translationY = translation;
+            v.observer.draw();
+            check(Math.abs(v.children.get(0).top + translation + 40) <= 0.5f,
+                    "animated visual anchor: " + translation);
+        }
+        v.expire(); released(v);
+        // A secondary row can use a different animation; only the primary visual
+        // anchor is restored, with the second row corroborating layout movement.
+        v = list(); KeepDmScrollPosition.preserveReplyLayout(v);
+        v.height += 48;
+        for (android.view.View child : v.children) child.top += 48;
+        v.children.get(0).translationY = -48; v.observer.draw();
+        v.children.get(0).translationY = -24; v.observer.draw();
+        check(v.children.get(0).top - 24 == -40, "independent secondary animation");
+        v.children.get(0).translationY = 0; v.observer.draw();
+        check(v.children.get(0).top == -40, "primary anchor after unequal animations");
+        v.expire(); released(v);
+        v = list(); KeepDmScrollPosition.preserveReplyLayout(v);
+        for (android.view.View child : v.children) child.translationY = -12;
+        v.observer.draw();
+        check(v.scrollCalls == 0, "unrelated item animation must not be compensated");
+        released(v);
+
         for (int delta : new int[] {48, -48, 1, 0}) {
             v = list();
             KeepDmScrollPosition.preserveReplyLayout(v);
@@ -230,6 +267,10 @@ public class HookTest {
         check(v.children.get(0).top == -40, "single large Reel");
         v.expire(); released(v);
 
+        v = list(); v.scrollLimit = 12; KeepDmScrollPosition.preserveReplyLayout(v);
+        resize(v, 48); released(v);
+        resize(v, 12);
+        check(v.scrollCalls == 1, "never chase a clamped native scroll");
         v = list(); KeepDmScrollPosition.preserveReplyLayout(v); v.expire(); released(v);
         v = list(); v.state = 1; KeepDmScrollPosition.preserveReplyLayout(v); released(v);
         v = list(); v.attached = false; KeepDmScrollPosition.preserveReplyLayout(v); released(v);

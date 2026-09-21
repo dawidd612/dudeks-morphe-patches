@@ -61,7 +61,10 @@ public final class KeepDmScrollPosition {
         private final RecyclerView list;
         private final View first, second;
         private final ViewTreeObserver observer;
-        private final int width, firstTop, secondTop, firstHeight, secondHeight;
+        private final int width, firstHeight, secondHeight;
+        private final float firstTop, firstTranslation, secondTranslation;
+        private int lastFirstTop, lastSecondTop;
+        private float lastFirstTranslation, lastSecondTranslation;
         private final int[] location = new int[2];
         private final long deadline = SystemClock.uptimeMillis() + MAX_TRANSITION_MS;
         private int bottom;
@@ -75,8 +78,11 @@ public final class KeepDmScrollPosition {
             width = list.getWidth();
             list.getLocationOnScreen(location);
             bottom = contentBottom();
-            firstTop = location[1] + first.getTop();
-            secondTop = second == null ? 0 : location[1] + second.getTop();
+            lastFirstTop = location[1] + first.getTop();
+            lastSecondTop = second == null ? 0 : location[1] + second.getTop();
+            firstTranslation = lastFirstTranslation = first.getTranslationY();
+            secondTranslation = lastSecondTranslation = second == null ? 0 : second.getTranslationY();
+            firstTop = lastFirstTop + firstTranslation;
             firstHeight = first.getHeight();
             secondHeight = second == null ? 0 : second.getHeight();
         }
@@ -114,27 +120,47 @@ public final class KeepDmScrollPosition {
             list.getLocationOnScreen(location);
             int nextBottom = contentBottom();
             int growth = nextBottom - bottom;
-            int movement = location[1] + first.getTop() - firstTop;
-            int secondMovement = second == null ? movement : location[1] + second.getTop() - secondTop;
-            if (movement == 0 && secondMovement == 0) {
-                // No layout yet, or Instagram already preserved the top anchor.
-                bottom = nextBottom;
-                return true;
-            }
-            if (growth == 0 || movement != growth || secondMovement != growth) {
+            int layoutMovement = location[1] + first.getTop() - lastFirstTop;
+            int secondLayoutMovement = second == null ? layoutMovement : location[1] + second.getTop() - lastSecondTop;
+            float translation = first.getTranslationY();
+            float otherTranslation = second == null ? 0 : second.getTranslationY();
+            if ((layoutMovement != 0 && layoutMovement != growth) || secondLayoutMovement != layoutMovement ||
+                    !followsResize(translation, lastFirstTranslation, firstTranslation, layoutMovement, growth) ||
+                    (second != null && !followsResize(otherTranslation, lastSecondTranslation,
+                            secondTranslation, layoutMovement, growth))) {
                 // Explicit navigation, manual scrolling or an independent item update.
                 // Never resume tracking after this, even if scrolling becomes idle.
                 dispose();
                 return true;
             }
-            list.scrollBy(0, growth);
+            float movement = location[1] + first.getTop() + translation - firstTop;
+            // Use the rendered offset: an item animation can temporarily cancel the
+            // layout movement. Correcting getTop() alone would introduce a new hop.
+            int correction = Math.round(movement);
+            if (correction != 0) list.scrollBy(0, correction);
             bottom = nextBottom;
-            if (location[1] + first.getTop() != firstTop ||
-                    (second != null && location[1] + second.getTop() != secondTop)) {
+            lastFirstTop = location[1] + first.getTop();
+            lastSecondTop = second == null ? 0 : location[1] + second.getTop();
+            lastFirstTranslation = translation;
+            lastSecondTranslation = otherTranslation;
+            if (Math.abs(lastFirstTop + translation - firstTop) > 1f) {
                 // The native scroll can be clamped at a boundary; do not chase it.
                 dispose();
             }
             return true;
+        }
+
+        private static boolean followsResize(float current, float previous, float initial,
+                int layoutMovement, int growth) {
+            if (current == previous) return true;
+            float change = current - previous;
+            // A move animation may mask part/all of a just-observed resize.
+            if (growth != 0 && layoutMovement == growth && change * growth < 0 &&
+                    Math.abs(change) <= Math.abs(growth)) return true;
+            // Thereafter allow only settling back towards its pre-send translation.
+            float oldOffset = previous - initial;
+            float newOffset = current - initial;
+            return oldOffset * newOffset >= 0 && Math.abs(newOffset) <= Math.abs(oldOffset);
         }
 
         @Override public void run() { dispose(); }
