@@ -187,6 +187,14 @@ public class HookTest {
         released(scoped);
         check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(reference), "new conversation retires old state");
         next.expire(); released(next);
+        for (boolean atLatest : new boolean[] {false, true}) {
+            scoped = list(); KeepDmScrollPosition.preserveReplyLayout(scoped);
+            check(!KeepDmScrollPosition.shouldKeepPosition(atLatest ? new Object() : null, atLatest),
+                    "normal subsequent send keeps stock behavior");
+            released(scoped);
+            check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(new java.lang.ref.WeakReference<>(scoped)),
+                    "normal subsequent send clears native viewport guard");
+        }
 
         // Regression: composer cleanup may happen after several unchanged draws.
         androidx.recyclerview.widget.RecyclerView v = list();

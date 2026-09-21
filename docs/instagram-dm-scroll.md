@@ -78,7 +78,8 @@ The observation window is a safety budget, not a hardcoded Instagram animation
 length. Its callback only removes listeners; it never performs a delayed jump.
 Detachment and an uptime deadline also clean up, including when drawing stops or
 timer delivery is delayed. Only the original reply send path creates this state. A weak pointer connects it
-to the native Direct bottom-nudge guard; a new reply retires the previous snapshot.
+to the native Direct bottom-nudge guard; every subsequent send retires the previous
+snapshot, including ordinary messages and replies at latest.
 Nothing intercepts global RecyclerView scrolling. A large Reel with one visible
 child remains supported, and no message contents or IDs are read or retained.
 Dataset insert anchoring remains Instagram's responsibility. Unrelated movement

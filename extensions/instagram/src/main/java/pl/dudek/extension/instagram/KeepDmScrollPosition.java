@@ -32,6 +32,10 @@ public final class KeepDmScrollPosition {
     }
 
     public static boolean shouldKeepPosition(Object repliedMessage, boolean atLatest) {
+        // Every subsequent send ends the previous transition, including ordinary
+        // messages and replies at latest. An eligible reply arms a fresh snapshot.
+        ReplyLayout previous = activeReply.get();
+        if (previous != null) previous.dispose();
         if (repliedMessage == null || atLatest) return false;
         try {
             return Boolean.TRUE.equals(SharedPref.getBooleanPref(ENABLED));
