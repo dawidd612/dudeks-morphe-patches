@@ -1,4 +1,4 @@
-name: Verify Instagram add-on
+name: Verify DM add-ons
 
 on:
   push:
@@ -9,6 +9,8 @@ on:
       - 'patches/**'
       - '*gradle*'
       - 'scripts/test_instagram_dm_hook.py'
+      - 'scripts/test_tiktok_dm_hook.py'
+      - 'scripts/VerifyTikTokDmDex.java'
       - '.github/workflows/verify-instagram.yml'
 
 permissions:
@@ -30,7 +32,9 @@ jobs:
           log-accepted-android-sdk-licenses: false
       - name: Test reply guard behavior
         run: python3 scripts/test_instagram_dm_hook.py
-      - name: Compile patches and Instagram extension
+      - name: Test TikTok viewport and queue behavior
+        run: python3 scripts/test_tiktok_dm_hook.py
+      - name: Compile patches and extensions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew :patches:buildAndroid :patches:generatePatchesList --no-daemon
