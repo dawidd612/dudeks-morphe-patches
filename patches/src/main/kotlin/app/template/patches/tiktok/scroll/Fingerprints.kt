@@ -26,14 +26,21 @@ internal object AddMessageEventFingerprint : Fingerprint(
 // a scroll. Incoming messages, navigation and initial loading share this method.
 internal object ScrollDecisionFingerprint : Fingerprint(
     returnType = "Z",
-    custom = { method, _ ->
+    custom = { method, classDef ->
         method.parameterTypes.size == 4 &&
             method.parameterTypes[1] == "Ljava/util/List;" &&
             method.parameterTypes[3] == "Z" &&
             method.calls().any {
                 it.definingClass == "Lcom/ss/android/ugc/aweme/im/sdk/chat/data/model/FakeMessageKt;" &&
                     it.name == "isFakeMessage"
-            } && method.calls().any { it.name == "getMsgStatus" }
+            } && method.calls().any { it.name == "getMsgStatus" } &&
+            classDef.methods.any { sibling ->
+                sibling.returnType == "Z" && sibling.parameterTypes.isEmpty() &&
+                    sibling.calls().any { it.name == "findFirstVisibleItemPosition" } &&
+                    sibling.calls().any {
+                        it.definingClass == "Lcom/ss/android/ugc/aweme/im/messagelist/api/ability/LoadMoreAbility;"
+                    }
+            }
     },
 )
 
