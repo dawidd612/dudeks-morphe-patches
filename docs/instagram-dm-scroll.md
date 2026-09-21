@@ -26,22 +26,65 @@ helper's total-space change to its coordinate. Growing the viewport can therefor
 move existing rows down even when no scroll-to-position runnable was scheduled.
 This is a separate layout path, not another global scroll call to block.
 
-The reply-only guard now also snapshots the top visible child (and a second when
-available), their top offsets and the list geometry. Before the next draw it removes
-its listeners, then compensates with RecyclerView's native `scrollBy(0, heightChange)`
-**only if** the same children remain attached and each has moved by exactly that
-height change. This preserves the existing top offset without using a stale adapter
-index or interpreting an obfuscated message ID. A large Reel with only one visible
-child is supported. No message contents or identifiers are read or retained.
+The user reported a remaining 1-2 cm movement with v1.27.1. That implementation
+removed its listener on the very first pre-draw, including when no resize had
+happened yet. It also rejected padding changes outright. Host regression tests
+reproduce the first limitation with unchanged frames followed by a resize. This
+establishes a gap in our correction, not a device trace of the user's remaining hop.
+A second regression reproduces a reverse hop when the row's layout position moves
+but `translationY` temporarily masks that move. Compensating `getTop()` alone in that
+case creates a visible error that then settles with the item animation.
 
-This is intentionally limited to the immediate reply/composer resize: unchanged
-height, independently moving rows, dragging/flinging, width/top/padding changes,
-loss of window focus and fragment detachment are excluded. Listeners are removed
-at the first pre-draw or detach; there is no timer, persistent scroll lock, reflection,
-or global RecyclerView modification. Native dataset anchoring still handles inserts.
-Asynchronous media resizing or later animation frames are not forced back to an
-old position. Phone verification is needed to confirm that this accounts for all
-of the movement on the user's build; the initial jump fix was confirmed by the user.
+Further DEX inspection found a second native scroll path in
+`DirectMessageListLinearLayoutManager.onLayoutChildren`: the traced section
+`DirectThreadScrollBottomIntoViewportLayoutHelper.afterLayoutChildren`. It examines
+a tagged first visible item, computes its bottom overflow and calls
+`scrollVerticallyBy` for a small overflow. In the analysis APK its helper `X/04Xe`
+constructs a 50 dp threshold; the scroll call is at original byte offset `0x0236`.
+This is independent of the delayed send-to-latest runnable and can bypass a
+resize-only correction. It is concrete native behavior; identifying it does not
+replace a device trace of the user's particular hop.
+
+The new `DirectViewportLayoutFingerprint` locates the traced method and validates
+its first-visible/missing-item gate, tagged-item checks, bottom padding calculation,
+scroll call and trace-cleanup exit. It reuses the register immediately overwritten
+by `const -1`, and takes the same exit used when no first item exists. The native
+weak RecyclerView reference is matched against the active old-reply snapshot.
+Only that list during a valid reply transition skips the bottom nudge. Other
+threads, the latest-message case, ordinary sends, expired state and manual scrolling
+retain the native helper. The top-anchoring helper and explicit navigation calls
+are unchanged. No obfuscated field or method name is hardcoded.
+
+The reply-only guard now snapshots the top visible child (and a second when
+available), their screen-space offsets, dimensions and the usable bottom edge of
+the list. For at most 1000 ms after that send callback it compares each pre-draw:
+
+- Unchanged rows: retain the anchor and update the bottom-edge baseline. Instagram
+  may already have preserved the top anchor itself.
+- Layout positions moving uniformly by exactly the change in the usable bottom edge:
+  compensate the primary row's rendered displacement with native `scrollBy` before
+  drawing. This covers deferred/multi-frame resizing, bottom-padding changes and
+  movement of the list within its window.
+- A move animation masking that observed resize: include `translationY` in the primary
+  visual anchor. Allow its translation to settle towards the pre-send value. The
+  initial animation offset must oppose, and not exceed, the measured resize. Unrelated
+  animations are rejected. The second row corroborates layout movement; it can animate
+  differently from the primary row.
+- Any independent row movement, dragging/flinging, changed anchor dimensions,
+  detached/replaced anchor views, width change or loss of focus: discard the snapshot
+  permanently. If native scrolling is clamped, stop instead of chasing the anchor.
+
+The observation window is a safety budget, not a hardcoded Instagram animation
+length. Its callback only removes listeners; it never performs a delayed jump.
+Detachment and an uptime deadline also clean up, including when drawing stops or
+timer delivery is delayed. Only the original reply send path creates this state. A weak pointer connects it
+to the native Direct bottom-nudge guard; every subsequent send retires the previous
+snapshot, including ordinary messages and replies at latest.
+Nothing intercepts global RecyclerView scrolling. A large Reel with one visible
+child remains supported, and no message contents or IDs are read or retained.
+Dataset insert anchoring remains Instagram's responsibility. Unrelated movement
+and resizes after the observation window are deliberately untouched. Phone feedback
+is still needed to establish whether the remaining hop uses this delayed/inset path.
 
 Settings use Piko `IgStr.str` and Android `values`/`values-pl` resources. English is
 the fallback. Both patch selection and the preference default are enabled, while
@@ -57,6 +100,9 @@ an explicitly saved false preference remains false.
   runnable's controller constructor parameter; verify its resumed-fragment check;
   identify the immediate/smooth RecyclerView scroll paths; and resolve the
   controller's first-visible/first-completely-visible at-latest predicate.
+- `DirectViewportLayoutFingerprint`: the Direct layout and bottom-viewport-helper
+  trace strings, a void method with two parameters, and the validated helper control
+  flow described above. The extra hook only skips its native bottom-nudge section.
 - Reuse only the two temporary registers immediately overwritten by the original
   `int-to-long`. Reject changed instruction shapes instead of guessing registers.
 - Piko settings are connected during patch finalization, after bundles have merged
@@ -92,15 +138,18 @@ already captures the at-latest predicate before updating the dataset.
 
 ## Phone test
 
-### Automated checks completed
+### Verification history
 
 - Full `:patches:buildAndroid` build in GitHub Actions: passed (Kotlin, Java and extension DEX).
 - `python3 scripts/test_instagram_dm_hook.py`: passed. Tests the production Java hook
   with small Android/Piko fakes: default on, eight combinations of reply/location/toggle,
   unavailable preferences, null/duplicate settings UI, Piko localization lookup, pixel
-  offset restoration for positive/negative/one-pixel resizes, one visible Reel, excluded
-  navigation/scroll/layout cases, and listener cleanup. These are host tests, not rendering tests.
-- Morphe Desktop `1.16.0`, Piko `3.9.0`, analyzed XAPK `384510833`: both **Add settings**
+  offset restoration for positive/negative/one-pixel resizes, delayed and animated resizes,
+  bottom insets, screen coordinates, fractional/unequal item animations, one visible Reel, excluded navigation/scroll/layout
+  cases, rapid replies, timeout cleanup with no draws and delayed timer delivery.
+  The delayed-resize regression fails against v1.27.1 and passes with the updated hook.
+  These are host tests, not device rendering tests.
+- APK integration verified for v1.27.1 with Morphe Desktop `1.16.0`, Piko `3.9.0`, analyzed XAPK `384510833`: both **Add settings**
   and **Keep DM scroll position** applied successfully; full DEX and resource rebuild passed.
   This developer test used `--force` because the input variant differs from Piko's target.
 - Applying the add-on without Piko: rejected at finalization with the explicit missing
@@ -108,7 +157,10 @@ already captures the at-latest predicate before updating the dataset.
 - Decoded output confirms the conditional skips only the send callback's `postDelayed`.
   The Direct scroll controller and delayed runnable are instruction-for-instruction
   unchanged. Compile-only Piko and AndroidX stubs must not be packaged in the extension.
-- No physical-device test or ART runtime verification has been performed.
+- The follow-up adds a guarded native viewport-helper fingerprint and extends the
+  runtime layout observer. Resource integration and compatibility are unchanged.
+  Host tests also cover native guard scope, expired/missing references and thread
+  replacement. No new physical-device test or ART runtime verification has been performed.
 
 ### On a phone
 
@@ -125,6 +177,8 @@ Keep the original app's signing-key requirements in mind when replacing a previo
 3. Scroll roughly 100 messages up, reply to an old Reel, and send. Check that the
    Reel remains around the same visible position after sending and after delivery.
 4. Repeat for text, photo and shared-post replies; send several replies in sequence.
+   Include a multiline answer and wait a second after each send. Compare the Reel's
+   position immediately after sending and after the reply panel finishes closing.
 5. At the bottom, send a plain message and a reply. Both should follow new messages normally.
 6. Scroll manually during delivery, tap jump-to-latest, open a search result, switch
    conversations, leave/reopen the app, and receive a new message while reading history.

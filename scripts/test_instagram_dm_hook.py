@@ -10,6 +10,13 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = {
+    "android/os/SystemClock.java": """
+package android.os;
+public class SystemClock {
+    public static long now;
+    public static long uptimeMillis() { return now; }
+}
+""",
     "android/view/ViewTreeObserver.java": """
 package android.view;
 public class ViewTreeObserver {
@@ -27,15 +34,28 @@ public class View {
     public interface OnAttachStateChangeListener {
         void onViewAttachedToWindow(View v); void onViewDetachedFromWindow(View v);
     }
-    public int top, height, width, paddingTop, paddingBottom;
+    public int top, height, width, paddingTop, paddingBottom, screenOffset;
     public Object parent;
-    public boolean attached = true, focus = true;
+    public float translationY;
+    public float getTranslationY() { return translationY; }
+    public boolean attached = true, focus = true, acceptsPosts = true;
+    public java.util.List<Runnable> callbacks = new java.util.ArrayList<>();
     public ViewTreeObserver observer = new ViewTreeObserver();
     public java.util.List<OnAttachStateChangeListener> attach = new java.util.ArrayList<>();
     public int getTop() { return top; } public int getBottom() { return top + height; }
     public int getHeight() { return height; } public int getWidth() { return width; }
     public int getPaddingTop() { return paddingTop; } public int getPaddingBottom() { return paddingBottom; }
     public Object getParent() { return parent; }
+    public void getLocationOnScreen(int[] xy) { xy[0] = 0; xy[1] = top + screenOffset; }
+    public boolean postDelayed(Runnable r, long delay) {
+        if (!acceptsPosts) return false;
+        callbacks.add(r); return true;
+    }
+    public boolean removeCallbacks(Runnable r) { return callbacks.remove(r); }
+    public void expire() {
+        android.os.SystemClock.now += 1001;
+        for (Runnable r : new java.util.ArrayList<>(callbacks)) r.run();
+    }
     public boolean isAttachedToWindow() { return attached; } public boolean hasWindowFocus() { return focus; }
     public ViewTreeObserver getViewTreeObserver() { return observer; }
     public void addOnAttachStateChangeListener(OnAttachStateChangeListener l) { attach.add(l); }
@@ -50,12 +70,15 @@ public class View {
 package androidx.recyclerview.widget;
 import android.view.View;
 public class RecyclerView extends View {
-    public int state, scrollCalls;
+    public int state, scrollCalls, scrollLimit = Integer.MAX_VALUE;
     public java.util.List<View> children = new java.util.ArrayList<>();
     public int getScrollState() { return state; }
     public int getChildCount() { return children.size(); }
     public View getChildAt(int i) { return children.get(i); }
-    public void scrollBy(int x, int y) { scrollCalls++; for (View child : children) child.top -= y; }
+    public void scrollBy(int x, int y) {
+        scrollCalls++; y = Math.max(-scrollLimit, Math.min(scrollLimit, y));
+        for (View child : children) child.top -= y;
+    }
 }
 """,
     "app/morphe/extension/instagram/utils/IgStr.java": """
@@ -134,53 +157,156 @@ public class HookTest {
         list.children.add(a); list.children.add(b);
         return list;
     }
+    static void resize(androidx.recyclerview.widget.RecyclerView v, int delta) {
+        v.height += delta;
+        for (android.view.View child : v.children) child.top += delta;
+        v.observer.draw();
+    }
+    static void released(androidx.recyclerview.widget.RecyclerView v) {
+        check(v.attach.isEmpty() && v.observer.listeners.isEmpty() && v.callbacks.isEmpty(), "listeners/timer released");
+    }
     static void layoutTests() {
         KeepDmScrollPosition.preserveReplyLayout(null);
         KeepDmScrollPosition.preserveReplyLayout(new android.view.View());
-        for (int delta : new int[] {48, -48, 1, 0}) {
-            androidx.recyclerview.widget.RecyclerView v = list();
-            KeepDmScrollPosition.preserveReplyLayout(v);
-            v.height += delta;
-            for (android.view.View child : v.children) child.top += delta;
-            v.observer.draw();
-            check(v.children.get(0).top == -40, "pixel offset restored: " + delta);
-            check(v.scrollCalls == (delta == 0 ? 0 : 1), "one correction");
-            v.height += 30; for (android.view.View child : v.children) child.top += 30;
-            v.observer.draw();
-            check(v.children.get(0).top == -10, "later layouts untouched");
-            check(v.attach.isEmpty() && v.observer.listeners.isEmpty(), "listeners released");
+        androidx.recyclerview.widget.RecyclerView scoped = list();
+        java.lang.ref.WeakReference<android.view.View> reference = new java.lang.ref.WeakReference<>(scoped);
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(reference), "no active reply, native nudge allowed");
+        KeepDmScrollPosition.preserveReplyLayout(scoped);
+        check(KeepDmScrollPosition.shouldSkipReplyLayoutScroll(reference), "reply-only native nudge guard");
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(null), "missing reference");
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(new java.lang.ref.WeakReference<>(null)), "cleared list");
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(new java.lang.ref.WeakReference<>(list())), "other thread unaffected");
+        scoped.state = 1;
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(reference), "manual scroll cancels native guard");
+        released(scoped);
+        scoped.state = 0;
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(reference), "native guard does not resume");
+        KeepDmScrollPosition.preserveReplyLayout(scoped);
+        androidx.recyclerview.widget.RecyclerView next = list();
+        KeepDmScrollPosition.preserveReplyLayout(next);
+        released(scoped);
+        check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(reference), "new conversation retires old state");
+        next.expire(); released(next);
+        for (boolean atLatest : new boolean[] {false, true}) {
+            scoped = list(); KeepDmScrollPosition.preserveReplyLayout(scoped);
+            check(!KeepDmScrollPosition.shouldKeepPosition(atLatest ? new Object() : null, atLatest),
+                    "normal subsequent send keeps stock behavior");
+            released(scoped);
+            check(!KeepDmScrollPosition.shouldSkipReplyLayoutScroll(new java.lang.ref.WeakReference<>(scoped)),
+                    "normal subsequent send clears native viewport guard");
         }
-        for (int scenario = 0; scenario < 10; scenario++) {
-            androidx.recyclerview.widget.RecyclerView v = list();
+
+        // Regression: composer cleanup may happen after several unchanged draws.
+        androidx.recyclerview.widget.RecyclerView v = list();
+        KeepDmScrollPosition.preserveReplyLayout(v);
+        for (int i = 0; i < 3; i++) { android.os.SystemClock.now += 16; v.observer.draw(); }
+        resize(v, 48);
+        check(v.children.get(0).top == -40, "delayed reply resize preserves the Reel offset");
+        v.expire(); released(v);
+
+        // ItemAnimator can initially mask the layout shift with a translation,
+        // then settle it over subsequent frames. Preserve what is actually drawn.
+        v = list(); KeepDmScrollPosition.preserveReplyLayout(v);
+        v.height += 48;
+        for (android.view.View child : v.children) { child.top += 48; child.translationY = -48; }
+        v.observer.draw();
+        check(v.children.get(0).top + v.children.get(0).translationY == -40,
+                "resize animation must not introduce a reverse hop");
+        for (float translation : new float[] {-36.5f, -24.25f, -12f, 0f}) {
+            for (android.view.View child : v.children) child.translationY = translation;
+            v.observer.draw();
+            check(Math.abs(v.children.get(0).top + translation + 40) <= 0.5f,
+                    "animated visual anchor: " + translation);
+        }
+        v.expire(); released(v);
+        // A secondary row can use a different animation; only the primary visual
+        // anchor is restored, with the second row corroborating layout movement.
+        v = list(); KeepDmScrollPosition.preserveReplyLayout(v);
+        v.height += 48;
+        for (android.view.View child : v.children) child.top += 48;
+        v.children.get(0).translationY = -48; v.observer.draw();
+        v.children.get(0).translationY = -24; v.observer.draw();
+        check(v.children.get(0).top - 24 == -40, "independent secondary animation");
+        v.children.get(0).translationY = 0; v.observer.draw();
+        check(v.children.get(0).top == -40, "primary anchor after unequal animations");
+        v.expire(); released(v);
+        v = list(); KeepDmScrollPosition.preserveReplyLayout(v);
+        for (android.view.View child : v.children) child.translationY = -12;
+        v.observer.draw();
+        check(v.scrollCalls == 0, "unrelated item animation must not be compensated");
+        released(v);
+
+        for (int delta : new int[] {48, -48, 1, 0}) {
+            v = list();
             KeepDmScrollPosition.preserveReplyLayout(v);
+            resize(v, delta);
+            check(v.children.get(0).top == -40, "pixel offset restored: " + delta);
+            check(v.scrollCalls == (delta == 0 ? 0 : 1), "one correction per resize");
+            resize(v, 12); resize(v, 12); resize(v, 24);
+            check(v.children.get(0).top == -40, "animated resize preserves the original anchor");
+            v.expire(); released(v);
+            resize(v, 30);
+            check(v.children.get(0).top == -10, "layouts after timeout untouched");
+        }
+        v = list(); v.paddingBottom = 48;
+        KeepDmScrollPosition.preserveReplyLayout(v);
+        v.paddingBottom = 0;
+        for (android.view.View child : v.children) child.top += 48;
+        v.observer.draw();
+        check(v.children.get(0).top == -40, "bottom inset removal without a height change");
+        v.expire(); released(v);
+
+        v = list(); KeepDmScrollPosition.preserveReplyLayout(v);
+        v.screenOffset = 48; v.observer.draw();
+        check(v.children.get(0).top + v.screenOffset == -40, "screen coordinate anchor");
+        v.expire(); released(v);
+
+        v = list(); KeepDmScrollPosition.preserveReplyLayout(v);
+        v.height += 48; v.observer.draw();
+        check(v.scrollCalls == 0, "do not duplicate native top anchoring");
+        resize(v, 24);
+        check(v.children.get(0).top == -40, "later bottom-anchored resize");
+        v.expire(); released(v);
+
+        for (int scenario = 0; scenario < 10; scenario++) {
+            v = list(); KeepDmScrollPosition.preserveReplyLayout(v);
             v.height += 48; for (android.view.View child : v.children) child.top += 48;
             switch (scenario) {
-                case 0: v.state = 1; break; // dragging
-                case 1: v.state = 2; break; // fling
-                case 2: v.children.get(0).parent = null; break; // anchor recycled
-                case 3: v.children.get(1).top += 12; break; // independent dataset change
-                case 4: v.width++; break; // orientation/window change
+                case 0: v.state = 1; break;
+                case 1: v.state = 2; break;
+                case 2: v.children.get(0).parent = null; break;
+                case 3: v.children.get(1).top += 12; break;
+                case 4: v.width++; break;
                 case 5: v.focus = false; break;
-                case 6: v.detach(); break; // navigation / fragment teardown
-                case 7: v.height -= 48; break; // scroll without viewport resize
-                case 8: v.top++; break;
-                case 9: v.paddingBottom++; break;
+                case 6: v.detach(); break;
+                case 7: v.height -= 48; break; // explicit scrolling, no viewport resize
+                case 8: v.children.get(0).height++; break; // media item resize/rebind
+                case 9: android.os.SystemClock.now += 1001; break; // timer delivery delayed
             }
             v.observer.draw();
             check(v.scrollCalls == 0, "excluded movement " + scenario);
-            check(v.attach.isEmpty() && v.observer.listeners.isEmpty(), "cleanup " + scenario);
+            released(v);
+            v.state = 0; resize(v, 10);
+            check(v.scrollCalls == 0, "cancelled tracking never resumes");
         }
-        androidx.recyclerview.widget.RecyclerView v = list();
-        v.children.remove(1); // a large Reel can be the only visible item
+        v = list(); v.children.remove(1);
         KeepDmScrollPosition.preserveReplyLayout(v);
-        v.height += 48; v.children.get(0).top += 48; v.observer.draw();
+        resize(v, 48);
         check(v.children.get(0).top == -40, "single large Reel");
-        v = list(); v.state = 1;
-        KeepDmScrollPosition.preserveReplyLayout(v);
-        check(v.observer.listeners.isEmpty(), "do not arm while dragging");
-        v = list(); v.attached = false;
-        KeepDmScrollPosition.preserveReplyLayout(v);
-        check(v.observer.listeners.isEmpty(), "do not arm detached view");
+        v.expire(); released(v);
+
+        v = list(); v.scrollLimit = 12; KeepDmScrollPosition.preserveReplyLayout(v);
+        resize(v, 48); released(v);
+        resize(v, 12);
+        check(v.scrollCalls == 1, "never chase a clamped native scroll");
+        v = list(); KeepDmScrollPosition.preserveReplyLayout(v); v.expire(); released(v);
+        v = list(); v.state = 1; KeepDmScrollPosition.preserveReplyLayout(v); released(v);
+        v = list(); v.attached = false; KeepDmScrollPosition.preserveReplyLayout(v); released(v);
+        v = list(); v.acceptsPosts = false; KeepDmScrollPosition.preserveReplyLayout(v); released(v);
+        v = list(); KeepDmScrollPosition.preserveReplyLayout(v);
+        KeepDmScrollPosition.preserveReplyLayout(v); resize(v, 48);
+        check(v.scrollCalls == 1, "rapid consecutive replies must not double compensate");
+        v.expire(); released(v);
     }
     public static void main(String[] args) {
         Object reply = new Object();
@@ -210,7 +336,7 @@ public class HookTest {
         check(polish.preference.title.equals("Zachowuj pozycję przewijania podczas odpowiadania"), "Polish title");
         check(polish.preference.summary.startsWith("Pozostań"), "Polish summary");
         layoutTests();
-        System.out.println("PASS: default on, send decisions, preferences, localization and one-frame resize anchoring");
+        System.out.println("PASS: default on, send decisions, preferences, localization and delayed, animated and inset resize anchoring");
     }
 }
 """,

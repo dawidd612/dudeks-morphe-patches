@@ -28,6 +28,16 @@ internal object DirectSendCompletedFingerprint : Fingerprint(
     },
 )
 
+// The layout-time bottom-edge nudge is independent of the send-to-latest runnable.
+internal object DirectViewportLayoutFingerprint : Fingerprint(
+    strings = listOf(
+        "DirectMessageListLinearLayoutManager.onLayoutChildren",
+        "DirectThreadScrollBottomIntoViewportLayoutHelper.afterLayoutChildren",
+    ),
+    returnType = "V",
+    custom = { method, _ -> method.parameterTypes.size == 2 },
+)
+
 internal const val PIKO_SETTINGS = "Lapp/morphe/extension/instagram/settings"
 internal const val SCREEN_BUILDER = "$PIKO_SETTINGS/preference/ScreenBuilder;"
 internal const val HELPER = "$PIKO_SETTINGS/preference/Helper;"
