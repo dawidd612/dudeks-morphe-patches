@@ -49,7 +49,10 @@ public final class KeepDmScrollPosition {
         }
         // The last drawn frame precedes insertion at position zero. Checking only
         // the new adapter positions would mistake normal bottom sending for history.
-        if (state != null && state.drawn && list.getScrollState() == 0) return state.history;
+        if (state != null && state.drawn && list.getScrollState() == 0) {
+            if (state.history) state.resizeUntil = SystemClock.uptimeMillis() + 1000;
+            return state.history;
+        }
         return inHistory(list);
     }
 
@@ -85,7 +88,7 @@ public final class KeepDmScrollPosition {
         View anchor;
         long itemId, resizeUntil;
         int position, itemCount, anchorHeight, width, height, paddingTop, paddingBottom, screenTop;
-        float anchorY, translation;
+        float anchorY;
         boolean drawn, history, allowBottom, disposed;
 
         State(RecyclerView list) {
@@ -105,11 +108,12 @@ public final class KeepDmScrollPosition {
         private boolean sameItem() {
             if (anchor == null || anchor.getParent() != list || anchor.getHeight() != anchorHeight) return false;
             int current = list.getChildAdapterPosition(anchor);
-            if (current < 0) return false;
+            RecyclerView.LayoutManager manager = list.getLayoutManager();
+            if (current < 0 || manager == null) return false;
             // Prefer stable IDs. Without them, retain the attached view only;
             // explicit navigation and drag/fling invalidate it separately.
             return itemId != -1 ? list.getChildItemId(anchor) == itemId :
-                    current == position || current == position + list.getLayoutManager().getItemCount() - itemCount;
+                    current == position || current == position + manager.getItemCount() - itemCount;
         }
 
         private void capture() {
@@ -129,7 +133,6 @@ public final class KeepDmScrollPosition {
                 position = list.getChildAdapterPosition(anchor);
                 itemCount = list.getLayoutManager().getItemCount();
                 anchorY = visualY(anchor);
-                translation = anchor.getTranslationY();
             }
         }
 
@@ -146,17 +149,14 @@ public final class KeepDmScrollPosition {
             boolean valid = history && idle && !allowBottom && list.hasWindowFocus() &&
                     width == list.getWidth() && sameItem();
             if (valid && resized) resizeUntil = now + 1000;
-            if (valid && now < resizeUntil &&
-                    (resized || translation != anchor.getTranslationY())) {
+            if (valid && now < resizeUntil) {
                 int delta = Math.round(visualY(anchor) - anchorY);
                 if (delta != 0) list.scrollBy(0, delta);
                 // A boundary, changed item or clamped scroll retires this anchor.
                 if (!sameItem() || Math.abs(visualY(anchor) - anchorY) > 1) {
                     resizeUntil = 0;
                 }
-                translation = anchor == null ? 0 : anchor.getTranslationY();
-            } else if (!valid || now >= resizeUntil ||
-                    (anchor != null && Math.abs(visualY(anchor) - anchorY) > 1)) {
+            } else if (!valid || now >= resizeUntil) {
                 resizeUntil = 0;
             }
             history = inHistory(list);

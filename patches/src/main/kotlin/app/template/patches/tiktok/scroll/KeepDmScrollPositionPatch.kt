@@ -47,8 +47,8 @@ val keepTikTokDmScrollPositionPatch = bytecodePatch(
                 ref is MethodReference && ref.name == "scrollToPositionWithOffset"
             }
         }
-        // The original first instruction after scrolling reloads the receiver
-        // register. It can safely hold our boolean result on the skipped path.
+        // The next native assignment provides a dead temporary for our result,
+        // preserving the RecyclerView register on the original fallthrough.
         val listRegister = commit.getInstruction<Instruction35c>(stop).registerC
         val next = commit.getInstruction<TwoRegisterInstruction>(scroll + 1)
         checkShape(scroll == stop + 4 && instructions[scroll + 1].opcode == Opcode.IGET_OBJECT &&
@@ -80,7 +80,7 @@ val keepTikTokDmScrollPositionPatch = bytecodePatch(
 
         // Direct message-ID/position navigation (tap a quote, search result, etc.)
         // is distinct from dataset auto-scroll and retires the resize anchor.
-        val navigation = classDefBy("Lcom/ss/android/ugc/aweme/im/messagelist/api/ability/MessageListScrollAbilityImpl;")
+        val navigation = mutableClassDefBy("Lcom/ss/android/ugc/aweme/im/messagelist/api/ability/MessageListScrollAbilityImpl;")
         val methods = navigation.methods.filter { method ->
             method.returnType == "V" && method.parameterTypes.firstOrNull() in listOf("I", "J") &&
                 method.parameterTypes.any { it == "Ljava/lang/String;" || it.toString().startsWith("Lkotlin/jvm/functions/Function") }

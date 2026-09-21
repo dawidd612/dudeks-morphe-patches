@@ -124,6 +124,14 @@ public class HookTest {
             r.paddingBottom+=30;for(View v:r.children)v.top-=30;r.observer.draw();
             check(y(r)==start,"bottom inset stable="+stable);r.detach();
         }
+        r=list(true);float commitY=y(r);
+        KeepDmScrollPosition.shouldSkipAutoScroll(r);
+        r.shift++;r.lm.count++;for(View v:r.children)v.top+=45;r.observer.draw();
+        check(y(r)==commitY,"dataset shift without viewport resize");
+        for(View v:r.children)v.top+=20;r.observer.draw();
+        check(y(r)==commitY,"delayed dataset movement");
+        KeepDmScrollPosition.navigateToMessage();for(View v:r.children)v.top-=100;r.observer.draw();
+        check(y(r)==commitY-100,"explicit navigation cancels commit anchor");r.detach();
         r=list(true);float start=y(r);resize(r,60);for(View v:r.children)v.translationY=-60;r.observer.draw();
         check(y(r)==start,"resize initially hidden by item animation");
         for(View v:r.children)v.translationY=-30;r.observer.draw();check(y(r)==start,"animation halfway");
