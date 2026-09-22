@@ -1,7 +1,8 @@
-/* Gardenscapes 9.9.0 arm64 only. Calls the original earned-star transaction. */
+/* Gardenscapes 9.9.0 arm64: repair the saved balance when the garden reads it. */
 typedef long i64;
+__attribute__((visibility("hidden"))) extern void *game_get_player(void);
 __attribute__((visibility("hidden"))) extern int game_get_int(void *);
-__attribute__((visibility("hidden"))) extern void game_add_stars(void *, int);
+__attribute__((visibility("hidden"))) extern void game_set_int(void *, int);
 #ifdef REPAIR_TEST
 extern i64 repair_syscall(i64, i64, i64, i64, i64);
 #else
@@ -17,43 +18,55 @@ static i64 repair_syscall(i64 n, i64 a, i64 b, i64 c, i64 d) {
 #endif
 static int earned(void *p) { return game_get_int((char *)p + 912); }
 static int spent(void *p) { return game_get_int((char *)p + 1016); }
+static int balance(void *p) { return (int)((unsigned)earned(p) - (unsigned)spent(p)); }
 
-__attribute__((visibility("hidden"))) void repair_stars(void *player, int amount) {
-    if (amount <= 0) { game_add_stars(player, amount); return; }
+__attribute__((visibility("hidden"))) int repair_stars(void *player) {
+    if (!player) return 0;
     i64 e = earned(player), s = spent(player);
-    i64 correction = s + 2 - e;
-    if (e >= s || s < 0 || s > 2147483645L || correction > 2147483647L) {
-        game_add_stars(player, amount); return;
-    }
+    int before = (int)((unsigned)e - (unsigned)s);
+    if (e >= s || s < 0 || (e < 2 && s > 2147483645L)) return before;
     i64 uid = repair_syscall(174, 0, 0, 0, 0); /* getuid */
-    if (uid < 10000 || uid > 2147483647L) { game_add_stars(player, amount); return; }
+    if (uid < 10000 || uid > 2147483647L) return before;
     unsigned user = (unsigned)uid / 100000;
     char path[128], digits[12];
-    const char *prefix = "/data/user/", *suffix = "/com.playrix.gardenscapes/files/.dudek-stars-repaired-v1";
+    /* A v1 completion may predate a save reload. This update authorizes one retry
+       for a still-negative balance; healthy saves are never topped up. */
+    const char *prefix = "/data/user/", *suffix = "/com.playrix.gardenscapes/files/.dudek-stars-repaired-v2";
     int pos = 0, count = 0;
     while (*prefix) path[pos++] = *prefix++;
     do { digits[count++] = '0' + user % 10; user /= 10; } while (user);
     while (count) path[pos++] = digits[--count];
     while (*suffix) path[pos++] = *suffix++;
     path[pos] = 0;
-    /* O_RDWR | O_CREAT | O_NOFOLLOW | O_CLOEXEC; app-private, owner only. */
-    i64 fd = repair_syscall(56, -100, (i64)path, 2 | 64 | 0x20000 | 0x80000, 0600);
-    if (fd < 0) { game_add_stars(player, amount); return; }
+    /* Linux/Android ARM64 O_NOFOLLOW is 0100000, unlike x86's 00400000.
+       O_RDWR | O_CREAT | O_NOFOLLOW | O_CLOEXEC; owner-only app-private file. */
+    i64 fd = repair_syscall(56, -100, (i64)path, 2 | 0100 | 0100000 | 02000000, 0600);
+    if (fd < 0) return before;
     if (repair_syscall(32, fd, 6, 0, 0) != 0) { /* flock LOCK_EX | LOCK_NB */
         repair_syscall(57, fd, 0, 0, 0);
-        game_add_stars(player, amount); return;
+        return before;
     }
     char done = 0;
     i64 size = repair_syscall(63, fd, (i64)&done, 1, 0);
-    if (size != 0) { /* Completed marker or unreadable state: fail closed. */
+    if (size != 0) {
         repair_syscall(57, fd, 0, 0, 0);
-        game_add_stars(player, amount); return;
+        return before;
     }
-    game_add_stars(player, (int)correction);
-    if ((i64)earned(player) - spent(player) == 2) {
+    /* Preserve legitimately earned stars/level progress. Correct the spent
+       counter through the game's notifying, save-backed property setter.
+       Only a corrupt earned counter below 2 needs the opposite adjustment. */
+    if (e >= 2) game_set_int((char *)player + 1016, (int)e - 2);
+    else game_set_int((char *)player + 912, (int)s + 2);
+    int after = balance(player);
+    if (after == 2) {
         done = 'D';
         if (repair_syscall(64, fd, (i64)&done, 1, 0) == 1)
-            repair_syscall(82, fd, 0, 0, 0); /* fsync */
+            repair_syscall(82, fd, 0, 0, 0);
     }
     repair_syscall(57, fd, 0, 0, 0);
+    return after; /* Never return a fabricated UI balance if the setter failed. */
+}
+
+__attribute__((visibility("hidden"))) int repair_get_stars(void) {
+    return repair_stars(game_get_player());
 }

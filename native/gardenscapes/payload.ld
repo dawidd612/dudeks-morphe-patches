@@ -1,6 +1,7 @@
 ENTRY(repair_entry)
-game_get_int = 0x38b6d08;
-game_add_resume = 0x38bd6e8;
+game_get_player = 0x386bd78;
+game_get_int = 0x387151c;
+game_set_int = 0x3871490;
 SECTIONS {
     . = 0x79a1000;
     .payload : { KEEP(*(.text.entry)) *(.text*) *(.rodata*) }

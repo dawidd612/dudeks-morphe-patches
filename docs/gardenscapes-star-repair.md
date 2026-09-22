@@ -5,28 +5,56 @@ The native library must have SHA-256
 `3a15c3c170c21a12b5f0253a9421b6bc41707f4e34285acbbcae8afde4851c5c`.
 Other builds, other CPU architectures and previously modified libraries are unsupported.
 
-The supplied XAPK contains the game engine in libgame.so and PLXE-encrypted Lua/XML
-assets. DEX hooks cannot directly repair the engine's saved star balance.
-ARM64 disassembly confirms the Lua GetStars binding at 0x3c0f930, its wrapper at
-0x3c15ad8, and the earned/spent property offsets 912/1016. The property reader is
-0x38b6d08. The earned-star transaction at 0x38bd6e4 reads the earned property,
-adds its argument, calls the property setter at 0x3871490 and notifies listeners.
-The cached UI fields alone are not patched.
+## Garden balance hook
 
-A strictly hash-guarded raw-resource patch adds a read/execute ELF segment,
-relocates the program-header table into it, and redirects the transaction entry.
-The original prologue is replayed by a trampoline. The native helper calls the
-original transaction with `spent + 2 - earned` only for a negative balance and a
-positive reward. Normal balances and non-positive transactions remain unchanged.
-The final balance is 2, inclusive of that reward. Integer overflow fails closed.
+The supplied XAPK contains libgame.so and PLXE-encrypted Lua/XML assets. The Lua
+`GetStars` binding at 0x3c0f930 registers the function at 0x3c15ad8. Disassembly
+shows that it gets the current player via 0x386bd78, reads the saved earned/spent
+properties at offsets 912/1016 via 0x387151c, and returns their difference. That
+reader also refreshes the property's UI cache. The notifying, save-backed property
+setter is 0x3871490. These are real properties, not just HUD text.
 
-An app-private marker under files/.dudek-stars-repaired-v1 is protected with flock.
-It is marked complete only after rereading a balance of 2. Marker presence prevents
-another correction even if a later balance becomes negative. Empty files from an
-interrupted operation are retryable; a repaired positive balance is never topped up.
-Paths derive the Android user number from UID and support secondary users. Storage
-or locking errors preserve the original reward. Clearing app data or reinstalling
-removes the marker. No account information or message content is stored.
+The patch redirects this specific garden balance getter into an added read/execute
+ELF segment. Original mappings stay intact and the program-header table is relocated.
+The hook gets the same player, reads the same properties and, only for a negative
+balance, performs one repair before returning the actual reread balance. For earned
+values of at least 2, it sets spent to `earned - 2`, preserving earned stars and level
+progress. If the earned counter itself is below 2, it instead sets earned to
+`spent + 2`, with an overflow guard. The original setter updates saved properties,
+caches and notifications. A rejected setter does not produce a fake UI value or a
+completion marker. Null player and unavailable storage leave recovery inactive.
+
+The former AddEarnedStars entry at 0x38bd6e4 is no longer patched. A level completion
+is no longer required, and normal rewards are not inflated into a large award.
+Positive and zero balances are never topped up, including after spending a repaired
+star. Existing normal reward/spending code stays intact.
+
+## Why the previous version was insufficient
+
+On the user's phone, the unofficial-install dialog fix worked, but a completed level
+changed -1401 to -1400. The v1 tests covered an isolated reward function with mocked
+engine calls and mocked file syscalls; they did not prove that the repair ran at the
+garden's loaded-save read or remained effective after loading/synchronizing a save.
+The exact runtime reason cannot be established without device diagnostics. In v1,
+any I/O failure or nonempty completion marker silently preserved a normal +1 reward.
+
+V2 moves repair to the garden's confirmed GetStars binding, changes the saved spent
+counter rather than issuing an oversized reward event, and uses a separate
+files/.dudek-stars-repaired-v2 marker. A stale v1 marker cannot suppress this retry.
+A completed v2 marker still prevents another correction even if a later balance is
+negative. Empty files from an interrupted attempt are retryable. flock prevents
+concurrent or reentrant repairs. Clearing app data/uninstalling removes the marker.
+No account identifiers or message content are stored.
+
+The ARM64 O_NOFOLLOW constant is also corrected to 0100000. The old x86-style
+0x20000 value meant O_LARGEFILE on ARM64 and did not provide the intended symlink
+protection. This was a separate verified ABI bug, not proof of the user's +1 cause.
+Reference: Linux v6.6 arch/arm64/include/uapi/asm/fcntl.h.
+
+Marker persistence and game autosave are not one atomic transaction. A later cloud
+rollback is not bypassed, and actual restart/cloud persistence needs device testing.
+
+## Local installation dialog
 
 The repaired APK has a different signing certificate. The local installation check
 at 0x3c254fc reads `EnableGameBlockedWindow`, calls the device-property check at
@@ -35,59 +63,43 @@ at 0x3c254fc reads `EnableGameBlockedWindow`, calls the device-property check at
 in the lambda RTTI (`ZN12AndroidUtils29ShowInvalidCertificateMessageEvE3$_0`), whose
 vtable is constructed in that function. Its only direct caller is the BL at
 0x3c25570. The patch replaces that BL with NOP, under the same full-library hash
-guard. It does not falsify the certificate result or change installer identity,
-serverCheaterType, localCheaterType or IsBannedBySupport. This targets the local
-"unofficial source" dialog; it does not establish that an account is unrestricted.
+guard. Certificate results and account/server restrictions are not changed.
+The user confirmed on-device that this removes the local dialog and allows play.
 
-This does not bypass server synchronization or account restrictions. Static/native logic
-checks do not prove that a cloud save will accept the correction. Actual device
-behavior, restart persistence and cloud synchronization require testing. The patch
-is experimental and selected by default in Morphe. Selecting it activates the hook
-without an in-game toggle; the actual correction still waits for the next positive
-star reward. Do not claim confirmed recovery yet.
+The patch remains experimental and selected by default in Morphe. It needs no
+in-game activation, but the v2 repair still needs confirmation on the user's save.
 
-## Building
+## Building and validation
 
-`python3 scripts/build_gardenscapes_payload.py` runs host tests against the production
-C helper and builds the freestanding ARM64 payload with Clang/LLD. Only our code is
-included in the payload. Native game offsets are locked to the full library hash.
-`python3 scripts/test_gardenscapes_arm64.py` executes the compiled payload and
-trampoline with Unicorn at two load addresses, checking registers, stack, marker
-persistence and error paths.
-`python3 scripts/verify_gardenscapes_apk.py original.xapk patched.apk` verifies
-the emitted APK, its unchanged DEX and the exact ELF changes.
-The build rejects a mismatch with the committed payload. After deliberately changing
-the helper or compiler, use `--update`, review the new bytes and rerun all tests.
-The generated base64 payload belongs in patches/src/main/resources/gardenscapes.
+- `python3 scripts/build_gardenscapes_payload.py` tests the production C helper and
+  builds the freestanding ARM64 payload with Clang/LLD. A changed payload is rejected
+  unless `--update` is supplied. CI publishes a candidate and separately fails if
+  it differs from the committed payload, so generated bytes must be reviewed.
+- `python3 scripts/test_gardenscapes_arm64.py` executes the compiled getter at two
+  ASLR addresses. It checks the returned balance against the modified properties,
+  normal spending/rewards, marker behavior, stack and callee-saved registers.
+- `native/gardenscapes/test_filesystem.c` runs with target ARM64 libc headers under
+  qemu-aarch64. It uses real open/read/write/flock/fsync/close calls. Only Android
+  UID, app-directory prefix and engine property access are substituted. It tests
+  the exact target ABI flags, legacy-marker migration, actual completion-file
+  persistence, process restart, lock contention, empty-file retry and symlink refusal.
+- `python3 scripts/verify_gardenscapes_apk.py original.xapk patched.apk` checks the
+  actual Morphe output: unchanged DEX, exact garden getter branch, original reward
+  path untouched, isolated certificate-dialog call, RX payload and ELF mappings.
+- Full Kotlin/Java build and the existing DM add-on regressions must pass before release.
 
 ## Test na telefonie
 
-Zachowaj dotychczasowy postęp. Nie odinstalowuj gry ani nie czyść danych tylko po to,
-żeby wgrać patch; jeśli podpis instalacji jest inny, najpierw rozwiąż kwestię kopii
-zapisu. Sam XAPK nie zawiera Twojego postępu.
-
-1. Zaktualizuj źródło patchy i spatchuj oryginalne 9.9.0 w Morphe. Repair negative
-   stars once jest domyślnie zaznaczony. Zainstaluj aktualizację z tym samym kluczem
-   podpisu Morphe, zachowując dane gry.
-2. Na urządzeniu ARM64 sprawdź, czy lokalne okno "unofficial source" zniknęło.
-   Otwórz zapis z ujemnym saldem i zdobądź jedną gwiazdkę. Nie ma dodatkowego
-   przełącznika do włączenia w grze.
-3. Oczekiwany wynik: 2 gwiazdki. Wydaj jedną w ogrodzie i sprawdź rzeczywiste
-   wykonanie zadania, a nie tylko licznik.
-4. Uruchom grę ponownie i sprawdź saldo. Zdobądź kolejną gwiazdkę: ma przybyć
-   normalnie jedna, bez ponownego ustawiania na 2.
-5. Osobno sprawdź zachowanie po synchronizacji zapisu. Cofnięcie salda przez serwer
-   oznacza, że lokalna naprawa nie rozwiązała problemu synchronizacji.
-
-## Validation performed
-
-- Full Kotlin/Java patch and extension build passed.
-- 19 host scenarios execute the production C helper.
-- 16 scenarios execute the compiled ARM64 payload and trampoline, at two load
-  addresses, preserving stack and callee-saved registers.
-- Morphe Desktop 1.16.0 successfully patched and rebuilt the supplied 9.9.0 XAPK.
-- The emitted APK verifier checks: original DEX unchanged, one native entry branch,
-  exactly one skipped local certificate-dialog call with its guard preserved,
-  exact compiled payload, preserved original ELF segments and a correctly relocated
-  program-header table with a read/execute payload segment.
-- Phone launch, actual garden spending and cloud/restart persistence remain untested.
+1. Odśwież źródło patchy i ponownie spatchuj oryginalne 9.9.0 ARM64 w Morphe,
+   wybierając Repair negative stars once (domyślnie zaznaczony).
+2. Zainstaluj jako aktualizację z tym samym kluczem Morphe. Nie usuwaj gry ani jej
+   danych. Nie trzeba usuwać znacznika pozostawionego przez starszą wersję patcha.
+3. Otwórz ogród z ujemnym saldem. Oczekiwany wynik to dokładnie 2 gwiazdki przy
+   odczycie licznika, bez kończenia kolejnego levelu.
+4. Wydaj jedną gwiazdkę na zadanie: zadanie ma zostać wykonane, a saldo wynosić 1.
+   Ponowne otwarcie ogrodu nie powinno uzupełniać salda do 2.
+5. Uruchom grę ponownie i sprawdź saldo. Zdobądź następną gwiazdkę: ma przybyć
+   normalnie jedna. Osobno sprawdź zachowanie po synchronizacji zapisu.
+6. Jeśli saldo pozostanie ujemne albo wróci do ujemnego po restarcie/synchronizacji,
+   zapisz, na którym etapie to nastąpiło. Nie oznacza to potwierdzonego odzyskania
+   postępu mimo poprawnego wyniku testów kodu.
