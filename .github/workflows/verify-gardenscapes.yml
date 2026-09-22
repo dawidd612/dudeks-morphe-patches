@@ -22,6 +22,10 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y clang lld
       - name: Test production logic and build ARM64 payload
         run: python3 scripts/build_gardenscapes_payload.py
+      - name: Execute compiled ARM64 code
+        run: |
+          python3 -m pip install unicorn==2.1.4
+          python3 scripts/test_gardenscapes_arm64.py
       - name: Compile patch bundle
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -34,3 +38,13 @@ jobs:
             patches/src/main/resources/gardenscapes/repair-arm64.b64
             patches-list.json
           if-no-files-found: error
+      - name: Prepare local validation tools
+        run: |
+          mkdir -p validation-tools
+          curl -fL --retry 3 https://github.com/MorpheApp/morphe-desktop/releases/download/v1.16.0/morphe-desktop-1.16.0-all.jar -o validation-tools/morphe.jar
+          tar -czf validation-tools/jdk21.tar.gz -C "$JAVA_HOME" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gardenscapes-validation-tools
+          path: validation-tools
+          retention-days: 1
