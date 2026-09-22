@@ -62,9 +62,9 @@ See [DEX analysis, compatibility and phone testing](docs/tiktok-dm-scroll.md).
 
 ### Gardenscapes
 
-**Repair negative stars once** is an experimental recovery patch for the original **9.9.0 ARM64** build. Select it manually. At the next positive star reward, a negative balance is corrected to **2**, then an app-private marker prevents another correction. Normal balances are unchanged. The marker is removed if app data is cleared or the app is uninstalled.
+**Repair negative stars once** is an experimental recovery patch for the original **9.9.0 ARM64** build, selected by default in Morphe. It skips the local unofficial-install dialog caused by the changed APK signature. At the next positive star reward, a negative balance is corrected to **2**, then an app-private marker prevents another correction. Normal balances are unchanged. The marker is removed if app data is cleared or the app is uninstalled. Account/server restrictions are unaffected.
 
-**PL:** Po spatchowaniu zdobądź jedną gwiazdkę. Oczekiwany wynik przy ujemnym saldzie to 2. Następnie sprawdź wykonanie zadania w ogrodzie, restart i synchronizację. Nie usuwaj aktualnej instalacji bez zabezpieczenia postępu. Potwierdzenie działania na rzeczywistym zapisie wymaga testu na telefonie.
+**PL:** Patch jest domyślnie zaznaczony w Morphe i nie wymaga włączania w grze. Pomija lokalne okno informujące o nieoficjalnej instalacji. Po spatchowaniu zdobądź jedną gwiazdkę. Oczekiwany wynik przy ujemnym saldzie to 2. Następnie sprawdź wykonanie zadania w ogrodzie, restart i synchronizację. Nie usuwaj aktualnej instalacji bez zabezpieczenia postępu. Potwierdzenie działania na rzeczywistym zapisie wymaga testu na telefonie.
 
 See [native analysis, limitations and phone testing](docs/gardenscapes-star-repair.md).
 

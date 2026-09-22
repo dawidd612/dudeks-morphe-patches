@@ -16,6 +16,7 @@ internal object GardenscapesElfRepair {
     private const val SEGMENT_ADDRESS = 0x79a0000L
     private const val HOOK_ADDRESS = 0x79a1000L
     private const val ADD_STARS = 0x38bd6e4
+    private const val INVALID_CERTIFICATE_MESSAGE_CALL = 0x3c25570
 
     fun apply(original: ByteArray, payload: ByteArray): ByteArray {
         val digest = MessageDigest.getInstance("SHA-256").digest(original)
@@ -25,6 +26,9 @@ internal object GardenscapesElfRepair {
         val source = ByteBuffer.wrap(original).order(ByteOrder.LITTLE_ENDIAN)
         require(source.getShort(18).toInt() == 183 && source.getShort(54).toInt() == 56)
         require(source.getInt(ADD_STARS) == 0xd100c3ff.toInt()) { "Earned-star transaction prologue changed" }
+        require(source.getInt(INVALID_CERTIFICATE_MESSAGE_CALL) == 0x97ffffc0.toInt()) {
+            "Invalid-certificate message call changed"
+        }
         val oldHeaders = source.getLong(32).toInt()
         val count = source.getShort(56).toInt()
         require(count == 9)
@@ -64,6 +68,10 @@ internal object GardenscapesElfRepair {
         val displacement = HOOK_ADDRESS - ADD_STARS
         require(displacement % 4 == 0L && displacement in -(1L shl 27) until (1L shl 27))
         target.putInt(ADD_STARS, 0x14000000 or ((displacement / 4).toInt() and 0x03ffffff))
+        // Re-signing the repaired APK triggers this local installation dialog.
+        // Skip only the call to AndroidUtils::ShowInvalidCertificateMessage().
+        // Certificate evaluation and account/server restriction paths stay intact.
+        target.putInt(INVALID_CERTIFICATE_MESSAGE_CALL, 0xd503201f.toInt()) // NOP
         return output
     }
 }
@@ -71,8 +79,8 @@ internal object GardenscapesElfRepair {
 @Suppress("unused")
 val repairGardenscapesNegativeStarsPatch = rawResourcePatch(
     name = "Repair negative stars once",
-    description = "Repairs a negative star balance to 2 on the next star reward, once per installation. Gardenscapes 9.9.0 ARM64 only. Experimental; requires a device test.",
-    default = false,
+    description = "Repairs a negative star balance to 2 on the next star reward, once per installation, and skips the local unofficial-install dialog. Gardenscapes 9.9.0 ARM64 only. Experimental; requires a device test.",
+    default = true,
 ) {
     compatibleWith(Compatibility(
         name = "Gardenscapes", packageName = "com.playrix.gardenscapes",
