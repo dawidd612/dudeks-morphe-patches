@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.29.1** (`main`) - **7 patches** across **5 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.29.2** (`main`) - **7 patches** across **5 apps** - back to [README](README.md)
 
 ---
 
@@ -21,7 +21,7 @@
 
 | Patch | Details |
 |---|---|
-| **Repair negative stars once** | Repairs a negative star balance to 2 on the next star reward, once per installation, and skips the local unofficial-install dialog. Gardenscapes 9.9.0 ARM64 only. Experimental; requires a device test. |
+| **Repair negative stars once** | Repairs a negative saved star balance to 2 when the garden reads it, once per installation, and skips the local unofficial-install dialog. No level completion needed. Gardenscapes 9.9.0 ARM64 only. Experimental. |
 
 ---
 

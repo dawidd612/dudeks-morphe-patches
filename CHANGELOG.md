@@ -1,3 +1,9 @@
+## [1.29.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.29.1...v1.29.2) (2026-09-22)
+
+### 🐛 Bug Fixes
+
+* **gardenscapes:** repair saved stars when opening the garden ([#8](https://github.com/dawidd612/dudeks-morphe-patches/issues/8)) ([3ddcb5d](https://github.com/dawidd612/dudeks-morphe-patches/commit/3ddcb5da0d280f8386a0e3618fb7d9a358361360))
+
 ## [1.29.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.29.0...v1.29.1) (2026-09-22)
 
 ### 🐛 Bug Fixes
