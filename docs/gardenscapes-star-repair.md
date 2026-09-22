@@ -28,10 +28,23 @@ Paths derive the Android user number from UID and support secondary users. Stora
 or locking errors preserve the original reward. Clearing app data or reinstalling
 removes the marker. No account information or message content is stored.
 
-This does not bypass server synchronization or integrity checks. Static/native logic
+The repaired APK has a different signing certificate. The local installation check
+at 0x3c254fc reads `EnableGameBlockedWindow`, calls the device-property check at
+0x3c1f164 and, for a false result, dispatches
+`AndroidUtils::ShowInvalidCertificateMessage()` at 0x3c25470. Its identity is retained
+in the lambda RTTI (`ZN12AndroidUtils29ShowInvalidCertificateMessageEvE3$_0`), whose
+vtable is constructed in that function. Its only direct caller is the BL at
+0x3c25570. The patch replaces that BL with NOP, under the same full-library hash
+guard. It does not falsify the certificate result or change installer identity,
+serverCheaterType, localCheaterType or IsBannedBySupport. This targets the local
+"unofficial source" dialog; it does not establish that an account is unrestricted.
+
+This does not bypass server synchronization or account restrictions. Static/native logic
 checks do not prove that a cloud save will accept the correction. Actual device
 behavior, restart persistence and cloud synchronization require testing. The patch
-is experimental and unselected by default. Do not claim confirmed recovery yet.
+is experimental and selected by default in Morphe. Selecting it activates the hook
+without an in-game toggle; the actual correction still waits for the next positive
+star reward. Do not claim confirmed recovery yet.
 
 ## Building
 
@@ -53,8 +66,12 @@ Zachowaj dotychczasowy postęp. Nie odinstalowuj gry ani nie czyść danych tylk
 żeby wgrać patch; jeśli podpis instalacji jest inny, najpierw rozwiąż kwestię kopii
 zapisu. Sam XAPK nie zawiera Twojego postępu.
 
-1. Spatchuj oryginalne 9.9.0 w Morphe, wybierając Repair negative stars once.
-2. Na urządzeniu ARM64 otwórz zapis z ujemnym saldem i zdobądź jedną gwiazdkę.
+1. Zaktualizuj źródło patchy i spatchuj oryginalne 9.9.0 w Morphe. Repair negative
+   stars once jest domyślnie zaznaczony. Zainstaluj aktualizację z tym samym kluczem
+   podpisu Morphe, zachowując dane gry.
+2. Na urządzeniu ARM64 sprawdź, czy lokalne okno "unofficial source" zniknęło.
+   Otwórz zapis z ujemnym saldem i zdobądź jedną gwiazdkę. Nie ma dodatkowego
+   przełącznika do włączenia w grze.
 3. Oczekiwany wynik: 2 gwiazdki. Wydaj jedną w ogrodzie i sprawdź rzeczywiste
    wykonanie zadania, a nie tylko licznik.
 4. Uruchom grę ponownie i sprawdź saldo. Zdobądź kolejną gwiazdkę: ma przybyć
@@ -69,7 +86,8 @@ zapisu. Sam XAPK nie zawiera Twojego postępu.
 - 16 scenarios execute the compiled ARM64 payload and trampoline, at two load
   addresses, preserving stack and callee-saved registers.
 - Morphe Desktop 1.16.0 successfully patched and rebuilt the supplied 9.9.0 XAPK.
-- The emitted APK verifier passed: original DEX unchanged, one native entry branch,
+- The emitted APK verifier checks: original DEX unchanged, one native entry branch,
+  exactly one skipped local certificate-dialog call with its guard preserved,
   exact compiled payload, preserved original ELF segments and a correctly relocated
   program-header table with a read/execute payload segment.
 - Phone launch, actual garden spending and cloud/restart persistence remain untested.
