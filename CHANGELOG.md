@@ -1,3 +1,9 @@
+## [1.29.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.28.1...v1.29.0) (2026-09-22)
+
+### ✨ New Features
+
+* **gardenscapes:** add experimental one-time negative star repair ([#6](https://github.com/dawidd612/dudeks-morphe-patches/issues/6)) ([fe0990d](https://github.com/dawidd612/dudeks-morphe-patches/commit/fe0990d26507fe50bd7224e83f72f698bad22ac8))
+
 ## [1.28.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.28.0...v1.28.1) (2026-09-21)
 
 ### 🐛 Bug Fixes

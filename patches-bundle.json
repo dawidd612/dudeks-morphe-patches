@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-21T12:31:43",
-  "description": "## [1.28.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.28.0...v1.28.1) (2026-09-21)\n\n### 🐛 Bug Fixes\n\n* **tiktok:** preserve history for all messages and composer resizes ([#5](https://github.com/dawidd612/dudeks-morphe-patches/issues/5)) ([8cf1415](https://github.com/dawidd612/dudeks-morphe-patches/commit/8cf1415c596d7ef2ff3483a1431d76c71295a3af))",
-  "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.28.1/patches-1.28.1.mpp",
+  "created_at": "2026-09-22T18:18:38",
+  "description": "## [1.29.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.28.1...v1.29.0) (2026-09-22)\n\n### ✨ New Features\n\n* **gardenscapes:** add experimental one-time negative star repair ([#6](https://github.com/dawidd612/dudeks-morphe-patches/issues/6)) ([fe0990d](https://github.com/dawidd612/dudeks-morphe-patches/commit/fe0990d26507fe50bd7224e83f72f698bad22ac8))",
+  "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.29.0/patches-1.29.0.mpp",
   "signature_download_url": "",
-  "version": "1.28.1"
+  "version": "1.29.0"
 }

@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.28.1",
+  "version": "1.29.0",
   "patches": [
     {
       "name": "Hide Premium prompts",
@@ -177,6 +177,32 @@
                 "X86": 86
               },
               "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Repair negative stars once",
+      "description": "Repairs a negative star balance to 2 on the next star reward, once per installation. Gardenscapes 9.9.0 ARM64 only. Experimental; requires a device test.",
+      "default": false,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.playrix.gardenscapes",
+          "name": "Gardenscapes",
+          "description": null,
+          "apkFileType": "XAPK",
+          "appIconColor": "#58A433",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "9.9.0",
+              "versionCodes": null,
+              "isExperimental": true,
               "minSdk": null,
               "description": null
             }

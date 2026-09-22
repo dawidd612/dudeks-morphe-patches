@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.28.1** (`main`) - **6 patches** across **4 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.29.0** (`main`) - **7 patches** across **5 apps** - back to [README](README.md)
 
 ---
 
@@ -12,6 +12,16 @@
 |---|---|
 | **Play Store Fix** | Removes the Google Play installation check that blocks patched APKs at startup. |
 | **Premium** | Enables Pro features, including after a purchase status refresh. |
+
+---
+
+## Gardenscapes (com.playrix.gardenscapes)
+
+**Supported versions:** `experimental 9.9.0`
+
+| Patch | Details |
+|---|---|
+| **Repair negative stars once** | Repairs a negative star balance to 2 on the next star reward, once per installation. Gardenscapes 9.9.0 ARM64 only. Experimental; requires a device test. |
 
 ---
 
