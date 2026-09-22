@@ -1,3 +1,9 @@
+## [1.29.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.29.0...v1.29.1) (2026-09-22)
+
+### 🐛 Bug Fixes
+
+* **gardenscapes:** skip local installation dialog and enable repair by default ([#7](https://github.com/dawidd612/dudeks-morphe-patches/issues/7)) ([be1494a](https://github.com/dawidd612/dudeks-morphe-patches/commit/be1494ab43028814a5d06e34783ca8e51725c8f9))
+
 ## [1.29.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.28.1...v1.29.0) (2026-09-22)
 
 ### ✨ New Features
