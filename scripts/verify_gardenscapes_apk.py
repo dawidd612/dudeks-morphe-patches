@@ -1,0 +1,31 @@
+"""Verify the actual rebuilt APK against the supplied original XAPK."""
+import base64, hashlib, io, pathlib, struct, sys, zipfile
+root=pathlib.Path(__file__).resolve().parents[1]
+with zipfile.ZipFile(sys.argv[1]) as source:
+    with zipfile.ZipFile(io.BytesIO(source.read('config.arm64_v8a.apk'))) as split:
+        original=split.read('lib/arm64-v8a/libgame.so')
+    with zipfile.ZipFile(io.BytesIO(source.read('com.playrix.gardenscapes.apk'))) as base:
+        dex={n:hashlib.sha256(base.read(n)).digest() for n in base.namelist() if n.startswith('classes') and n.endswith('.dex')}
+with zipfile.ZipFile(sys.argv[2]) as patched:
+    output=patched.read('lib/arm64-v8a/libgame.so')
+    for name,digest in dex.items():assert hashlib.sha256(patched.read(name)).digest()==digest,(name,'unexpected DEX change')
+assert hashlib.sha256(original).hexdigest()=='3a15c3c170c21a12b5f0253a9421b6bc41707f4e34285acbbcae8afde4851c5c'
+payload=base64.b64decode((root/'patches/src/main/resources/gardenscapes/repair-arm64.b64').read_text())
+u16=lambda b,o:struct.unpack_from('<H',b,o)[0]
+u64=lambda b,o:struct.unpack_from('<Q',b,o)[0]
+ph=lambda b,o:struct.unpack_from('<IIQQQQQQ',b,o)
+off=(len(original)+0x3fff)&~0x3fff
+assert u64(output,32)==off and u16(output,56)==10
+for i in range(9):
+    old=ph(original,64+i*56);new=ph(output,off+i*56)
+    if old[0]==6:assert new==(6,4,off,0x79a0000,0x79a0000,560,560,8)
+    else:assert new==old
+assert ph(output,off+9*56)==(1,5,off,0x79a0000,0x79a0000,0x1000+len(payload),0x1000+len(payload),0x4000)
+assert output[off+0x1000:]==payload
+word=struct.unpack_from('<I',output,0x38bd6e4)[0]
+assert word>>26==5 and 0x38bd6e4+(word&0x3ffffff)*4==0x79a1000
+# No changes outside ELF header fields and the single native entry branch.
+restored=bytearray(output[:len(original)])
+for start,size in [(32,8),(56,2),(0x38bd6e4,4)]:restored[start:start+size]=original[start:start+size]
+assert restored==original
+print('PASS: rebuilt APK, unchanged DEX, exact native entry, ASLR-relative branch, RX payload and relocated ELF headers')
