@@ -15,7 +15,7 @@ internal object GardenscapesElfRepair {
     private const val LIBRARY_SHA256 = "3a15c3c170c21a12b5f0253a9421b6bc41707f4e34285acbbcae8afde4851c5c"
     private const val SEGMENT_ADDRESS = 0x79a0000L
     private const val HOOK_ADDRESS = 0x79a1000L
-    private const val ADD_STARS = 0x38bd6e4
+    private const val GET_STARS = 0x3c15ad8
     private const val INVALID_CERTIFICATE_MESSAGE_CALL = 0x3c25570
 
     fun apply(original: ByteArray, payload: ByteArray): ByteArray {
@@ -25,7 +25,7 @@ internal object GardenscapesElfRepair {
         require(payload.isNotEmpty() && payload.size < 0x3000) { "Invalid repair payload" }
         val source = ByteBuffer.wrap(original).order(ByteOrder.LITTLE_ENDIAN)
         require(source.getShort(18).toInt() == 183 && source.getShort(54).toInt() == 56)
-        require(source.getInt(ADD_STARS) == 0xd100c3ff.toInt()) { "Earned-star transaction prologue changed" }
+        require(source.getInt(GET_STARS) == 0xf81e0ffe.toInt()) { "Garden star-balance getter prologue changed" }
         require(source.getInt(INVALID_CERTIFICATE_MESSAGE_CALL) == 0x97ffffc0.toInt()) {
             "Invalid-certificate message call changed"
         }
@@ -65,9 +65,9 @@ internal object GardenscapesElfRepair {
         payload.copyInto(output, newOffset + 0x1000)
         target.putLong(32, newOffset.toLong())
         target.putShort(56, (count + 1).toShort())
-        val displacement = HOOK_ADDRESS - ADD_STARS
+        val displacement = HOOK_ADDRESS - GET_STARS
         require(displacement % 4 == 0L && displacement in -(1L shl 27) until (1L shl 27))
-        target.putInt(ADD_STARS, 0x14000000 or ((displacement / 4).toInt() and 0x03ffffff))
+        target.putInt(GET_STARS, 0x14000000 or ((displacement / 4).toInt() and 0x03ffffff))
         // Re-signing the repaired APK triggers this local installation dialog.
         // Skip only the call to AndroidUtils::ShowInvalidCertificateMessage().
         // Certificate evaluation and account/server restriction paths stay intact.
@@ -79,7 +79,7 @@ internal object GardenscapesElfRepair {
 @Suppress("unused")
 val repairGardenscapesNegativeStarsPatch = rawResourcePatch(
     name = "Repair negative stars once",
-    description = "Repairs a negative star balance to 2 on the next star reward, once per installation, and skips the local unofficial-install dialog. Gardenscapes 9.9.0 ARM64 only. Experimental; requires a device test.",
+    description = "Repairs a negative saved star balance to 2 when the garden reads it, once per installation, and skips the local unofficial-install dialog. No level completion needed. Gardenscapes 9.9.0 ARM64 only. Experimental.",
     default = true,
 ) {
     compatibleWith(Compatibility(

@@ -22,8 +22,10 @@ for i in range(9):
     else:assert new==old
 assert ph(output,off+9*56)==(1,5,off,0x79a0000,0x79a0000,0x1000+len(payload),0x1000+len(payload),0x4000)
 assert output[off+0x1000:]==payload
-word=struct.unpack_from('<I',output,0x38bd6e4)[0]
-assert word>>26==5 and 0x38bd6e4+(word&0x3ffffff)*4==0x79a1000
+assert original[0x3c15ad8:0x3c15adc]==bytes.fromhex('fe0f1ef8')
+assert output[0x38bd6e4:0x38bd768]==original[0x38bd6e4:0x38bd768] # reward path untouched
+word=struct.unpack_from('<I',output,0x3c15ad8)[0]
+assert word>>26==5 and 0x3c15ad8+(word&0x3ffffff)*4==0x79a1000
 # Confirm the original call target and its certificate-result guard before checking
 # that only the dialog dispatch was removed. The condition/check itself must survive.
 call=0x3c25570
@@ -36,6 +38,6 @@ assert output[call:call+4]==bytes.fromhex('1f2003d5') # nop
 assert b'ZN12AndroidUtils29ShowInvalidCertificateMessageEvE3$_0' in original
 # No changes outside ELF header fields, the native entry branch and this dialog call.
 restored=bytearray(output[:len(original)])
-for start,size in [(32,8),(56,2),(0x38bd6e4,4),(call,4)]:restored[start:start+size]=original[start:start+size]
+for start,size in [(32,8),(56,2),(0x3c15ad8,4),(call,4)]:restored[start:start+size]=original[start:start+size]
 assert restored==original
-print('PASS: rebuilt APK, unchanged DEX, exact native entry, isolated certificate-dialog call, ASLR-relative branch, RX payload and relocated ELF headers')
+print('PASS: rebuilt APK, unchanged DEX, exact garden getter entry, isolated certificate-dialog call, ASLR-relative branch, RX payload and relocated ELF headers')
