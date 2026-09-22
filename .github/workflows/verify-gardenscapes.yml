@@ -1,7 +1,7 @@
 name: Verify Gardenscapes repair
 on:
   pull_request:
-    paths: ['native/gardenscapes/**', 'patches/**', 'scripts/build_gardenscapes_payload.py', '.github/workflows/verify-gardenscapes.yml']
+    paths: ['native/gardenscapes/**', 'patches/**', 'scripts/*gardenscapes*.py', '.github/workflows/verify-gardenscapes.yml']
 permissions:
   contents: read
   packages: read
@@ -38,13 +38,3 @@ jobs:
             patches/src/main/resources/gardenscapes/repair-arm64.b64
             patches-list.json
           if-no-files-found: error
-      - name: Prepare local validation tools
-        run: |
-          mkdir -p validation-tools
-          curl -fL --retry 3 https://github.com/MorpheApp/morphe-desktop/releases/download/v1.16.0/morphe-desktop-1.16.0-all.jar -o validation-tools/morphe.jar
-          tar -czf validation-tools/jdk21.tar.gz -C "$JAVA_HOME" .
-      - uses: actions/upload-artifact@v4
-        with:
-          name: gardenscapes-validation-tools
-          path: validation-tools
-          retention-days: 1

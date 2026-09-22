@@ -1,5 +1,5 @@
 """Build the freestanding ARM64 hook; never downloads or embeds game code."""
-import base64, pathlib, struct, subprocess, tempfile
+import base64, pathlib, struct, subprocess, tempfile, sys
 root=pathlib.Path(__file__).resolve().parents[1]
 with tempfile.TemporaryDirectory() as tmp:
     tmp=pathlib.Path(tmp)
@@ -22,5 +22,7 @@ with tempfile.TemporaryDirectory() as tmp:
     assert payload and len(payload)<0x3000
     dest=root/'patches/src/main/resources/gardenscapes/repair-arm64.b64'
     dest.parent.mkdir(parents=True,exist_ok=True)
+    if dest.exists() and base64.b64decode(dest.read_text()) != payload and '--update' not in sys.argv:
+        raise RuntimeError('Payload differs from the committed build; review and regenerate with --update')
     dest.write_text(base64.b64encode(payload).decode()+'\n')
     print('Built ARM64 payload:',len(payload),'bytes')

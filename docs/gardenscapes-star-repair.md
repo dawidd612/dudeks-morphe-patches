@@ -38,6 +38,13 @@ is experimental and unselected by default. Do not claim confirmed recovery yet.
 `python3 scripts/build_gardenscapes_payload.py` runs host tests against the production
 C helper and builds the freestanding ARM64 payload with Clang/LLD. Only our code is
 included in the payload. Native game offsets are locked to the full library hash.
+`python3 scripts/test_gardenscapes_arm64.py` executes the compiled payload and
+trampoline with Unicorn at two load addresses, checking registers, stack, marker
+persistence and error paths.
+`python3 scripts/verify_gardenscapes_apk.py original.xapk patched.apk` verifies
+the emitted APK, its unchanged DEX and the exact ELF changes.
+The build rejects a mismatch with the committed payload. After deliberately changing
+the helper or compiler, use `--update`, review the new bytes and rerun all tests.
 The generated base64 payload belongs in patches/src/main/resources/gardenscapes.
 
 ## Test na telefonie
@@ -54,3 +61,15 @@ zapisu. Sam XAPK nie zawiera Twojego postępu.
    normalnie jedna, bez ponownego ustawiania na 2.
 5. Osobno sprawdź zachowanie po synchronizacji zapisu. Cofnięcie salda przez serwer
    oznacza, że lokalna naprawa nie rozwiązała problemu synchronizacji.
+
+## Validation performed
+
+- Full Kotlin/Java patch and extension build passed.
+- 19 host scenarios execute the production C helper.
+- 16 scenarios execute the compiled ARM64 payload and trampoline, at two load
+  addresses, preserving stack and callee-saved registers.
+- Morphe Desktop 1.16.0 successfully patched and rebuilt the supplied 9.9.0 XAPK.
+- The emitted APK verifier passed: original DEX unchanged, one native entry branch,
+  exact compiled payload, preserved original ELF segments and a correctly relocated
+  program-header table with a read/execute payload segment.
+- Phone launch, actual garden spending and cloud/restart persistence remain untested.
