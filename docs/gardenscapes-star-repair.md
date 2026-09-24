@@ -67,7 +67,33 @@ guard. Certificate results and account/server restrictions are not changed.
 The user confirmed on-device that this removes the local dialog and allows play.
 
 The patch remains experimental and selected by default in Morphe. It needs no
-in-game activation, but the v2 repair still needs confirmation on the user's save.
+in-game activation. The user confirmed that the v2 star repair works on their save.
+
+## Play Games diagnostics
+
+The user reports that tapping the Play Games connection button does nothing.
+In the original 9.9.0 DEX, GoogleGameCenter.signIn(J,Z) chooses isAuthenticated()
+for silent requests and GamesSignInClient.signIn() for interactive requests.
+Its completion callback (identified by "signIn complete ") discards Task exceptions
+and forwards only result 3 with null error details. This can conceal the cause of
+an unsuccessful connection. It does not prove which error occurs on the phone.
+
+The repair now includes a bytecode dependency showing a short "connecting..."
+toast at interactive sign-in entry and a diagnostic toast on authentication failure.
+ApiException reports its numeric status; other exceptions report only their class
+name. A cancelled task/no exception and an unauthenticated successful task have
+distinct messages. Successful SDK authentication reports "authenticated", which
+does not confirm cloud synchronization. Silent startup checks have no toasts.
+Original callbacks, results, token requests and SDK configuration
+remain intact. The hook stores nothing and shows no account IDs or token contents.
+UI reporting runs on the main looper using application context and tolerates a
+missing context or UI failure. It is not a cloud-sync or certificate-validation fix.
+
+On a device, update the patched installation using the same Morphe signing key,
+without uninstalling or clearing data, then tap the Play Games button. Report the
+toast's status, whether only "connecting..." appears, or whether neither appears.
+Those distinguish an SDK error, a request without a completion, and a path that
+never reaches interactive GoogleGameCenter.signIn. Cloud sync remains unverified.
 
 ## Building and validation
 
@@ -84,7 +110,7 @@ in-game activation, but the v2 repair still needs confirmation on the user's sav
   the exact target ABI flags, legacy-marker migration, actual completion-file
   persistence, process restart, lock contention, empty-file retry and symlink refusal.
 - `python3 scripts/verify_gardenscapes_apk.py original.xapk patched.apk` checks the
-  actual Morphe output: unchanged DEX, exact garden getter branch, original reward
+  actual Morphe output: preserved game method bodies plus the two sign-in diagnostic prefixes, exact garden getter branch, original reward
   path untouched, isolated certificate-dialog call, RX payload and ELF mappings.
 - Full Kotlin/Java build and the existing DM add-on regressions must pass before release.
 
@@ -103,3 +129,5 @@ in-game activation, but the v2 repair still needs confirmation on the user's sav
 6. Jeśli saldo pozostanie ujemne albo wróci do ujemnego po restarcie/synchronizacji,
    zapisz, na którym etapie to nastąpiło. Nie oznacza to potwierdzonego odzyskania
    postępu mimo poprawnego wyniku testów kodu.
+
+DEX verification requires `python3 -m pip install androguard==4.1.4`.

@@ -82,6 +82,7 @@ val repairGardenscapesNegativeStarsPatch = rawResourcePatch(
     description = "Repairs a negative saved star balance to 2 when the garden reads it, once per installation, and skips the local unofficial-install dialog. No level completion needed. Gardenscapes 9.9.0 ARM64 only. Experimental.",
     default = true,
 ) {
+    dependsOn(playGamesDiagnostics)
     compatibleWith(Compatibility(
         name = "Gardenscapes", packageName = "com.playrix.gardenscapes",
         apkFileType = ApkFileType.XAPK, appIconColor = 0x58A433,
