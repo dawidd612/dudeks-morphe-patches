@@ -82,8 +82,9 @@ The repair now includes a bytecode dependency showing a short "connecting..."
 toast at interactive sign-in entry and a diagnostic toast on authentication failure.
 ApiException reports its numeric status; other exceptions report only their class
 name. A cancelled task/no exception and an unauthenticated successful task have
-distinct messages. Silent startup checks and successful authentication have no
-completion toast. Original callbacks, results, token requests and SDK configuration
+distinct messages. Successful SDK authentication reports "authenticated", which
+does not confirm cloud synchronization. Silent startup checks have no toasts.
+Original callbacks, results, token requests and SDK configuration
 remain intact. The hook stores nothing and shows no account IDs or token contents.
 UI reporting runs on the main looper using application context and tolerates a
 missing context or UI failure. It is not a cloud-sync or certificate-validation fix.

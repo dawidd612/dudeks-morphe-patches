@@ -96,7 +96,9 @@ internal val playGamesDiagnostics = bytecodePatch {
             if-eqz v0, :dudeks_not_authenticated
             invoke-virtual {v0}, Lcom/google/android/gms/games/AuthenticationResult;->isAuthenticated()Z
             move-result v0
-            if-nez v0, :dudeks_original_result
+            if-eqz v0, :dudeks_not_authenticated
+            const-string v1, "authenticated"
+            goto :dudeks_report
             :dudeks_not_authenticated
             const-string v1, "not authenticated"
             :dudeks_report
