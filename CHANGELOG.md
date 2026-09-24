@@ -1,3 +1,9 @@
+## [1.29.3](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.29.2...v1.29.3) (2026-09-24)
+
+### 🐛 Bug Fixes
+
+* **gardenscapes:** expose silent Play Games sign-in failures ([#9](https://github.com/dawidd612/dudeks-morphe-patches/issues/9)) ([c748a65](https://github.com/dawidd612/dudeks-morphe-patches/commit/c748a650faaa52d21800af279c33f2771f6ddbf4))
+
 ## [1.29.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.29.1...v1.29.2) (2026-09-22)
 
 ### 🐛 Bug Fixes
