@@ -1,7 +1,9 @@
 # Good Pizza, Great Pizza: rewarded videos
 
-**Skip rewarded ads** targets `com.tapblaze.pizzabusiness` **5.57.3 (2277)**,
-distributed as APKM. It is selected by default and marked **experimental**.
+**Skip rewarded ads** and **Google Play Games via MicroG-RE** target
+`com.tapblaze.pizzabusiness` **5.57.3 (2277)**, distributed as APKM.
+Both are selected by default and marked **experimental**. They share startup
+support and can also be selected independently.
 Static analysis used the supplied base APK and ARM64 native library. No APK,
 game assets, save files or user screenshots belong in this repository.
 
@@ -52,9 +54,23 @@ remain; unused ads may still load in the background.
 ## Re-signed startup companion
 
 The input uses PairIP. Its Java signature check rejects a Morphe signing
-certificate before game startup. The patch includes a narrowly guarded companion
-that no-ops `SignatureCheck.verifyIntegrity(Context)`, `StartupLauncher.launch()`
-and `LicenseClient.checkLicense(Context)` for this exact input layout.
+certificate before game startup. The companion guards this exact input layout
+and no-ops `SignatureCheck.verifyIntegrity(Context)` and `StartupLauncher.launch()`.
+
+The reported Google Play "Get this game from Play" screen is consistent with the
+licensing client's remediation flow. The old companion only disabled the public
+`checkLicense(Context)` entry. There are additional entries through `stopTrial`,
+initialization, callbacks and delayed retries. The companion now disables the
+ten local licensing operations covering public check/trial entry, initialization,
+trial end, service binding, response processing, repeated-check scheduling,
+paywall/error activity launch and delayed shutdown. In particular, disabling
+binding also covers callbacks that bypass the ordinary initialization entry.
+
+If Android restores an old `LicenseActivity` task, its `onStart` calls the
+superclass and finishes only that activity. It neither sends the Play pending
+intent nor closes the game's tasks. All affected method signatures and expected
+calls are checked before the grouped edits. Replacement bodies have their old
+exception tables removed. No successful signed license response is fabricated.
 
 It preserves `VMRunner`, the native loader, protected assets and all 20 protected
 SDK/WorkManager callers. Some protected methods return values that are unboxed;
@@ -63,6 +79,33 @@ later VM calls require state from the skipped startup program.** Re-signed launc
 background/foreground transitions and gameplay must be tested on the device before
 claiming working startup support. Android's installation signature rules and
 server-side checks are not changed.
+
+## Google Play Games through MicroG-RE
+
+The separate default-selected patch targets **MorpheApp/MicroG-RE 7.1.0+**,
+package `app.revanced.android.gms`. Stable **7.1.1** is recommended; its release
+removes an SMS permission that could make Play Protect block its installation.
+See [official releases](https://github.com/MorpheApp/MicroG-RE/releases).
+
+Only the Games Connect and Games Service clients are redirected. Their service
+actions and host package point to MicroG; per-client overrides disable the stock
+Google Play Services availability gate and stock Chimera lookup. A missing
+MicroG service still produces a real connection failure. Other Google services,
+Firebase and billing keep their original routing. Binder descriptors, transaction
+IDs and Bundle keys retain their original Google namespace.
+
+The manifest declares MicroG package visibility plus the original package name
+and APK signing-certificate SHA-1 (`828d99f1d85e52eb473af06d690f84ee72904330`)
+using MicroG-RE's supported metadata. The game keeps its own package name, client
+ID, Games application ID and save paths. Its presence check looks for MicroG
+instead of requiring the separate stock Play Games app.
+
+The original `isAuthenticated`, interactive sign-in, `requestServerSideAccess`,
+player-ID retrieval and success/error callbacks remain unchanged. The patch does
+not return a fake account, player ID, token or cloud-save success. Source review
+of MicroG-RE 7.1.0 confirms Games Connect, server auth-code and snapshot handlers;
+this does **not** establish end-to-end compatibility with the game's backend.
+Actual account selection, save upload and restore after restart need phone tests.
 
 ## Input and validation
 
@@ -83,18 +126,38 @@ server-side checks are not changed.
   The emitted DEX passed five placement scenarios (including null, empty and
   Unicode), unchanged game-thread dispatch methods, preserved SDK initialization,
   preserved VMRunner and empty exception tables in the startup companion.
+- `scripts/VerifyPizzaIntegrationDex.java` checks the actual emitted DEX and
+  binary manifest: ten inactive license operations, safe restored-activity exit,
+  scoped MicroG routing, real package presence check, original signer metadata,
+  unchanged authentication/SDK methods and all 20 protected VM callers. Native
+  libraries and assets are compared byte-for-byte. Compile it together with
+  `VerifyPizzaRewardDex.java`, using the Morphe CLI JAR as the classpath; run with
+  `patched.apk original.apk microg` (or `stock` when the MicroG patch is disabled).
+- CI compiles the full bundle and both verification tools. The copyrighted input
+  APK stays outside the repository; emitted-APK checks run separately on the
+  supplied input. Neither CI nor these checks executes Google authentication.
 
 ## Test on the phone
 
 1. Preserve your save/sync before changing installations. Use the clean APKM
-   5.57.3 (2277), retaining its native and asset splits, and select this patch.
-2. Test launch, a background/foreground cycle and a restart first. A startup crash
+   5.57.3 (2277), retaining its native and asset splits. Keep the same Morphe
+   signing key when updating an existing patched installation; do not clear data
+   or uninstall to work around an update error.
+2. Install MicroG-RE 7.1.1 (`app.revanced.android.gms`) and add your Google account
+   there. Select both patches, or disable the MicroG patch if keeping stock Games
+   routing. Updating the patch source alone does not modify an installed game.
+3. Test launch, a background/foreground cycle and a restart first. A startup crash
    requires its log; do not treat successful patching as successful installation.
-3. Accept each available video offer. Check that no video opens, exactly the
+4. Accept each available video offer. Check that no video opens, exactly the
    normal reward appears, and its UI returns to gameplay. Check another offer,
    fast repeated taps and leaving/re-entering the game during completion.
-4. Test with no ad fill/network access where the game itself allows the offer.
+5. Test with no ad fill/network access where the game itself allows the offer.
    Game eligibility/online requirements still apply.
+6. Sign in through the game's Google Play Games button, upload a small progress
+   change and verify it after restarting. Confirm a real restore on another
+   installation/device before relying on the cloud copy. If it fails, capture
+   the exact message and relevant `PlayGames`, `GamesService`, `GamesConnectService`
+   and `AndroidRuntime` log lines, excluding account/token contents.
 
 Realme GT7 / Realme UI 7 runtime and every event offer have **not** been tested
 here. Exact version support is based on inspected code, not a device guarantee.
