@@ -78,6 +78,21 @@ schedule widget rows during updates to work around disappearing tiles and stale
 recycled layouts. Intended for the reported Realme GT7 / Realme UI 7 issue;
 device confirmation is still needed. See [implementation, installation and testing](docs/google-calendar-widget.md).
 
+### Good Pizza, Great Pizza
+
+For **5.57.3 (2277)** APKM, **Skip rewarded ads** completes eligible rewarded-video
+offers through the game's normal reward callback. **Google Play Games via
+MicroG-RE** routes game sign-in and server authorization through
+`app.revanced.android.gms` (MicroG-RE 7.1.0+, recommended 7.1.1). Both are selected
+by default and include the local Play installation-check repair, including
+trial/retry paths and a restored licensing screen.
+
+**PL:** Odśwież źródło i ponownie spatchuj czysty APKM. Do logowania zainstaluj
+MicroG-RE 7.1.1 i dodaj w nim konto Google. Zachowaj dotychczasowy klucz podpisu
+Morphe przy aktualizacji; nie usuwaj danych gry. Oba patche są eksperymentalne -
+logowanie oraz rzeczywisty zapis i odtworzenie postępu wymagają potwierdzenia
+na telefonie. [Szczegóły i testy](docs/pizzabusiness-rewarded-ads.md).
+
 ### Android blocks overlay access
 
 If Android displays "App was denied access" when you enable "Display over other apps", open **Settings > Apps > AndroPods > More (three dots) > Allow restricted settings**. Confirm the prompt, then return to the overlay setting and enable it.
