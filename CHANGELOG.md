@@ -1,3 +1,10 @@
+## [1.31.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.30.1...v1.31.0) (2026-09-27)
+
+### ✨ New Features
+
+* **pizzabusiness:** release licensing repair and MicroG Games integration ([ddb4879](https://github.com/dawidd612/dudeks-morphe-patches/commit/ddb487930d3f227c4696c8fadc582dccf3dae0bd))
+* **pizzabusiness:** repair Play licensing flow and add MicroG Games support ([c37d208](https://github.com/dawidd612/dudeks-morphe-patches/commit/c37d2080ca9d55dc7f1cd6678be3a0da01d8e5c6))
+
 ## [1.30.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.30.0...v1.30.1) (2026-09-27)
 
 ### 🐛 Bug Fixes
