@@ -19,6 +19,7 @@ public class VerifyPizzaRewardDex {
     static final String COCOS = "Lorg/cocos2dx/lib/Cocos2dxActivity;";
     static final String HELPER = "Lpl/dudek/extension/pizzabusiness/RewardedAds;";
     static final String INIT_REQUEST = "Lpl/dudek/extension/pizzabusiness/RewardedAds$1;";
+    static final String SDK_READY = "Lcom/tapblaze/pizzabusiness/BaseIronSourceWrapper$4$2$1$1;";
     static final String STRING = "Ljava/lang/String;";
     static final Object UNSET = new Object();
     static final Object REQUEST_OBJECT = new Object();
@@ -156,6 +157,9 @@ public class VerifyPizzaRewardDex {
                     check(target != null && target.getDefiningClass().equals(NATIVE), "Unexpected runner call");
                     check(Set.of("onVideoStarted", "onVideoWatched", "onVideoEnded", "onVideoReady").contains(target.getName()),
                         "Unexpected native callback " + target.getName());
+                    List<String> expectedTypes = target.getName().equals("onVideoWatched") ? List.of(STRING) : List.of();
+                    check(target.getReturnType().equals("V") && target.getParameterTypes().equals(expectedTypes) &&
+                        registers(instruction).size() == expectedTypes.size(), "Wrong callback descriptor or argument count");
                     List<Object> arguments = new ArrayList<>();
                     for (int register : registers(instruction)) {
                         check(values[register] != UNSET, "Native callback receives an uninitialized register");
@@ -246,6 +250,7 @@ public class VerifyPizzaRewardDex {
             field.getDefiningClass().equals(REQUEST) && field.getName().equals("val$placement") && field.getType().equals(STRING),
             "Constructor does not preserve input placement");
         check(key(call(ctorCode.get(1))).equals("Ljava/lang/Object;-><init>()V") &&
+            registers(ctorCode.get(1)).equals(List.of(constructor.getImplementation().getRegisterCount() - 2)) &&
             ctorCode.get(2).getOpcode() == Opcode.RETURN_VOID, "Unexpected constructor side effect");
 
         var readyCode = code(ready);
@@ -253,6 +258,16 @@ public class VerifyPizzaRewardDex {
             ((NarrowLiteralInstruction) readyCode.get(0)).getNarrowLiteral() == 1 && readyCode.get(1).getOpcode() == Opcode.RETURN &&
             ((OneRegisterInstruction) readyCode.get(0)).getRegisterA() == ((OneRegisterInstruction) readyCode.get(1)).getRegisterA(),
             "Reward readiness still depends on ad loading");
+        check(code(method(patched, SDK_READY, "run", "V")).size() == 1 &&
+            code(method(patched, SDK_READY, "run", "V")).get(0).getOpcode() == Opcode.RETURN_VOID,
+            "Background SDK readiness can still compete with local completion timers");
+        for (Method startup : List.of(
+            method(patched, "Lcom/pairip/SignatureCheck;", "verifyIntegrity", "V", "Landroid/content/Context;"),
+            method(patched, "Lcom/pairip/StartupLauncher;", "launch", "V"),
+            method(patched, "Lcom/pairip/licensecheck/LicenseClient;", "checkLicense", "V", "Landroid/content/Context;"))) {
+            check(code(startup).size() == 1 && code(startup).get(0).getOpcode() == Opcode.RETURN_VOID &&
+                startup.getImplementation().getTryBlocks().isEmpty(), "Startup companion has stale code/exception handlers");
+        }
 
         var initCode = code(initialize);
         check(initCode.size() >= 2 && key(call(initCode.get(0))).equals(HELPER + "->initialize()V"),
@@ -300,7 +315,7 @@ public class VerifyPizzaRewardDex {
             var original = classes(arguments[1]);
             Set<String> expected = Set.of(key(show), key(ready), key(initialize), key(runner));
             int unchanged = 0;
-            for (String owner : List.of(BASE, NATIVE, REQUEST)) {
+            for (String owner : List.of(BASE, NATIVE, REQUEST, "Lcom/pairip/VMRunner;")) {
                 check(original.containsKey(owner), "Original APK missing bridge " + owner);
                 Map<String, Method> outputMethods = new HashMap<>();
                 for (Method candidate : patched.get(owner).getMethods()) outputMethods.put(key(candidate), candidate);
@@ -322,7 +337,19 @@ public class VerifyPizzaRewardDex {
                 check(old.getOpcode() == updated.getOpcode() && registers(old).equals(registers(updated)), "Original init flow changed");
                 if (old instanceof ReferenceInstruction r) check(updated instanceof ReferenceInstruction s &&
                     r.getReference().toString().equals(s.getReference().toString()), "Original init references changed");
+                if (old instanceof WideLiteralInstruction r) check(updated instanceof WideLiteralInstruction s &&
+                    r.getWideLiteral() == s.getWideLiteral(), "Original init constants changed");
+                if (old instanceof OffsetInstruction r) check(updated instanceof OffsetInstruction s &&
+                    r.getCodeOffset() == s.getCodeOffset(), "Original init branch offsets changed");
             }
+            // Compile-only extension stubs must never replace the game's real queue or activity lookup.
+            for (String owner : List.of(COCOS, "Lorg/cocos2dx/lib/Cocos2dxHelper;")) {
+                Method before = method(original, owner, "runOnGLThread", "V", "Ljava/lang/Runnable;");
+                Method after = method(patched, owner, "runOnGLThread", "V", "Ljava/lang/Runnable;");
+                check(canonical(before).equals(canonical(after)), "Game GL queue was replaced by an extension stub");
+            }
+            check(canonical(method(original, ACTIVITY, "getInstance", ACTIVITY)).equals(
+                canonical(method(patched, ACTIVITY, "getInstance", ACTIVITY))), "Game activity lookup changed");
             System.out.println("PASS: " + unchanged + " untouched bridge methods and original SDK/offerwall initialization preserved");
         }
         System.out.println("PASS: emitted DEX GL dispatch, captured placement, readiness, native signatures, registers/branches, " +

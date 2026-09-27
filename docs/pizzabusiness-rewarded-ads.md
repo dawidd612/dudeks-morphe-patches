@@ -28,6 +28,8 @@ the placement, so no placement list or hardcoded reward amount is needed.
   `onVideoEnded`, then `onVideoReady`. Preserve the original null-placement
   fallback, `DefaultRewardedVideo`.
 - Report video readiness independently of LevelPlay's cache/no-fill result.
+- Silence the original rewarded SDK's ready Runnable, so background loads cannot
+  reuse the native ready timer key ahead of the local reward/end sequence.
 - Before the original `Initialize` body, queue `onInitialized` and `onVideoReady`
   on the game thread. Native ready/show gates check the initialization flag
   before calling Java; changing Java readiness alone cannot bypass failed SDK

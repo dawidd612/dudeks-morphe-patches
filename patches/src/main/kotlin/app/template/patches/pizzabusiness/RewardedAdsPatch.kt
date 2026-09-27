@@ -16,6 +16,8 @@ import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.Method
 import com.android.tools.smali.dexlib2.iface.instruction.FiveRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
 
@@ -27,6 +29,7 @@ internal const val RUNNABLE = "Ljava/lang/Runnable;"
 internal const val ACTIVITY = "Lorg/cocos2dx/lib/Cocos2dxActivity;"
 internal const val HELPER = "Lpl/dudek/extension/pizzabusiness/RewardedAds;"
 private const val AD = "Lcom/unity3d/mediation/rewarded/LevelPlayRewardedAd;"
+private const val SDK_READY = "Lcom/tapblaze/pizzabusiness/BaseIronSourceWrapper\$4\$2\$1\$1;"
 
 internal fun requirePizza(value: Boolean, message: String) {
     if (!value) throw PatchException("Skip rewarded ads: $message. Use clean Good Pizza, Great Pizza 5.57.3 (2277).")
@@ -75,6 +78,7 @@ val skipRewardedAdsPatch = bytecodePatch(
         val initialize = pizzaMethod(BASE, "Initialize", listOf(STRING, STRING, STRING, "Z", "I"), "V")
         val run = pizzaMethod(REQUEST, "run", emptyList(), "V", static = false)
         val constructor = pizzaMethod(REQUEST, "<init>", listOf(STRING), "V", static = false)
+        val sdkReady = pizzaMethod(SDK_READY, "run", emptyList(), "V", static = false)
 
         requirePizza(classDefBy(BRIDGE).superclass == BASE, "JNI bridge superclass changed")
         listOf("onInitialized", "onVideoReady", "onVideoStarted", "onVideoEnded", "onVideoWatched").forEach { name ->
@@ -88,6 +92,11 @@ val skipRewardedAdsPatch = bytecodePatch(
         requirePizza(constructor.implementation?.registerCount == 2 &&
             constructor.instructions.map { it.opcode } == listOf(Opcode.IPUT_OBJECT, Opcode.INVOKE_DIRECT, Opcode.RETURN_VOID),
             "request constructor changed")
+        val capture = constructor.instructions.first() as TwoRegisterInstruction
+        val captureField = (capture as ReferenceInstruction).reference as FieldReference
+        requirePizza(capture.registerA == 1 && capture.registerB == 0 &&
+            captureField.definingClass == REQUEST && captureField.name == "val\$placement" && captureField.type == STRING,
+            "constructor no longer captures its placement argument")
         requirePizza(run.implementation?.registerCount == 4 && run.implementation!!.tryBlocks.isEmpty() &&
             run.calls(AD, "showAd") && run.calls(AD, "isAdReady"), "reward request body changed or already patched")
         requirePizza(ready.implementation?.registerCount == 1 && ready.implementation!!.tryBlocks.isEmpty() &&
@@ -96,14 +105,19 @@ val skipRewardedAdsPatch = bytecodePatch(
             initialize.calls("Landroid/app/Activity;", "runOnUiThread") && !initialize.calls(HELPER, "initialize"),
             "initialization changed or already patched")
         requirePizza(pizzaMethod(ACTIVITY, "runOnGLThread", listOf(RUNNABLE), "V", static = false)
-            .calls("Lorg/cocos2dx/lib/Cocos2dxGLSurfaceView;", "queueEvent"), "game queue changed")
+            .calls("Landroid/opengl/GLSurfaceView;", "queueEvent"), "game queue changed")
         pizzaMethod("Lorg/cocos2dx/lib/Cocos2dxHelper;", "runOnGLThread", listOf(RUNNABLE), "V")
+        requirePizza(sdkReady.instructions.map { it.opcode } == listOf(Opcode.INVOKE_STATIC, Opcode.RETURN_VOID) &&
+            sdkReady.calls(BRIDGE, "onVideoReady"), "SDK readiness callback changed")
 
         // This Runnable is private to the rewarded gateway, not interstitials.
         var constructorCalls = 0
         classDefForEach { cls ->
             cls.methods.forEach { method ->
-                if (method.calls(REQUEST, "<init>")) constructorCalls++
+                constructorCalls += method.implementation?.instructions?.count {
+                    val ref = (it as? ReferenceInstruction)?.reference as? MethodReference
+                    ref?.definingClass == REQUEST && ref.name == "<init>"
+                } ?: 0
             }
         }
         requirePizza(constructorCalls == 1 && show.calls(REQUEST, "<init>"), "request is shared with another flow")
@@ -117,6 +131,9 @@ val skipRewardedAdsPatch = bytecodePatch(
         // All guards finish before these related bytecode changes are made.
         initialize.addInstructions(0, "invoke-static {}, $HELPER->initialize()V")
         ready.replaceBody("const/4 p0, 0x1\nreturn p0")
+        // Background SDK loads must not reuse the native readiness timer key
+        // ahead of the locally queued reward/end sequence.
+        sdkReady.replaceBody("return-void")
         show.replaceInstruction(4,
             "invoke-virtual {v${post.registerC}, v${post.registerD}}, $ACTIVITY->runOnGLThread($RUNNABLE)V")
         // The same captured placement is passed to the native reward handler.
