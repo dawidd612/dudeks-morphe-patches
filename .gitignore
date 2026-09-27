@@ -128,3 +128,7 @@ node_modules/
 # Ignore IDEA files
 .idea/
 local.properties
+
+
+# Generated from the final published bundle, after Gradle publish.
+/SHA256SUMS.txt
