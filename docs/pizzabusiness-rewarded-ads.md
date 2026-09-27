@@ -79,6 +79,10 @@ server-side checks are not changed.
   dexlib2-containing JAR, such as the JADX all JAR, on the classpath; arguments are
   `patched.apk [original.apk]`. This does not execute the native reward handlers
   or establish that the re-signed game starts.
+- Applied to the supplied base APK using Morphe CLI 1.17.0 in FULL bytecode mode.
+  The emitted DEX passed five placement scenarios (including null, empty and
+  Unicode), unchanged game-thread dispatch methods, preserved SDK initialization,
+  preserved VMRunner and empty exception tables in the startup companion.
 
 ## Test on the phone
 
