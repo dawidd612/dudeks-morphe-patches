@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.29.3** (`main`) - **7 patches** across **5 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.29.4** (`main`) - **8 patches** across **6 apps** - back to [README](README.md)
 
 ---
 
@@ -22,6 +22,16 @@
 | Patch | Details |
 |---|---|
 | **Repair negative stars once** | Repairs a negative saved star balance to 2 when the garden reads it, once per installation, and skips the local unofficial-install dialog. No level completion needed. Gardenscapes 9.9.0 ARM64 only. Experimental. |
+
+---
+
+## Google Calendar (com.google.android.calendar)
+
+**Supported versions:** `experimental 2026.37.0-984865732-release`
+
+| Patch | Details |
+|---|---|
+| **Stabilize schedule widget** | Rebuilds schedule widget row contents on Android 16+ to work around missing tiles and recycled layout corruption. Experimental; intended for Realme UI 7. Does not reset the widget. |
 
 ---
 

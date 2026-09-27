@@ -1,3 +1,10 @@
+## [1.29.4](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.29.3...v1.29.4) (2026-09-27)
+
+### 🐛 Bug Fixes
+
+* **calendar:** publish schedule widget stabilization ([#11](https://github.com/dawidd612/dudeks-morphe-patches/issues/11)) ([6704e49](https://github.com/dawidd612/dudeks-morphe-patches/commit/6704e4911e0a76e18cf3bff85f56c9ffb89b9fbd))
+* **calendar:** stabilize schedule widget rows on Android 16 ([#10](https://github.com/dawidd612/dudeks-morphe-patches/issues/10)) ([a25be15](https://github.com/dawidd612/dudeks-morphe-patches/commit/a25be1560329fd15fec1c7212045def8c47fd485))
+
 ## [1.29.3](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.29.2...v1.29.3) (2026-09-24)
 
 ### 🐛 Bug Fixes
