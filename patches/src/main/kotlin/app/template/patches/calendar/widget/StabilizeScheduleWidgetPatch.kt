@@ -2,6 +2,7 @@ package app.template.patches.calendar.widget
 
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
+import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.patch.ApkFileType
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
@@ -89,9 +90,13 @@ val stabilizeScheduleWidgetPatch = bytecodePatch(
         // so reading the factory/context at a return would be unsafe.
         returns.reversed().forEach { (index, instruction) ->
             val register = (instruction as OneRegisterInstruction).registerA
-            method.addInstructions(index, """
-                invoke-static/range {v$register .. v$register}, $HOOK->wrap($REMOTE_VIEWS)$REMOTE_VIEWS
+            // Replace the original location so branches to a shared return also
+            // enter the hook. Inserting before it would leave those labels behind.
+            method.replaceInstruction(index,
+                "invoke-static/range {v$register .. v$register}, $HOOK->wrap($REMOTE_VIEWS)$REMOTE_VIEWS")
+            method.addInstructions(index + 1, """
                 move-result-object v$register
+                return-object v$register
             """.trimIndent())
         }
         method.addInstructions(contextLoad.index + 1,
