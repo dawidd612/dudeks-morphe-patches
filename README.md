@@ -68,6 +68,14 @@ See [DEX analysis, compatibility and phone testing](docs/tiktok-dm-scroll.md).
 
 See [native analysis, limitations and phone testing](docs/gardenscapes-star-repair.md).
 
+### Google Calendar
+
+**Stabilize schedule widget** is an experimental, default-selected patch for
+**2026.37.0-984865732-release** (APKM). On Android 16+, it rebuilds the contents of
+schedule widget rows during updates to work around disappearing tiles and stale
+recycled layouts. Intended for the reported Realme GT7 / Realme UI 7 issue;
+device confirmation is still needed. See [implementation, installation and testing](docs/google-calendar-widget.md).
+
 ### Android blocks overlay access
 
 If Android displays "App was denied access" when you enable "Display over other apps", open **Settings > Apps > AndroPods > More (three dots) > Allow restricted settings**. Confirm the prompt, then return to the overlay setting and enable it.
