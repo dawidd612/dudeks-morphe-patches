@@ -1,3 +1,10 @@
+## [1.30.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.30.0...v1.30.1) (2026-09-27)
+
+### 🐛 Bug Fixes
+
+* **release:** checksum the final bundle after Gradle publish ([a4d4bd9](https://github.com/dawidd612/dudeks-morphe-patches/commit/a4d4bd90fd5cd5bc27ac3d23a2200a796416c27c))
+* **release:** publish corrected bundle checksums ([6f44aeb](https://github.com/dawidd612/dudeks-morphe-patches/commit/6f44aebbee9cfbaf13f633714de7957450992816))
+
 ## [1.30.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.29.4...v1.30.0) (2026-09-27)
 
 ### ✨ New Features
