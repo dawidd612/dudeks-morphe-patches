@@ -1,3 +1,10 @@
+## [1.30.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.29.4...v1.30.0) (2026-09-27)
+
+### ✨ New Features
+
+* **pizzabusiness:** publish rewarded video skip ([#13](https://github.com/dawidd612/dudeks-morphe-patches/issues/13)) ([031d4c3](https://github.com/dawidd612/dudeks-morphe-patches/commit/031d4c35bf96d4c184bfde0b17bf743ec9c8cb4c))
+* **pizzabusiness:** skip rewarded videos through the native reward flow ([#12](https://github.com/dawidd612/dudeks-morphe-patches/issues/12)) ([ded73f2](https://github.com/dawidd612/dudeks-morphe-patches/commit/ded73f2e523c779f6c7b50129d00a3f8cb6bc8dc))
+
 ## [1.29.4](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.29.3...v1.29.4) (2026-09-27)
 
 ### 🐛 Bug Fixes

@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.29.4** (`main`) - **8 patches** across **6 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.30.0** (`main`) - **9 patches** across **7 apps** - back to [README](README.md)
 
 ---
 
@@ -22,6 +22,16 @@
 | Patch | Details |
 |---|---|
 | **Repair negative stars once** | Repairs a negative saved star balance to 2 when the garden reads it, once per installation, and skips the local unofficial-install dialog. No level completion needed. Gardenscapes 9.9.0 ARM64 only. Experimental. |
+
+---
+
+## Good Pizza, Great Pizza (com.tapblaze.pizzabusiness)
+
+**Supported versions:** `experimental 5.57.3`
+
+| Patch | Details |
+|---|---|
+| **Skip rewarded ads** | Completes the game's rewarded-video flow without playing an ad, keeping the requested placement and normal reward. Experimental; includes re-signed startup support and needs device testing. |
 
 ---
 
