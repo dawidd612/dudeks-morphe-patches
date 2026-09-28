@@ -4,6 +4,15 @@ Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
 ## Latest user confirmation and billing investigation — 2026-09-28
 
+Published [v1.31.1](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.31.1):
+implementation commit `de4d708`, automated release commit `bf05114`.
+GitHub release workflow `36443560520` succeeded. Downloaded release bundle
+SHA-256: `72880b7ee51630f47640730307ddf4174d389115d468ce15c1885b8923eee639`.
+Checksum, GitHub build attestation, metadata version and all three bootstrap
+resources were verified. The release explicitly documents the unresolved paid
+billing limitation. This publication state supersedes the older no-commit/no-release
+notes below. No game APK, account data, save or signing key was published.
+
 The user explicitly confirmed working Google Play Games, TapBlaze, correct save
 and gameplay. They requested normal paid purchases, a commit and a GitHub release.
 The existing candidate and its prior runtime tests remain the application baseline.
