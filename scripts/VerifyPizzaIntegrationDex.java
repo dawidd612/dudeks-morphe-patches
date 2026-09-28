@@ -69,13 +69,15 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
         "com.android.vending.derived.apk.id");
 
     public static void main(String[] args) throws Exception {
-        check((args.length == 3 || args.length == 4) && Set.of("microg","stock").contains(args[2]),
-            "Usage: VerifyPizzaIntegrationDex patched.apk original.apk microg|stock [bootstrap-resource-directory]");
+        check((args.length >= 3 && args.length <= 5) && Set.of("microg","stock").contains(args[2]) &&
+            (args.length < 5 || args[4].equals("hide-paid")),
+            "Usage: VerifyPizzaIntegrationDex patched.apk original.apk microg|stock [bootstrap-resource-directory [hide-paid]]");
         boolean microg = args[2].equals("microg");
+        boolean hidePaid = args.length == 5;
         var patched = classes(args[0]);
         var original = classes(args[1]);
         Map<String, Method> sdkRestorations = new HashMap<>();
-        if (args.length == 4) {
+        if (args.length >= 4) {
             for (ClassDef cls : classes(java.nio.file.Path.of(args[3], "sdk-receivers.dex").toString()).values())
                 for (Method m : cls.getMethods()) sdkRestorations.put(key(m), m);
         }
@@ -103,6 +105,13 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
             screen.getImplementation().getTryBlocks().isEmpty(), "Restored screen can open Play or close game tasks");
 
         Set<String> allowed = new HashSet<>();
+        if (hidePaid) {
+            Method checkout = method(patched, "Lcom/tapblaze/pizzabusiness/PurchasesManager;", "purchase", "V", STRING);
+            validateRegistersAndBranches(checkout);
+            allowed.add(key(checkout));
+            // On-device tests exercise cancellation and observe Billing/JNI
+            // callbacks. Here every other billing method must retain parity.
+        }
         if (microg) {
             allowed.add(key(method(patched, ACTIVITY, "onCreate", "V", "Landroid/os/Bundle;")));
             allowed.add(key(method(patched, ACTIVITY, "lambda$initializeGooglePlayGames$3", "V")));
@@ -140,8 +149,8 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
         // player IDs, errors, Binder descriptors and SDK/VM return values survive.
         int preserved = 0, protectedMethods = 0, restored = 0, billingMethods = 0;
         for (ClassDef cls : original.values()) {
-            // Re-signing does not authorize Google Play purchases. Verify that
-            // the patch preserves the real checkout and purchase callbacks.
+            // Preserve purchase results, verification, restoration and SDK
+            // behavior. Only the explicitly selected checkout entry may differ.
             boolean billing = cls.getType().startsWith("Lcom/android/billingclient/") ||
                 cls.getType().startsWith("Lcom/google/android/gms/internal/play_billing/") ||
                 cls.getType().startsWith("Lcom/tapblaze/pizzabusiness/PurchasesManager");
@@ -168,7 +177,7 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
         }
         check(protectedMethods == 20, "Protected SDK method count changed");
         check(restored == sdkRestorations.size(), "SDK restoration missing from emitted APK");
-        if (args.length == 4) {
+        if (args.length >= 4) {
             int constants = 0;
             try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(new java.util.zip.GZIPInputStream(
                     java.nio.file.Files.newInputStream(java.nio.file.Path.of(args[3], "strings.tsv.gz"))), java.nio.charset.StandardCharsets.UTF_8))) {
@@ -217,7 +226,9 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
         }
         System.out.println("PASS: 10 licensing entry/retry/remediation/shutdown bodies have no side effects; restored screen only finishes itself");
         System.out.println("PASS: " + preserved + " unchanged authentication/SDK methods; " + restored + " SDK receivers restored from upstream libraries");
-        System.out.println("PASS: " + billingMethods + " executable billing methods unchanged; checkout, results and purchase processing preserved");
+        System.out.println("PASS: " + billingMethods + " executable billing methods unchanged; " +
+            (hidePaid ? "checkout cancellation requires runtime test; " : "checkout preserved; ") +
+            "results and purchase processing preserved");
         System.out.println("PASS: " + args[2] + " transport, original app identity, signer metadata, package visibility and native/assets integrity");
         System.out.println("LIMIT: these checks do not log in to Google or write/read a cloud save on a phone");
     }

@@ -145,6 +145,10 @@ results and limits are recorded in [runtime validation](pizza-runtime-validation
   `VerifyPizzaRewardDex.java`, using the Morphe CLI JAR as the classpath; run with
   `patched.apk original.apk microg patches/src/main/resources/pizzabusiness/5.57.3`
   (or `stock` when the MicroG patch is disabled).
+  When `Hide paid offers` is selected, append `hide-paid` to the integration
+  command and add `--store-visibility docs/pizza-store-visibility.json` to the
+  split-asset verifier. This permits only the reviewed native visibility output
+  and checkout entry; runtime cancellation and save tests remain required.
 - CI compiles the full bundle and both verification tools. The copyrighted input
   APK stays outside the repository; emitted-APK checks run separately on the
   supplied input. Neither CI nor these checks executes Google authentication.
@@ -156,8 +160,10 @@ results and limits are recorded in [runtime validation](pizza-runtime-validation
    signing key when updating an existing patched installation; do not clear data
    or uninstall to work around an update error.
 2. Install MicroG-RE 7.1.1 (`app.revanced.android.gms`) and add your Google account
-   there. Select both patches, or disable the MicroG patch if keeping stock Games
+   there. Select the desired patches, or disable the MicroG patch if keeping stock Games
    routing. Updating the patch source alone does not modify an installed game.
+   `Hide paid offers` hides the paid storefront/starter promotion and cancels
+   checkout. It keeps gem-to-funds exchanges and does not grant paid products.
 3. Test launch, a background/foreground cycle and a restart first. A startup crash
    requires its log; do not treat successful patching as successful installation.
 4. Accept each available video offer. Check that no video opens, exactly the

@@ -25,7 +25,7 @@ Choose a supported app version, select the patches you want and patch a clean AP
 |---|---|---|---|---|
 | 1 | [**AndroPods**](PATCHES.md#andropods-provitaliiandropods) | 2 | `1.5.30` | [`pro.vitalii.andropods`](https://play.google.com/store/apps/details?id=pro.vitalii.andropods) |
 | 2 | [**Gardenscapes**](PATCHES.md#gardenscapes-complayrixgardenscapes) | 1 | `experimental 9.9.0` | [`com.playrix.gardenscapes`](https://play.google.com/store/apps/details?id=com.playrix.gardenscapes) |
-| 3 | [**Good Pizza, Great Pizza**](PATCHES.md#good-pizza-great-pizza-comtapblazepizzabusiness) | 2 | `experimental 5.57.3` | [`com.tapblaze.pizzabusiness`](https://play.google.com/store/apps/details?id=com.tapblaze.pizzabusiness) |
+| 3 | [**Good Pizza, Great Pizza**](PATCHES.md#good-pizza-great-pizza-comtapblazepizzabusiness) | 3 | `experimental 5.57.3` | [`com.tapblaze.pizzabusiness`](https://play.google.com/store/apps/details?id=com.tapblaze.pizzabusiness) |
 | 4 | [**Google Calendar**](PATCHES.md#google-calendar-comgoogleandroidcalendar) | 1 | `experimental 2026.37.0-984865732-release` | [`com.google.android.calendar`](https://play.google.com/store/apps/details?id=com.google.android.calendar) |
 | 5 | [**Instagram**](PATCHES.md#instagram-cominstagramandroid) | 1 | `experimental 439.0.0.37.89` | [`com.instagram.android`](https://play.google.com/store/apps/details?id=com.instagram.android) |
 | 6 | [**Mapa Turystyczna**](PATCHES.md#mapa-turystyczna-plmapa_turystycznaapp) | 2 | `1.16.6` | [`pl.mapa_turystyczna.app`](https://play.google.com/store/apps/details?id=pl.mapa_turystyczna.app) |
@@ -83,13 +83,19 @@ device confirmation is still needed. See [implementation, installation and testi
 For **5.57.3 (2277)** APKM, **Skip rewarded ads** completes eligible rewarded-video
 offers through the game's normal reward callback. **Google Play Games via
 MicroG-RE** routes game sign-in and server authorization through
-`app.revanced.android.gms` (MicroG-RE 7.1.0+, recommended 7.1.1). Both are selected
+`app.revanced.android.gms` (MicroG-RE 7.1.0+, recommended 7.1.1). These are selected
 by default and include the local Play installation-check repair, including
 trial/retry paths and a restored licensing screen.
 
+**Hide paid offers**, also selected by default, keeps the store's gem-to-funds
+exchanges, hides its paid sections and starter promotion, and cancels checkout
+requests before Google Billing opens. It does not grant paid goods or enable
+real-money purchases. Existing purchase processing and game assets are retained.
+See [billing and visibility changes](docs/pizza-billing.md).
+
 **PL:** Odśwież źródło i ponownie spatchuj czysty APKM. Do logowania zainstaluj
 MicroG-RE 7.1.1 i dodaj w nim konto Google. Zachowaj dotychczasowy klucz podpisu
-Morphe przy aktualizacji; nie usuwaj danych gry. Oba patche są eksperymentalne -
+Morphe przy aktualizacji; nie usuwaj danych gry. Patche są eksperymentalne -
 logowanie oraz rzeczywisty zapis i odtworzenie postępu wymagają potwierdzenia
 na telefonie. [Szczegóły i testy](docs/pizzabusiness-rewarded-ads.md).
 

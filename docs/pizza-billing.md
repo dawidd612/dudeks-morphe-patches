@@ -1,4 +1,36 @@
-# Google Play purchases: verified restriction
+# Paid-offer visibility and Google Play restriction
+
+## Accepted alternative: Hide paid offers
+
+The user accepted hiding broken paid offers and cancelling checkout, while
+preserving in-game exchanges, rewards and saved data. The optional, default-on
+`Hide paid offers` patch targets only ARM64 Pizza 5.57.3 (2277).
+
+- StoreLayer uses its existing FUNDS view (`0x40`), preserving gem-to-cash
+  exchanges while excluding paid storefront sections.
+- The separate starter-offer visibility predicate returns false. This hides
+  its popup/icon without marking the starter bundle purchased.
+- The Java purchase entry queues the game's original cancellation callback on
+  the GL thread. Old or event-specific entry points therefore cannot open
+  Google Billing through that entry. No purchase-success event is synthesized.
+- Purchase result handling, verification, restoration, acknowledgement,
+  consumption, inventory, balances, subscription benefits and all assets remain
+  unchanged. This is not a paid-purchase implementation or a grant of paid goods.
+
+The two native edits and exact input/output hashes are recorded in
+[the visibility manifest](pizza-store-visibility.json). The resource patch
+requires the restored native library's exact input hash; other builds are not
+silently patched. The manifest lets the split verifier permit this exact output
+while continuing to compare every other library and asset. The integration
+verifier's `hide-paid` option permits only the public checkout entry to differ
+among billing methods; on-device tests must separately establish cancellation.
+
+The global paid storefront and starter promotion are covered. Future or
+server-driven event artwork may still advertise products; checkout is cancelled.
+Previously owned paid items must remain usable. Do not change offer ownership or
+subscription tables to suppress advertisements.
+
+## Previous genuine-checkout investigation (v1.31.1)
 
 On 2026-09-28 the user confirmed working Google Play Games, TapBlaze, restored
 progress and gameplay, then requested normal real-money purchases. Purchases

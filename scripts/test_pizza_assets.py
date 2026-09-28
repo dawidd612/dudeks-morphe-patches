@@ -1,5 +1,7 @@
 """Black-box regression checks for split/native/asset preservation."""
 import io
+import hashlib
+import json
 from pathlib import Path
 import subprocess
 import sys
@@ -20,7 +22,7 @@ def archive(entries):
 
 
 class AssetPreservationTests(unittest.TestCase):
-    def verify(self, patched_entries, extra_split=None, delta=None):
+    def verify(self, patched_entries, extra_split=None, delta=None, visibility=None):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             splits = {"base.apk": archive({"assets/base": b"base"}),
@@ -35,6 +37,9 @@ class AssetPreservationTests(unittest.TestCase):
             if delta is not None:
                 (root / "bootstrap.gz").write_bytes(delta)
                 arguments += ["--bootstrap-delta", str(root / "bootstrap.gz")]
+            if visibility is not None:
+                (root / "visibility.json").write_text(json.dumps(visibility))
+                arguments += ["--store-visibility", str(root / "visibility.json")]
             return subprocess.run(arguments,
                                   capture_output=True, text=True)
 
@@ -79,6 +84,28 @@ class AssetPreservationTests(unittest.TestCase):
 
     def test_bootstrap_for_different_input_fails(self):
         self.assertNotEqual(self.verify(self.originals(), delta=encode(b"other", b"native")).returncode, 0)
+
+    def visibility(self):
+        return {"input_sha256": hashlib.sha256(b"restored").hexdigest(),
+                "output_sha256": hashlib.sha256(b"hidden").hexdigest()}
+
+    def test_reviewed_visibility_after_bootstrap_passes(self):
+        entries = self.originals()
+        entries[LIBRARY] = b"hidden"
+        result = self.verify(entries, delta=encode(b"native", b"restored"), visibility=self.visibility())
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_visibility_requires_matching_input(self):
+        entries = self.originals()
+        entries[LIBRARY] = b"hidden"
+        self.assertNotEqual(self.verify(entries, visibility=self.visibility()).returncode, 0)
+
+    def test_visibility_rejects_unrelated_asset_change(self):
+        entries = self.originals()
+        entries[LIBRARY] = b"hidden"
+        entries["assets/save-template"] = b"changed"
+        self.assertNotEqual(self.verify(entries, delta=encode(b"native", b"restored"),
+                                       visibility=self.visibility()).returncode, 0)
 
 
 if __name__ == "__main__":

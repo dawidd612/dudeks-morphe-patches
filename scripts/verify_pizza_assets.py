@@ -20,6 +20,7 @@ def main():
     parser.add_argument("original_apkm")
     parser.add_argument("patched_apk")
     parser.add_argument("--bootstrap-delta", help="Exact ARM64 initialization delta from the reviewed patch resources")
+    parser.add_argument("--store-visibility", help="Reviewed native visibility manifest (after bootstrap restoration)")
     args = parser.parse_args()
     expected = {}
     split_count = 0
@@ -55,6 +56,13 @@ def main():
         if expected.get(name) != header[4:36].hex():
             raise AssertionError("Bootstrap input library does not match the original APKM")
         expected[name] = header[36:68].hex()
+    if args.store_visibility:
+        with open(args.store_visibility, encoding="utf-8") as source:
+            visibility = json.load(source)
+        name = "lib/arm64-v8a/libcocos2dcpp.so"
+        if expected.get(name) != visibility["input_sha256"]:
+            raise AssertionError("Store visibility input does not match the restored library")
+        expected[name] = visibility["output_sha256"]
     with zipfile.ZipFile(args.patched_apk) as patched:
         for name, value in expected.items():
             with patched.open(name) as stream:

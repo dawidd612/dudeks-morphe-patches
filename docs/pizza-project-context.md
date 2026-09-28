@@ -2,6 +2,42 @@
 
 Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
+## Latest scope: hide paid offers — 2026-09-28
+
+The user accepted the alternative of hiding broken real-money offers and
+cancelling checkout, preserving in-game rewards/exchanges and their save. This
+supersedes the earlier request to implement genuine checkout; no paid goods are
+granted. `HidePaidOffersPatch.kt` adds a default-selected, optional ARM64 5.57.3
+patch. Native changes select the existing FUNDS storefront and hide the separate
+starter promotion. The public Java purchase entry queues the game's original
+cancellation Runnable on the GL thread. All assets, balances/ownership code and
+the other 2165 executable billing methods remain unchanged.
+
+Candidate `artifacts/hide-paid-20260928/pizza-hidden.apk` SHA-256:
+`4baed6a374788afb3be919b74b08169eeb910440c7a76e842fe2ba4b82974da7`.
+It was built from source and a clean APKM, then installed with the existing key.
+See [validation and failures](pizza-hidden-offers-validation.md) and
+[exact native edits](pizza-store-visibility.json). Build, emitted-DEX, native,
+all-split integrity and 11 asset regressions pass. Runtime tests verify three
+genuine cancellations (no success/Billing), ordinary gem-to-funds exchange,
+exact sponsor reward, persistence and clean setup/tutorial.
+
+User AVD 5554 remains logged in, Chapter 2 / Day 43, cash 361.24, gems 36;
+same-key update and two force-stop launches preserve all three RGB menu regions
+and genuine Games sign-in success. Diagnostic AVD 5556 is clean-installed Day 1,
+now closed to reduce emulator load; its earlier Day 2 save is archived in ignored
+`debug-day2-backup.tar`. MicroG remains enabled. Do not reset user AVD 5554.
+
+A diagnostic early-boot test encountered System UI ANR and a black renderer after
+MicroG cancellation; force-stop/relaunch recovered. Preserve this failure and do
+not claim every reboot/environment passed. Account-AVD reboot tests run with the
+other AVD closed and boot services settled. Both account-AVD reboots pass:
+genuine Games sign-in, identical RGB save/currency regions and no new app crash.
+User AVD is left running at the preserved main menu. The feature is ready for
+the authorized commit/release; publication details follow after verification.
+
+Original-context checkpoints below remain historical evidence.
+
 ## Latest user confirmation and billing investigation — 2026-09-28
 
 Published [v1.31.1](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.31.1):
