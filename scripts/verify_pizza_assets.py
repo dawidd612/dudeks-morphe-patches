@@ -20,6 +20,8 @@ def main():
     parser.add_argument("original_apkm")
     parser.add_argument("patched_apk")
     parser.add_argument("--bootstrap-delta", help="Exact ARM64 initialization delta from the reviewed patch resources")
+    parser.add_argument("--native-delta", action="append", default=[], metavar="APK_PATH=DELTA",
+                        help="Reviewed reconstruction for a native library; may be repeated")
     parser.add_argument("--store-visibility", help="Reviewed native visibility manifest (after bootstrap restoration)")
     args = parser.parse_args()
     expected = {}
@@ -47,12 +49,14 @@ def main():
         raise AssertionError("Input has no APK splits/native libraries")
     if not any(name.startswith("assets/") for name in expected):
         raise AssertionError("Input has no game assets")
+    native_deltas = dict(item.split("=", 1) for item in args.native_delta)
     if args.bootstrap_delta:
-        with gzip.open(args.bootstrap_delta, "rb") as delta:
+        native_deltas["lib/arm64-v8a/libcocos2dcpp.so"] = args.bootstrap_delta
+    for name, path in native_deltas.items():
+        with gzip.open(path, "rb") as delta:
             header = delta.read(68)
         if len(header) != 68 or header[:4] != b"PZB2":
             raise AssertionError("Invalid bootstrap delta")
-        name = "lib/arm64-v8a/libcocos2dcpp.so"
         if expected.get(name) != header[4:36].hex():
             raise AssertionError("Bootstrap input library does not match the original APKM")
         expected[name] = header[36:68].hex()

@@ -124,3 +124,12 @@ Requires Java 21 and access to the Morphe Gradle dependencies.
 ## Credits and license
 
 Based on [rushiranpise/morphe-patches](https://github.com/rushiranpise/morphe-patches) and the Morphe patch tooling. Licensed under [GPL-3.0](LICENSE); see [NOTICE](NOTICE) for retained terms. Maintained independently of Morphe and the patched app developers.
+
+### Good Coffee, Great Coffee (experimental development)
+
+Coffee **1.24.0 (1397), ARM64 APKM** has startup, rewarded-ad skipping and MicroG
+Games patches. Android gameplay, a real in-game +10 reward and in-game purchases
+were exercised. Google sign-in/cloud restore and paid checkout remain unverified;
+Coffee does not yet include Pizza's paid-offer hiding. See [test evidence and
+limitations](docs/coffee-project-context.md). The release index above reflects
+the last published bundle.

@@ -22,7 +22,7 @@ def archive(entries):
 
 
 class AssetPreservationTests(unittest.TestCase):
-    def verify(self, patched_entries, extra_split=None, delta=None, visibility=None):
+    def verify(self, patched_entries, extra_split=None, delta=None, visibility=None, native_deltas=None):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             splits = {"base.apk": archive({"assets/base": b"base"}),
@@ -40,6 +40,10 @@ class AssetPreservationTests(unittest.TestCase):
             if visibility is not None:
                 (root / "visibility.json").write_text(json.dumps(visibility))
                 arguments += ["--store-visibility", str(root / "visibility.json")]
+            for index, (name, value) in enumerate((native_deltas or {}).items()):
+                path = root / f"native-{index}.gz"
+                path.write_bytes(value)
+                arguments += ["--native-delta", f"{name}={path}"]
             return subprocess.run(arguments,
                                   capture_output=True, text=True)
 
@@ -84,6 +88,20 @@ class AssetPreservationTests(unittest.TestCase):
 
     def test_bootstrap_for_different_input_fails(self):
         self.assertNotEqual(self.verify(self.originals(), delta=encode(b"other", b"native")).returncode, 0)
+
+    def test_multiple_reviewed_native_libraries(self):
+        other = "lib/arm64-v8a/libunity.so"
+        entries = self.originals() | {LIBRARY: b"restored", other: b"unity restored"}
+        deltas = {LIBRARY: encode(b"native", b"restored"), other: encode(b"unity", b"unity restored")}
+        result = self.verify(entries, {other: b"unity"}, native_deltas=deltas)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        entries[other] = b"incorrect reconstruction"
+        self.assertNotEqual(self.verify(entries, {other: b"unity"}, native_deltas=deltas).returncode, 0)
+
+    def test_native_delta_requires_actual_original_library(self):
+        result = self.verify(self.originals(), native_deltas={
+            "lib/arm64-v8a/absent.so": encode(b"native", b"restored")})
+        self.assertNotEqual(result.returncode, 0)
 
     def visibility(self):
         return {"input_sha256": hashlib.sha256(b"restored").hexdigest(),
