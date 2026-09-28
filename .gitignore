@@ -129,6 +129,11 @@ node_modules/
 .idea/
 local.properties
 
+# Local runtime evidence, device backups, signing material and test tooling.
+/artifacts/
+/tools/
+__pycache__/
+
 
 # Generated from the final published bundle, after Gradle publish.
 /SHA256SUMS.txt

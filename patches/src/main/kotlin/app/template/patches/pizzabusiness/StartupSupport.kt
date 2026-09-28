@@ -1,12 +1,18 @@
 package app.template.patches.pizzabusiness
 
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.template.patches.shared.replaceBody
 import com.android.tools.smali.dexlib2.iface.value.StringEncodedValue
+import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 
 /** Narrow startup companion. Preserve protected SDK methods and their return types. */
 internal val pizzaStartupSupport = bytecodePatch {
+    dependsOn(pizzaNativeBootstrap)
     execute {
         val context = "Landroid/content/Context;"
         val signature = "Lcom/pairip/SignatureCheck;"
@@ -49,8 +55,30 @@ internal val pizzaStartupSupport = bytecodePatch {
             screen.calls("Lcom/pairip/licensecheck/LicenseActivity;", "showPaywallAndCloseApp"),
             "licensing entry, retry or remediation flow changed")
 
-        // Do not replace VMRunner or its callers: some return values are unboxed.
-        // Native VM state after skipping startup still needs an on-device test.
+        // Preserve initialized constants, native code/imports and recovered SDK
+        // behavior before replacing the original re-signing startup path.
+        restorePizzaBootstrap()
+
+        // Tapjoy's connection worker outlives Activity recreation. Android
+        // automatically removes Activity-owned receivers on destruction, then
+        // the worker crashes when it performs its normal unregister. Give only
+        // this receiver the application lifetime; retain SDK UI contexts,
+        // connection retries, callbacks and unregister/finally behavior.
+        val worker = pizzaMethod("Lck/f0;", "run", emptyList(), "V", static = false)
+        val stores = worker.instructions.withIndex().filter { (_, instruction) ->
+            val field = (instruction as? ReferenceInstruction)?.reference as? FieldReference
+            instruction.opcode == Opcode.IPUT_OBJECT && field?.definingClass == "Lck/f0;" && field.name == "e"
+        }
+        requirePizza(stores.size == 1 && worker.hasString("android.net.conn.CONNECTIVITY_CHANGE") &&
+            worker.calls(context, "registerReceiver") && worker.calls(context, "unregisterReceiver"),
+            "Tapjoy connection receiver lifetime changed")
+        val store = stores.single()
+        val receiverContext = (store.value as TwoRegisterInstruction).registerA
+        worker.addInstructions(store.index, """
+            invoke-virtual {v$receiverContext}, Landroid/content/Context;->getApplicationContext()Landroid/content/Context;
+            move-result-object v$receiverContext
+        """.trimIndent())
+        // VMRunner and all remaining protected callers retain their return types.
         integrity.replaceBody("return-void")
         startup.replaceBody("return-void")
         checkLicense.replaceBody("return-void")

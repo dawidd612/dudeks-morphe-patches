@@ -72,13 +72,13 @@ intent nor closes the game's tasks. All affected method signatures and expected
 calls are checked before the grouped edits. Replacement bodies have their old
 exception tables removed. No successful signed license response is fabricated.
 
-It preserves `VMRunner`, the native loader, protected assets and all 20 protected
-SDK/WorkManager callers. Some protected methods return values that are unboxed;
-the broad AndroPods helper is unsuitable here. **It is not established whether
-later VM calls require state from the skipped startup program.** Re-signed launch,
-background/foreground transitions and gameplay must be tested on the device before
-claiming working startup support. Android's installation signature rules and
-server-side checks are not changed.
+The companion restores 1459 original string constants, ARM64 native initialization
+and four exact upstream SDK receiver bodies; see [bootstrap provenance](pizza-bootstrap.md).
+`VMRunner`, protected assets and the other 16 protected SDK/WorkManager callers
+remain intact. Tapjoy's connection receiver uses application context so its normal
+cleanup survives Activity destruction. Connection retries, failures and SDK UI
+contexts remain unchanged. ARM32 and physical-device compatibility remain unverified.
+Android's installation signature rules and server-side checks are not changed.
 
 ## Google Play Games through MicroG-RE
 
@@ -94,18 +94,28 @@ MicroG service still produces a real connection failure. Other Google services,
 Firebase and billing keep their original routing. Binder descriptors, transaction
 IDs and Bundle keys retain their original Google namespace.
 
+**Paid purchases remain blocked in the re-signed APK by Google Play's billing
+configuration check.** Working Games sign-in does not authorize Play Billing.
+See [the reproduced checkout failure and publisher requirements](pizza-billing.md).
+
 The manifest declares MicroG package visibility plus the original package name
 and APK signing-certificate SHA-1 (`828d99f1d85e52eb473af06d690f84ee72904330`)
 using MicroG-RE's supported metadata. The game keeps its own package name, client
 ID, Games application ID and save paths. Its presence check looks for MicroG
 instead of requiring the separate stock Play Games app.
 
-The original `isAuthenticated`, interactive sign-in, `requestServerSideAccess`,
-player-ID retrieval and success/error callbacks remain unchanged. The patch does
-not return a fake account, player ID, token or cloud-save success. Source review
-of MicroG-RE 7.1.0 confirms Games Connect, server auth-code and snapshot handlers;
-this does **not** establish end-to-end compatibility with the game's backend.
-Actual account selection, save upload and restore after restart need phone tests.
+The SDK initializes during Activity creation, after the game's existing root-window
+check accepts that Activity, so its lifecycle observer can track the foreground
+window before the first sign-in. Rejected duplicate windows do not initialize it.
+MicroG resolutions bypass the
+legacy stock GMS/Play Store version probe and still launch the service's actual
+PendingIntent, including cancellation and retries. Authentication results,
+`requestServerSideAccess`, player retrieval and success/error callbacks remain
+unchanged. No account, player ID, token or cloud-save result is fabricated.
+Real account selection, server authorization and player retrieval succeeded on
+the API 35 ARM64-translating emulator. TapBlaze restored the user's existing save;
+that is separate from Google Play Games authentication. Current regression
+results and limits are recorded in [runtime validation](pizza-runtime-validation.md).
 
 ## Input and validation
 
@@ -129,10 +139,12 @@ Actual account selection, save upload and restore after restart need phone tests
 - `scripts/VerifyPizzaIntegrationDex.java` checks the actual emitted DEX and
   binary manifest: ten inactive license operations, safe restored-activity exit,
   scoped MicroG routing, real package presence check, original signer metadata,
-  unchanged authentication/SDK methods and all 20 protected VM callers. Native
-  libraries and assets are compared byte-for-byte. Compile it together with
+  unchanged authentication/SDK methods and exact upstream receiver restorations.
+  `verify_pizza_assets.py` compares all input APKM splits, permitting only the
+  reviewed ARM64 reconstruction hash with `--bootstrap-delta`. Compile it together with
   `VerifyPizzaRewardDex.java`, using the Morphe CLI JAR as the classpath; run with
-  `patched.apk original.apk microg` (or `stock` when the MicroG patch is disabled).
+  `patched.apk original.apk microg patches/src/main/resources/pizzabusiness/5.57.3`
+  (or `stock` when the MicroG patch is disabled).
 - CI compiles the full bundle and both verification tools. The copyrighted input
   APK stays outside the repository; emitted-APK checks run separately on the
   supplied input. Neither CI nor these checks executes Google authentication.

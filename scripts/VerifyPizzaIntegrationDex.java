@@ -60,12 +60,25 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
         return result;
     }
 
+    // APKM merge removes distribution/split packaging markers. They do not
+    // describe the game's identity or authentication configuration. Allow only
+    // their removal; a changed value is still a regression.
+    static final Set<String> MERGED_PACKAGING_METADATA = Set.of(
+        "com.android.stamp.source", "com.android.stamp.type",
+        "com.android.vending.splits.required", "com.android.vending.splits",
+        "com.android.vending.derived.apk.id");
+
     public static void main(String[] args) throws Exception {
-        check(args.length == 3 && Set.of("microg","stock").contains(args[2]),
-            "Usage: VerifyPizzaIntegrationDex patched.apk original.apk microg|stock");
+        check((args.length == 3 || args.length == 4) && Set.of("microg","stock").contains(args[2]),
+            "Usage: VerifyPizzaIntegrationDex patched.apk original.apk microg|stock [bootstrap-resource-directory]");
         boolean microg = args[2].equals("microg");
         var patched = classes(args[0]);
         var original = classes(args[1]);
+        Map<String, Method> sdkRestorations = new HashMap<>();
+        if (args.length == 4) {
+            for (ClassDef cls : classes(java.nio.file.Path.of(args[3], "sdk-receivers.dex").toString()).values())
+                for (Method m : cls.getMethods()) sdkRestorations.put(key(m), m);
+        }
         List<Method> blocked = List.of(
             method(patched, LICENSE, "checkLicense", "V", "Landroid/content/Context;"),
             method(patched, LICENSE, "stopTrial", "V", "Landroid/content/Context;"),
@@ -91,6 +104,14 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
 
         Set<String> allowed = new HashSet<>();
         if (microg) {
+            allowed.add(key(method(patched, ACTIVITY, "onCreate", "V", "Landroid/os/Bundle;")));
+            allowed.add(key(method(patched, ACTIVITY, "lambda$initializeGooglePlayGames$3", "V")));
+            Method resolution = method(patched, "Lcom/google/android/gms/internal/games_v2/zzbq;", "zzo", "V",
+                "Lcom/google/android/gms/tasks/TaskCompletionSource;", "I", "Landroid/app/PendingIntent;", "Z", "Z");
+            allowed.add(key(resolution));
+            check(code(resolution).stream().anyMatch(i -> key(call(i)).equals(
+                "Lcom/google/android/gms/games/internal/v2/resolution/a;->a(Landroid/app/Activity;Landroid/app/PendingIntent;)Lcom/google/android/gms/tasks/Task;")),
+                "Games authentication no longer launches the actual service resolution");
             for (var entry : CLIENTS.entrySet()) {
                 String owner = entry.getKey();
                 Method action = method(patched, owner, "getStartServiceAction", STRING);
@@ -117,8 +138,13 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
 
         // Whole-class comparison: authentication callbacks, server-auth requests,
         // player IDs, errors, Binder descriptors and SDK/VM return values survive.
-        int preserved = 0, protectedMethods = 0;
+        int preserved = 0, protectedMethods = 0, restored = 0, billingMethods = 0;
         for (ClassDef cls : original.values()) {
+            // Re-signing does not authorize Google Play purchases. Verify that
+            // the patch preserves the real checkout and purchase callbacks.
+            boolean billing = cls.getType().startsWith("Lcom/android/billingclient/") ||
+                cls.getType().startsWith("Lcom/google/android/gms/internal/play_billing/") ||
+                cls.getType().startsWith("Lcom/tapblaze/pizzabusiness/PurchasesManager");
             boolean auth = cls.getType().equals(ACTIVITY) || cls.getType().equals(CLIENT) ||
                 cls.getType().startsWith("Lcom/google/android/gms/internal/games_v2/") ||
                 cls.getType().startsWith("Lld/") || cls.getType().equals("Lcom/pairip/VMRunner;");
@@ -126,14 +152,38 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
                 boolean vm = before.getImplementation() != null && code(before).stream().anyMatch(i ->
                     call(i) != null && call(i).getDefiningClass().equals("Lcom/pairip/VMRunner;") && call(i).getName().equals("invoke"));
                 if (vm && !cls.getType().startsWith("Lcom/pairip/")) protectedMethods++;
-                if ((!auth && !(vm && !cls.getType().startsWith("Lcom/pairip/"))) || allowed.contains(key(before))) continue;
+                if ((!auth && !billing && !(vm && !cls.getType().startsWith("Lcom/pairip/"))) || allowed.contains(key(before))) continue;
                 Method after = method(patched, cls.getType(), before.getName(), before.getReturnType(),
                     before.getParameterTypes().stream().map(Object::toString).toArray(String[]::new));
+                Method recovered = sdkRestorations.get(key(before));
+                if (recovered != null) {
+                    check(vm && canonical(recovered).equals(canonical(after)), "SDK behavior differs from original library: " + key(before));
+                    restored++;
+                    continue;
+                }
                 check(canonical(before).equals(canonical(after)), "Unrelated/auth/protected method changed: " + key(before));
+                if (billing && before.getImplementation() != null) billingMethods++;
                 preserved++;
             }
         }
         check(protectedMethods == 20, "Protected SDK method count changed");
+        check(restored == sdkRestorations.size(), "SDK restoration missing from emitted APK");
+        if (args.length == 4) {
+            int constants = 0;
+            try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(new java.util.zip.GZIPInputStream(
+                    java.nio.file.Files.newInputStream(java.nio.file.Path.of(args[3], "strings.tsv.gz"))), java.nio.charset.StandardCharsets.UTF_8))) {
+                for (String row; (row = reader.readLine()) != null;) {
+                    String[] parts = row.split("\t", -1);
+                    String expected = new String(Base64.getDecoder().decode(parts[2]), java.nio.charset.StandardCharsets.UTF_8);
+                    Field field = null;
+                    for (Field f : patched.get(parts[0]).getFields()) if (f.getName().equals(parts[1])) field = f;
+                    check(field != null && field.getInitialValue() instanceof com.android.tools.smali.dexlib2.iface.value.StringEncodedValue value &&
+                        value.getValue().equals(expected), "Original startup constant not restored: " + parts[0] + "->" + parts[1]);
+                    constants++;
+                }
+            }
+            System.out.println("PASS: " + constants + " original startup strings initialized");
+        }
 
         try (ZipFile oldZip = new ZipFile(args[1]); ZipFile newZip = new ZipFile(args[0])) {
             var before = AndroidManifestBlock.load(oldZip.getInputStream(oldZip.getEntry("AndroidManifest.xml")));
@@ -141,8 +191,11 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
             check(before.getPackageName().equals(after.getPackageName()) && before.getVersionCode().equals(after.getVersionCode()),
                 "Game identity changed");
             var oldMeta = metadata(before); var newMeta = metadata(after);
-            for (var entry : oldMeta.entrySet()) check(Objects.equals(newMeta.get(entry.getKey()), entry.getValue()),
-                "Original metadata changed: " + entry.getKey());
+            for (var entry : oldMeta.entrySet()) {
+                if (MERGED_PACKAGING_METADATA.contains(entry.getKey()) && !newMeta.containsKey(entry.getKey())) continue;
+                check(Objects.equals(newMeta.get(entry.getKey()), entry.getValue()),
+                    "Original metadata changed: " + entry.getKey());
+            }
             if (microg) {
                 var sig = new ApkVerifier.Builder(new java.io.File(args[1])).build().verify();
                 check(sig.isVerified() && sig.getSignerCertificates().size() == 1, "Original APK signature not verified");
@@ -163,7 +216,8 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
             }
         }
         System.out.println("PASS: 10 licensing entry/retry/remediation/shutdown bodies have no side effects; restored screen only finishes itself");
-        System.out.println("PASS: " + preserved + " unchanged authentication/SDK methods, including 20 protected VM callers");
+        System.out.println("PASS: " + preserved + " unchanged authentication/SDK methods; " + restored + " SDK receivers restored from upstream libraries");
+        System.out.println("PASS: " + billingMethods + " executable billing methods unchanged; checkout, results and purchase processing preserved");
         System.out.println("PASS: " + args[2] + " transport, original app identity, signer metadata, package visibility and native/assets integrity");
         System.out.println("LIMIT: these checks do not log in to Google or write/read a cloud save on a phone");
     }

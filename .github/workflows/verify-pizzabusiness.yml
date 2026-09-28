@@ -4,8 +4,13 @@ on:
     paths:
       - 'extensions/pizzabusiness/**'
       - 'patches/src/main/kotlin/app/template/patches/pizzabusiness/**'
+      - 'patches/src/main/resources/pizzabusiness/**'
       - 'scripts/VerifyPizzaRewardDex.java'
       - 'scripts/VerifyPizzaIntegrationDex.java'
+      - 'scripts/verify_pizza_assets.py'
+      - 'scripts/test_pizza_assets.py'
+      - 'scripts/VerifyPizzaBootstrap.java'
+      - 'scripts/build_pizza_native_delta.py'
       - '.github/workflows/verify-pizzabusiness.yml'
 permissions:
   contents: read
@@ -32,6 +37,10 @@ jobs:
           curl -fL --retry 2 https://github.com/MorpheApp/morphe-desktop/releases/download/v1.17.0/morphe-desktop-1.17.0-all.jar -o "$RUNNER_TEMP/morphe-cli.jar"
           echo "8cf6a9eab4ee9dab146bddc24681897851564f53116baec11f36ba2fa2f589be  $RUNNER_TEMP/morphe-cli.jar" | sha256sum -c -
           javac -cp "$RUNNER_TEMP/morphe-cli.jar" -d "$RUNNER_TEMP/pizza-verifiers" scripts/VerifyPizzaRewardDex.java scripts/VerifyPizzaIntegrationDex.java
+          javac -cp "patches/build/classes/kotlin/main:$RUNNER_TEMP/morphe-cli.jar" -d "$RUNNER_TEMP/pizza-verifiers" scripts/VerifyPizzaBootstrap.java
+          java -cp "$RUNNER_TEMP/pizza-verifiers:patches/build/classes/kotlin/main:patches/build/resources/main:$RUNNER_TEMP/morphe-cli.jar" VerifyPizzaBootstrap
+      - name: Check split asset preservation verifier
+        run: python3 scripts/test_pizza_assets.py
       - uses: actions/upload-artifact@v4
         with:
           name: dudeks-pizzabusiness-candidate

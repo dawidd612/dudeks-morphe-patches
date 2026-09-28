@@ -2,6 +2,7 @@ package app.template.patches.pizzabusiness
 
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
+import app.morphe.patcher.extensions.InstructionExtensions.removeInstruction
 import app.morphe.patcher.patch.ApkFileType
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
@@ -12,9 +13,12 @@ import app.template.patches.shared.replaceBody
 import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.builder.instruction.BuilderInstruction21c
+import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.reference.StringReference
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethod
 import com.android.tools.smali.dexlib2.immutable.ImmutableMethodImplementation
 import com.android.tools.smali.dexlib2.immutable.reference.ImmutableStringReference
@@ -102,6 +106,70 @@ val pizzaMicroGSupportPatch = bytecodePatch(
         val installed = pizzaMethod(GAME_ACTIVITY, "isGooglePlayGamesInstalled", emptyList(), "Z")
         requirePizza(installed.hasString("com.google.android.play.games") &&
             installed.calls("Landroid/content/pm/PackageManager;", "getApplicationInfo"), "Games presence check changed")
+
+        // Register the SDK lifecycle observer before this Activity starts. Late
+        // initialization from the login button misses onResume and leaves the
+        // SDK without an Activity for its genuine account-selection resolution.
+        val create = pizzaMethod(GAME_ACTIVITY, "onCreate", listOf("Landroid/os/Bundle;"), "V", static = false)
+        val init = pizzaMethod(GAME_ACTIVITY, "lambda\$initializeGooglePlayGames\$3", emptyList(), "V")
+        val lateInitIndex = init.implementation!!.instructions.indexOfFirst {
+            val call = (it as? ReferenceInstruction)?.reference as? MethodReference
+            call?.definingClass == "Lcom/google/android/gms/internal/games_v2/zzbw;" && call.name == "zza"
+        }
+        requirePizza(lateInitIndex >= 0 && create.calls("Lorg/cocos2dx/lib/Cocos2dxActivity;", "onCreate"),
+            "Games lifecycle initialization changed")
+        // Cocos finishes duplicate/non-root Activities in super.onCreate. The
+        // game's existing root check must accept this Activity before the SDK
+        // starts watching it; initializing a rejected window can launch Games
+        // resolution while the real game has not created its renderer yet.
+        val acceptedActivity = create.implementation!!.instructions.indexOfFirst {
+            val field = (it as? ReferenceInstruction)?.reference as? FieldReference
+            it.opcode == Opcode.SPUT_OBJECT && field?.definingClass == GAME_ACTIVITY &&
+                field.name == "activity" && field.type == "Landroid/app/Activity;"
+        }
+        requirePizza(acceptedActivity >= 0 && create.calls("Landroid/app/Activity;", "isTaskRoot"),
+            "accepted Games Activity initialization changed")
+        create.addInstructions(acceptedActivity + 1,
+            "invoke-static {p0}, Lcom/google/android/gms/internal/games_v2/zzbw;->zza(Landroid/content/Context;)V")
+        init.removeInstruction(lateInitIndex)
+
+        val resolutionOwner = "Lcom/google/android/gms/internal/games_v2/zzbq;"
+        val resolution = pizzaMethod(resolutionOwner, "zzo", listOf(
+            "Lcom/google/android/gms/tasks/TaskCompletionSource;", "I", "Landroid/app/PendingIntent;", "Z", "Z"),
+            "V", static = false)
+        val resolutionCode = resolution.implementation!!.instructions.toList()
+        val pendingFlag = resolution.implementation!!.registerCount - 2
+        val pendingIntent = pendingFlag - 1
+        val start = resolutionCode.indices.firstOrNull { index ->
+            index + 1 < resolutionCode.size && resolutionCode[index].opcode == Opcode.IF_EQZ &&
+                (resolutionCode[index] as? OneRegisterInstruction)?.registerA == pendingFlag &&
+                resolutionCode[index + 1].opcode == Opcode.IF_EQZ &&
+                (resolutionCode[index + 1] as? OneRegisterInstruction)?.registerA == pendingIntent
+        } ?: throw app.morphe.patcher.patch.PatchException("Pizza Games resolution entry changed")
+        val tag = resolutionCode.single {
+            ((it as? ReferenceInstruction)?.reference as? StringReference)?.string == "GamesApiManager"
+        } as OneRegisterInstruction
+        val boundary = resolutionCode.take(start).sumOf { it.codeUnits }
+        requirePizza(start > 2 && resolution.hasString("com.google.android.gms.version") &&
+            resolution.hasString("PlayStore is not installed") &&
+            resolution.calls("Lcom/google/android/gms/games/internal/v2/resolution/a;", "a") &&
+            resolution.implementation!!.tryBlocks.all { it.startCodeAddress + it.codeUnitCount <= boundary },
+            "legacy Play Store resolution probe changed")
+
+        // The returned PendingIntent belongs to the selected Games service. The
+        // stock GMS/Play Store version probe only predicts Play Games installation
+        // behavior and cannot describe MicroG. Keep the main-thread check, actual
+        // resolution launch, cancellation, retries and service authentication.
+        val resolvedCode = MutableMethodImplementation(resolution.implementation!!)
+        repeat(start - 2) { resolvedCode.removeInstruction(2) }
+        resolvedCode.addInstruction(2, BuilderInstruction21c(Opcode.CONST_STRING, tag.registerA,
+            ImmutableStringReference("GamesApiManager")))
+        val resolutionClass = mutableClassDefBy(resolutionOwner)
+        resolutionClass.methods.remove(resolution)
+        resolutionClass.methods.add(MutableMethod(ImmutableMethod(resolution.definingClass, resolution.name,
+            resolution.parameters, resolution.returnType, resolution.accessFlags, resolution.annotations,
+            resolution.hiddenApiRestrictions, ImmutableMethodImplementation(resolvedCode.registerCount,
+                resolvedCode.instructions, emptyList(), emptyList()))))
 
         actions.forEachIndexed { index, method ->
             val (owner, action) = gamesClients.entries.elementAt(index)
