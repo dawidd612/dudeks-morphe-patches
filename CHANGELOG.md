@@ -1,3 +1,9 @@
+## [1.31.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.31.0...v1.31.1) (2026-09-28)
+
+### 🐛 Bug Fixes
+
+* **pizzabusiness:** stabilize startup and Google Play Games lifecycle ([de4d708](https://github.com/dawidd612/dudeks-morphe-patches/commit/de4d708fec03c9bdb638e35b85954985edee49c3))
+
 ## [1.31.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.30.1...v1.31.0) (2026-09-27)
 
 ### ✨ New Features
