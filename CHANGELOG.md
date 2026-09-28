@@ -1,3 +1,9 @@
+## [1.32.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.31.1...v1.32.0) (2026-09-28)
+
+### ✨ New Features
+
+* **pizzabusiness:** hide paid offers and cancel unsupported checkout ([1bd0c2b](https://github.com/dawidd612/dudeks-morphe-patches/commit/1bd0c2b3a6f53804203b2b313294ce857158ccb9))
+
 ## [1.31.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.31.0...v1.31.1) (2026-09-28)
 
 ### 🐛 Bug Fixes

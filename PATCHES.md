@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.31.1** (`main`) - **10 patches** across **7 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.32.0** (`main`) - **11 patches** across **7 apps** - back to [README](README.md)
 
 ---
 
@@ -32,6 +32,7 @@
 | Patch | Details |
 |---|---|
 | **Google Play Games via MicroG-RE** | Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms. Experimental: cloud save and restore need device verification. |
+| **Hide paid offers** | Hides real-money storefront sections and cancels Google Play checkout. Keeps in-game currency exchanges and existing purchase processing. Requires ARM64 Pizza 5.57.3. |
 | **Skip rewarded ads** | Completes the game's rewarded-video flow without playing an ad, keeping the requested placement and normal reward. Experimental; includes re-signed startup support and needs device testing. |
 
 ---
