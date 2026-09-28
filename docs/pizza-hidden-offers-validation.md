@@ -5,6 +5,14 @@ Candidate APK SHA-256:
 Local candidate bundle (version field still 1.31.1) SHA-256:
 `b2f250b5fba247f969eed83418a858a7bc6d3d67a15f46f9b131dd9f1901652f`.
 
+Published [v1.32.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.32.0)
+from implementation `1bd0c2b` / metadata `c519c17`, workflow `36452104570`.
+Release MPP SHA-256:
+`e3a1e311b2b5fa756f527e0c1af7e7766c43a292885a7bbdd280a2c418f39cca`.
+Downloaded checksum and GitHub build attestation pass. All 12 Pizza patch class,
+bootstrap resource and extension entries are byte-identical to the tested local
+candidate bundle. Version metadata and the new patch's default selection match.
+
 Built from source with Java 21, then patched the clean 5.57.3 APKM with CLI
 1.17.0/FULL and three selected patches: Skip rewarded ads, Google Play Games via
 MicroG-RE, Hide paid offers. Both installations retain the existing test key.

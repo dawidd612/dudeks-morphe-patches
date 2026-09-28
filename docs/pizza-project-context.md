@@ -33,8 +33,18 @@ MicroG cancellation; force-stop/relaunch recovered. Preserve this failure and do
 not claim every reboot/environment passed. Account-AVD reboot tests run with the
 other AVD closed and boot services settled. Both account-AVD reboots pass:
 genuine Games sign-in, identical RGB save/currency regions and no new app crash.
-User AVD is left running at the preserved main menu. The feature is ready for
-the authorized commit/release; publication details follow after verification.
+User AVD is left running at the preserved main menu.
+
+Published [v1.32.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.32.0),
+implementation `1bd0c2b`, release metadata `c519c17`. Workflow `36452104570`
+succeeded. Downloaded MPP SHA-256:
+`e3a1e311b2b5fa756f527e0c1af7e7766c43a292885a7bbdd280a2c418f39cca`.
+Checksum and GitHub build attestation verified; all 12 Pizza patch-class/resource
+entries match the locally runtime-tested bundle byte-for-byte. Published metadata
+contains the default-on Hide paid offers patch and version 1.32.0. Release notes
+include the diagnostic boot failure and ARM64/experimental limits. No APK, save,
+account data, raw log or signing key was published. Worktree is ready for further
+work; retain user AVD and diagnostic artifacts.
 
 Original-context checkpoints below remain historical evidence.
 
