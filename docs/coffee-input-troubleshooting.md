@@ -63,3 +63,13 @@ completed; no code change was made on the assumption that it was a permanent han
 The Samsung SM-A546B was not connected through ADB. Android 16 and real TapBlaze
 account restoration remain unverified. These checks do not justify a release
 claiming that real authentication or cloud restoration has been repaired.
+
+## Separate runtime fix
+
+Further testing reproduced a native crash when the Singular SDK received a
+network-change event on an adult test profile. The callback was restored from
+the same SDK version; see [source and reproduction](coffee-sdk-restoration.md)
+and [runtime evidence](coffee-project-context.md#singular-network-callback-regression--2026-09-30).
+The corrected build opened the TapBlaze ID email/code form. A visible login form
+is not proof of authenticated account restoration. This runtime correction does
+not repair invalid ZIP data or remove Android's need for working storage.

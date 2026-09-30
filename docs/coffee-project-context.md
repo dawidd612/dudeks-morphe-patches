@@ -144,3 +144,41 @@ The original app on a separate empty control-data.img reached a Play licensing
 error, so that control cannot establish gameplay parity. Existing AVD data was
 not overwritten. The configured API36.1 AVD has a missing system image; no
 Android16 result is claimed. No authentication/cloud success is claimed.
+
+## Singular network callback regression — 2026-09-30
+
+The isolated `control-data.img` profile reached Day1 gameplay with published
+1.33.0 after choosing adult test age26. Two subsequent launches crashed in
+`BroadcastReceivers$NetworkChange.onReceive -> VMRunner.invoke`, with guest
+`libpairipcore.so+0x32b58` and native-bridge abort `Cannot process signal 11`.
+Evidence: `clean-relaunch-crash.log`, `clean-relaunch-system.log`,
+`clean-retry-crash.log` under `artifacts/coffee-20260930/`. These are distinct from
+Manager ZIP failures. Do not generalize the earlier successful child-profile
+startup to all account-eligible profiles.
+
+Restored the exact Singular12.6.1 SDK network callback, preserving its connection
+check and original queued API worker. See `coffee-sdk-restoration.md` for source
+hashes and regeneration. The original constructor/fields/worker remain in place;
+all replacement references resolve against the clean Coffee DEX. Build, clean
+premerged-input patching with the two defaults, rebuild, signing and the full
+15-split/46-library/2447-asset audit passed. Candidate APK SHA256:
+`0ff79d46fdbfaa1f4becc6f455eb63e9163637b4cdeaf7540bd239a74d9b76eb`.
+
+On5558, same-key update loaded the main menu, survived network disconnect and
+reconnect, then survived force-stop/relaunch and another disconnect/reconnect.
+`network-success-process.log` records the actual connectivity callback followed
+by successful SDK queue processing; `network-second-process.log` preserves the
+second run. The TapBlaze ID email/verification-code form opened through the
+normal Login button (`network-tapblaze.png` in the older screenshot directory).
+No email/code was submitted and no real account/cloud restore is claimed.
+After an Android reboot, the corrected app again reached the menu with Login
+(`network-reboot-observe.png`); its process log records a connectivity callback
+and no fatal/verification exception. Boot completion was awaited before launch.
+On5556, background/foreground returned to the same Day2 session.
+
+On5556, the update preserved Day2 and the previous reward crystal. The news reward
+increased crystals1 ->2 without video (`network-news-end.png`, `network-reward.png`).
+Actual Day2 gameplay retained cash139.04 and crystals2 (`network-day2-play.png`).
+Raw logs, test profiles, APKs and keys remain private. Samsung remains unavailable;
+the user cannot connect it now. The clean premerged input in Downloads is an
+input-preparation workaround, not a repair of arbitrary corrupt phone archives.

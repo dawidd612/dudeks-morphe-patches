@@ -82,8 +82,10 @@ internal val coffeeNativeBootstrap = rawResourcePatch {
 }
 
 internal fun BytecodePatchContext.restoreCoffeeBootstrap() {
-    // Coffee ships the same Fyber 8.4.6 and Ad Quality 9.9.0 receivers as Pizza.
+    // Restore stock Fyber 8.4.6, Ad Quality 9.9.0 and Singular 12.6.1 callbacks.
     // Restore their SDK behavior, including initialization, instead of no-oping them.
+    checkCoffee(coffeeMethod("Lcom/singular/sdk/internal/Constants;", "<clinit>", emptyList(), "V")
+        .hasString("Singular/v12.6.1"), "Singular SDK version changed")
     val sdk = CoffeeBootstrap.resource("sdk-receivers.dex").use {
         DexBackedDexFile(Opcodes.getDefault(), ByteBuffer.wrap(it.readBytes()))
     }
