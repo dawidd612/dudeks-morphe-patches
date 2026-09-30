@@ -182,3 +182,20 @@ Actual Day2 gameplay retained cash139.04 and crystals2 (`network-day2-play.png`)
 Raw logs, test profiles, APKs and keys remain private. Samsung remains unavailable;
 the user cannot connect it now. The clean premerged input in Downloads is an
 input-preparation workaround, not a repair of arbitrary corrupt phone archives.
+
+### Published checkpoint
+
+Fix commit `d540f54` was pushed to main and released as **v1.33.1**; GitHub run
+`36763799828` passed. Published bundle SHA256:
+`2c3d229501cad8d5fadab118ed0371ecdecf5a77d73cd2db1ac6d85cb3b683b3`.
+The downloaded checksum matches. All20 Coffee entries match the tested local
+candidate, apart from hash-manifest line endings (parsed JSON values match).
+Code, extension and binary restoration resources are byte-identical.
+
+A subsequent clean installation of the corrected APK on the disposable5558
+profile reached actual Day1 gameplay after choosing test age25 and declining
+personalized-ad consent (`network-clean-final.png`, `network-clean-process.log`).
+Only this disposable profile was uninstalled for that test;5556's Day2 save and
+all signing material remain preserved. The release notes explicitly distinguish
+the fixed receiver crash, input-preparation workaround and unverified real
+TapBlaze/cloud/Samsung Android16 behavior. v1.33.0 notes point to the correction.
