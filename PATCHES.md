@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.32.0** (`main`) - **11 patches** across **7 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.33.0** (`main`) - **14 patches** across **8 apps** - back to [README](README.md)
 
 ---
 
@@ -22,6 +22,18 @@
 | Patch | Details |
 |---|---|
 | **Repair negative stars once** | Repairs a negative saved star balance to 2 when the garden reads it, once per installation, and skips the local unofficial-install dialog. No level completion needed. Gardenscapes 9.9.0 ARM64 only. Experimental. |
+
+---
+
+## Good Coffee, Great Coffee (com.tapblaze.coffeebusiness)
+
+**Supported versions:** `experimental 1.24.0`
+
+| Patch | Details |
+|---|---|
+| **Coffee startup support** | Restores version-specific Unity startup after re-signing. Experimental: runtime validation in progress. |
+| **Google Play Games via MicroG-RE** | Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms. Experimental: cloud save and restore need device verification. |
+| **Skip rewarded ads** | Completes the requested rewarded-video flow locally using the game's callbacks. Experimental; Coffee device validation is in progress. |
 
 ---
 

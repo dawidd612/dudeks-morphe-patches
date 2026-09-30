@@ -1,3 +1,9 @@
+## [1.33.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.32.0...v1.33.0) (2026-09-30)
+
+### ✨ New Features
+
+* **coffeebusiness:** add experimental startup, rewards and MicroG patches ([529f096](https://github.com/dawidd612/dudeks-morphe-patches/commit/529f0965957810635214f649317a6ee2befb52f9))
+
 ## [1.32.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.31.1...v1.32.0) (2026-09-28)
 
 ### ✨ New Features
