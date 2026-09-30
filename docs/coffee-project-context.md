@@ -113,3 +113,34 @@ Final observation: emulator5554 reached actual Day1 gameplay with Maisie in the
 same process8455 (`firebase-main-final.png`), confirming that the observed
 Firebase startup crash is resolved in this run. Emulator5556 reached the Day2
 notification permission prompt after loading its preserved save.
+
+## Input failures and release retest — 2026-09-30
+
+User reports Manager 1.33.0 on Samsung SM-A546B / Android 16: first ENOSPC during
+split merge with 883.60 MB free, then invalid DEFLATE stored-block lengths during
+outer archive extraction with 5.40 GB free. Both precede patch execution. Phone
+and exact failing/cached input are unavailable over ADB. Local APKM is unchanged
+and passes every outer/inner CRC. See `coffee-input-troubleshooting.md`.
+
+Default two-patch selection was reproduced successfully from both the full APKM
+and clean premerged APK with the published 1.33.0 MPP. Both reports pass patch,
+rebuild and signing; both asset audits pass 15 splits / 46 libraries / 2447 assets.
+Startup support is already a dependency of both defaults; no dependency fix is
+needed. A read-only archive diagnostic and corrupted-input regression cases are
+in `scripts/verify_apkm.py` and `scripts/test_verify_apkm.py`.
+
+Local evidence: ignored `artifacts/coffee-20260930/`. Clean input supplied locally
+as `%USERPROFILE%/Downloads/Coffee-1.24.0-clean-merged.apk` (hash in recovery guide).
+Final release-default APK was installed with the existing test key on 5556 after
+backing up files/preferences to `pre-update-save.tar` (68 tar members). It reached
+Day2 gameplay with cash139.04; news reward increased crystals0 ->1 without video.
+Screens are in the older screenshot helper's `artifacts/coffee-20260928/` folder:
+`final-reloaded.png`, `day2-play.png`, `reward-gem.png`. No save reset took place.
+
+Initial 5% loading on old AVDs was slow, not established as a permanent hang:
+both a previous pre-Firebase-DEX build and final release-default build eventually
+loaded on5556. The final release-default build was restored after comparison.
+The original app on a separate empty control-data.img reached a Play licensing
+error, so that control cannot establish gameplay parity. Existing AVD data was
+not overwritten. The configured API36.1 AVD has a missing system image; no
+Android16 result is claimed. No authentication/cloud success is claimed.

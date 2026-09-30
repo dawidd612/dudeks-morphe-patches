@@ -134,3 +134,7 @@ were exercised. Google sign-in/cloud restore and paid checkout remain unverified
 Coffee does not yet include Pizza's paid-offer hiding. See [test evidence and
 limitations](docs/coffee-project-context.md). The release index above reflects
 the last published bundle.
+
+For APKM extraction errors or insufficient storage, see the
+[Coffee input recovery guide](docs/coffee-input-troubleshooting.md). Two default
+patch selections automatically include startup support as a dependency.
