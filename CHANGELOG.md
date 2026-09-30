@@ -1,3 +1,9 @@
+## [1.33.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.0...v1.33.1) (2026-09-30)
+
+### 🐛 Bug Fixes
+
+* **coffeebusiness:** restore Singular network callback after restart ([d540f54](https://github.com/dawidd612/dudeks-morphe-patches/commit/d540f5441884243324012576f4df5b53c83190f7))
+
 ## [1.33.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.32.0...v1.33.0) (2026-09-30)
 
 ### ✨ New Features
