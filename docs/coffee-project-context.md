@@ -199,3 +199,51 @@ Only this disposable profile was uninstalled for that test;5556's Day2 save and
 all signing material remain preserved. The release notes explicitly distinguish
 the fixed receiver crash, input-preparation workaround and unverified real
 TapBlaze/cloud/Samsung Android16 behavior. v1.33.0 notes point to the correction.
+
+## Original APKM follow-up — 2026-09-30
+
+User wants the original APKMirror APKM supported directly, without a premerge.
+The supplied URL identifies the same 1.24.0 / 1397 variant already in Downloads.
+The APKMirror file-hash dialog was inspected: SHA256 and exact byte size match
+our unchanged input (`61a8e5d...305d37`, 649647098 bytes). This is stronger than
+a filename comparison, but does not establish the bytes downloaded on Samsung.
+
+Cloned official Manager tag v1.33.0 (`2ba7bd57f24b3677b72b5487c9512cc0df77eed7`)
+to ignored `tools/morphe-manager` and indexed it separately with auto-watch off.
+Traced HomeViewModel import, SplitApkInspector, PatcherViewModel/PatcherWorker,
+the runtime and SplitApkPreparer. The reported extraction happens before patches.
+No demonstrated Manager defect has been found and no Manager code was changed.
+
+Ignored `artifacts/coffee-20260930/ZipArchiveProbe.java` was compiled to DEX and
+run using Android `app_process` on API35 and a newly created isolated API36 AOSP
+ATD emulator. It uses ZipFile input streams, FileOutputStream and an 8192-byte
+buffer, matching the reported inflater/copy path, plus CRC32 and length checks.
+Both runs passed all 15 APK entries. Logs: `android-zip-probe.log` and
+`android36-zip-probe.log`; API36 fingerprint in `android36-fingerprint.txt`.
+API36 AVD is `Morphe_Coffee_Zip_API36`, serial5560, now shut down. It has no user
+accounts or game saves. These are ZIP tests, not API36 game/authentication tests.
+
+Official Manager v1.33.0 was installed on the disposable5558 profile. Imported
+the published patches-1.33.1.mpp through its UI and selected the unchanged APKM
+from Downloads. The Manager import copy had the same SHA256 as APKMirror.
+Both default patches were selected; native libraries were preserved and the
+actual runtime logged patcher1.15.0 and STRIP_FAST. Extraction, merge and patch
+application succeeded. Manager temporary storage reached 4.4GiB; during the run
+only our earlier ZIP-probe scratch copy/extracted modules were removed to free
+1.3GiB. Do not cite this as a measured minimum-space threshold or an untouched
+low-storage run. The selected input and Manager data were never removed.
+
+Manager subsequently finished signing and showed **Patched**, 2 patches, source
+1.33.1 (`manager-original-success.xml`). Pulled the completed signed result to
+`manager-original-output.apk` (698415230 bytes), SHA256
+`a74675db460278fb5d8a01eeacaaca15f2a6aeaeefaf4f3f03ba12ba3f38f694`.
+`apksigner verify` passed; the preservation audit passed 15 splits, 46 libraries
+and 2447 assets (`manager-original-assets.json`), with only the two reviewed
+native deltas permitted. Full logs are `manager-original-logcat.txt`. This
+Manager-signed output was not installed over the existing differently signed
+test save. Earlier runtime evidence applies to the previously tested candidate.
+
+The remaining diagnostic blocker is the exact failing Samsung source/cache:
+the user cannot attach the phone now. Do not claim a ZIP fix from another patch
+bundle release. Keep the original format available and the premerged APK merely
+as a workaround. Real TapBlaze authentication still requires user credentials.

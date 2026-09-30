@@ -60,9 +60,40 @@ Day 2 gameplay with the preserved 139.04 cash balance. The news-screen reward
 increased crystals from 0 to 1 without a video. Slow loading at 5% eventually
 completed; no code change was made on the assumption that it was a permanent hang.
 
-The Samsung SM-A546B was not connected through ADB. Android 16 and real TapBlaze
-account restoration remain unverified. These checks do not justify a release
+The Samsung SM-A546B was not connected through ADB. Game runtime on Android 16
+and real TapBlaze account restoration remain unverified. These checks do not justify a release
 claiming that real authentication or cloud restoration has been repaired.
+
+## Original APKMirror bundle: Android extraction verification
+
+The user supplied the [original 1.24.0 APKMirror variant](https://www.apkmirror.com/apk/tapblaze/good-coffee-great-coffee/good-coffee-great-coffee-1-24-0-release/good-coffee-great-coffee-1-24-0-android-apk-download/).
+Its published **file** SHA-256 (not the signing-certificate fingerprint) is
+`61a8e5d22782a4599f1c2fe46ed4e5bee328311e3173db16cff653b1ed305d37`,
+and its size is 649647098 bytes. Both match our unchanged local APKM.
+
+On both Android 15 / API 35 and Android 16 / API 36, a Java probe using Android's
+`ZipFile.getInputStream` and an 8192-byte copy buffer extracted all 15 APK entries
+successfully. Every extracted entry matched its declared length and CRC32.
+This exercises the inflater used at the reported failure site. It does not test
+Samsung's filesystem or establish the integrity of the user's downloaded/cached
+copy. The API 36 test used an isolated AOSP ATD x86_64 emulator.
+
+The original APKM format does not require conversion to a single APK to be
+readable on these Android versions. The premerged input above remains an optional
+workaround. A damaged compressed stream cannot be recovered by skipping the ZIP
+error: that would omit or truncate game data.
+
+An end-to-end run in the **official Android Manager 1.33.0**, using patcher
+1.15.0 and our published 1.33.1 bundle, also succeeded on API35. The unchanged
+APKM was selected through the Downloads picker, its imported copy retained the
+same SHA-256, both default patches ran, and Manager reached its **Patched**
+screen with an installable signed output. Native libraries were preserved;
+Manager used STRIP_FAST. No custom Manager build or input conversion was used.
+Its working directory reached 4.4 GiB; earlier probe scratch files were removed
+during the run to free space, so this is not a minimum-free-space measurement.
+
+The Samsung error remains unreproduced. These results establish support for
+the published original bundle, not a repair of the phone's particular failure.
 
 ## Separate runtime fix
 
