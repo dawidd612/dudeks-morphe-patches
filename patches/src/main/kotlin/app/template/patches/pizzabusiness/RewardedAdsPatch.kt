@@ -59,7 +59,7 @@ internal fun BytecodePatchContext.pizzaMethod(
 @Suppress("unused")
 val skipRewardedAdsPatch = bytecodePatch(
     name = "Skip rewarded ads",
-    description = "Completes the game's rewarded-video flow without playing an ad, keeping the requested placement and normal reward. Experimental; includes re-signed startup support and needs device testing.",
+    description = "Completes the game's rewarded-video flow without playing an ad, keeping the requested placement and normal reward. Includes re-signed startup support.",
     default = true,
 ) {
     compatibleWith(Compatibility(
@@ -67,7 +67,7 @@ val skipRewardedAdsPatch = bytecodePatch(
         packageName = "com.tapblaze.pizzabusiness",
         apkFileType = ApkFileType.APKM,
         appIconColor = 0xB47454,
-        targets = listOf(AppTarget(version = "5.57.3", versionCode = 2277, isExperimental = true)),
+        targets = listOf(AppTarget(version = "5.57.3", versionCode = 2277, isExperimental = false)),
     ))
     dependsOn(pizzaStartupSupport)
     extendWith("extensions/pizzabusiness.mpe")

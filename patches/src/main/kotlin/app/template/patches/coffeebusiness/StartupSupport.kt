@@ -14,7 +14,7 @@ import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 @Suppress("unused")
 val coffeeStartupSupport = bytecodePatch(
     name = "Coffee startup support",
-    description = "Restores version-specific Unity startup after re-signing. Experimental: runtime validation in progress.",
+    description = "Restores version-specific Unity startup after re-signing.",
     default = false,
 ) {
     compatibleWith(app.morphe.patcher.patch.Compatibility(
@@ -22,7 +22,7 @@ val coffeeStartupSupport = bytecodePatch(
         packageName = "com.tapblaze.coffeebusiness",
         apkFileType = app.morphe.patcher.patch.ApkFileType.APKM,
         appIconColor = 0x98704C,
-        targets = listOf(app.morphe.patcher.patch.AppTarget(version = "1.24.0", versionCode = 1397, isExperimental = true)),
+        targets = listOf(app.morphe.patcher.patch.AppTarget(version = "1.24.0", versionCode = 1397, isExperimental = false)),
     ))
     dependsOn(coffeeNativeBootstrap)
     extendWith("extensions/coffeebusiness.mpe")

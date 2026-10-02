@@ -73,7 +73,7 @@ private val pizzaMicroGResources = resourcePatch {
 @Suppress("unused")
 val pizzaMicroGSupportPatch = bytecodePatch(
     name = "Google Play Games via MicroG-RE",
-    description = "Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms. Experimental: cloud save and restore need device verification.",
+    description = "Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms.",
     default = true,
 ) {
     compatibleWith(Compatibility(
@@ -81,7 +81,7 @@ val pizzaMicroGSupportPatch = bytecodePatch(
         packageName = GAME,
         apkFileType = ApkFileType.APKM,
         appIconColor = 0xB47454,
-        targets = listOf(AppTarget(version = "5.57.3", versionCode = 2277, isExperimental = true)),
+        targets = listOf(AppTarget(version = "5.57.3", versionCode = 2277, isExperimental = false)),
     ))
     dependsOn(pizzaStartupSupport, pizzaMicroGResources)
     execute {

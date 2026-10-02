@@ -51,7 +51,7 @@ val pizzaHidePaidOffersPatch = bytecodePatch(
         packageName = "com.tapblaze.pizzabusiness",
         apkFileType = ApkFileType.APKM,
         appIconColor = 0xB47454,
-        targets = listOf(AppTarget(version = "5.57.3", versionCode = 2277, isExperimental = true)),
+        targets = listOf(AppTarget(version = "5.57.3", versionCode = 2277, isExperimental = false)),
     ))
     dependsOn(pizzaStartupSupport, pizzaFundsStore)
     execute {

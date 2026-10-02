@@ -5,6 +5,7 @@ on:
       - 'extensions/calendar/**'
       - 'patches/src/main/kotlin/app/template/patches/calendar/**'
       - 'scripts/test_calendar_widget_rows.py'
+      - 'scripts/test_calendar_widget_tile_shapes.py'
       - 'scripts/VerifyCalendarWidgetDex.java'
       - '.github/workflows/verify-calendar.yml'
 permissions:
@@ -25,6 +26,14 @@ jobs:
           log-accepted-android-sdk-licenses: false
       - name: Check row replacement contract and guards
         run: python3 scripts/test_calendar_widget_rows.py
+      - name: Set up Kotlin for resource contract tests
+        run: |
+          curl --fail --location --retry 2 https://github.com/JetBrains/kotlin/releases/download/v2.2.20/kotlin-compiler-2.2.20.zip -o "$RUNNER_TEMP/calendar-kotlin.zip"
+          unzip -q "$RUNNER_TEMP/calendar-kotlin.zip" -d "$RUNNER_TEMP/calendar-kotlin"
+          echo "KOTLINC=$RUNNER_TEMP/calendar-kotlin/kotlinc/bin/kotlinc" >> "$GITHUB_ENV"
+          python3 -m pip install Pillow==11.3.0
+      - name: Check tile shape resource transformation
+        run: python3 scripts/test_calendar_widget_tile_shapes.py
       - name: Compile patch bundle and metadata
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
