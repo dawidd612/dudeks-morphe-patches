@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-30T19:11:53",
-  "description": "## [1.33.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.0...v1.33.1) (2026-09-30)\n\n### 🐛 Bug Fixes\n\n* **coffeebusiness:** restore Singular network callback after restart ([d540f54](https://github.com/dawidd612/dudeks-morphe-patches/commit/d540f5441884243324012576f4df5b53c83190f7))",
-  "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.33.1/patches-1.33.1.mpp",
+  "created_at": "2026-10-02T18:37:26",
+  "description": "## [1.33.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.1...v1.33.2) (2026-10-02)\n\n### 🐛 Bug Fixes\n\n* **calendar:** preserve schedule tile geometry after delayed corruption ([ca11861](https://github.com/dawidd612/dudeks-morphe-patches/commit/ca11861009dca2f08c60d5407d8eca836bf59e8c))\n* publish Calendar tile repair and stable Pizza/Coffee targets ([3e3e286](https://github.com/dawidd612/dudeks-morphe-patches/commit/3e3e2869de46803929b2058a358c11acef3bd989))\n* stabilize Calendar tile geometry and mark Pizza/Coffee stable ([0093a73](https://github.com/dawidd612/dudeks-morphe-patches/commit/0093a7381f7dac28bdd19bc42a8aebd64bb5af8d))\n* **tapblaze:** mark supported Pizza and Coffee patches stable ([aa26b58](https://github.com/dawidd612/dudeks-morphe-patches/commit/aa26b58e70d63b2df66e5f7ee016bd897029787d))",
+  "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.33.2/patches-1.33.2.mpp",
   "signature_download_url": "",
-  "version": "1.33.1"
+  "version": "1.33.2"
 }

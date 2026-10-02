@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.33.1** (`main`) - **14 patches** across **8 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.33.2** (`main`) - **14 patches** across **8 apps** - back to [README](README.md)
 
 ---
 
@@ -27,25 +27,25 @@
 
 ## Good Coffee, Great Coffee (com.tapblaze.coffeebusiness)
 
-**Supported versions:** `experimental 1.24.0`
+**Supported versions:** `1.24.0`
 
 | Patch | Details |
 |---|---|
-| **Coffee startup support** | Restores version-specific Unity startup after re-signing. Experimental: runtime validation in progress. |
-| **Google Play Games via MicroG-RE** | Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms. Experimental: cloud save and restore need device verification. |
-| **Skip rewarded ads** | Completes the requested rewarded-video flow locally using the game's callbacks. Experimental; Coffee device validation is in progress. |
+| **Coffee startup support** | Restores version-specific Unity startup after re-signing. |
+| **Google Play Games via MicroG-RE** | Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms. |
+| **Skip rewarded ads** | Completes the requested rewarded-video flow locally using the game's callbacks. |
 
 ---
 
 ## Good Pizza, Great Pizza (com.tapblaze.pizzabusiness)
 
-**Supported versions:** `experimental 5.57.3`
+**Supported versions:** `5.57.3`
 
 | Patch | Details |
 |---|---|
-| **Google Play Games via MicroG-RE** | Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms. Experimental: cloud save and restore need device verification. |
+| **Google Play Games via MicroG-RE** | Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms. |
 | **Hide paid offers** | Hides real-money storefront sections and cancels Google Play checkout. Keeps in-game currency exchanges and existing purchase processing. Requires ARM64 Pizza 5.57.3. |
-| **Skip rewarded ads** | Completes the game's rewarded-video flow without playing an ad, keeping the requested placement and normal reward. Experimental; includes re-signed startup support and needs device testing. |
+| **Skip rewarded ads** | Completes the game's rewarded-video flow without playing an ad, keeping the requested placement and normal reward. Includes re-signed startup support. |
 
 ---
 
@@ -55,7 +55,7 @@
 
 | Patch | Details |
 |---|---|
-| **Stabilize schedule widget** | Rebuilds schedule widget row contents on Android 16+ to work around missing tiles and recycled layout corruption. Experimental; intended for Realme UI 7. Does not reset the widget. |
+| **Stabilize schedule widget** | Rebuilds schedule widget row contents on Android 16+ to work around missing tiles, deformed tile backgrounds and recycled layout corruption. Experimental; intended for Realme UI 7. Does not reset the widget. |
 
 ---
 

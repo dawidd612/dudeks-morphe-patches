@@ -1,3 +1,12 @@
+## [1.33.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.1...v1.33.2) (2026-10-02)
+
+### 🐛 Bug Fixes
+
+* **calendar:** preserve schedule tile geometry after delayed corruption ([ca11861](https://github.com/dawidd612/dudeks-morphe-patches/commit/ca11861009dca2f08c60d5407d8eca836bf59e8c))
+* publish Calendar tile repair and stable Pizza/Coffee targets ([3e3e286](https://github.com/dawidd612/dudeks-morphe-patches/commit/3e3e2869de46803929b2058a358c11acef3bd989))
+* stabilize Calendar tile geometry and mark Pizza/Coffee stable ([0093a73](https://github.com/dawidd612/dudeks-morphe-patches/commit/0093a7381f7dac28bdd19bc42a8aebd64bb5af8d))
+* **tapblaze:** mark supported Pizza and Coffee patches stable ([aa26b58](https://github.com/dawidd612/dudeks-morphe-patches/commit/aa26b58e70d63b2df66e5f7ee016bd897029787d))
+
 ## [1.33.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.0...v1.33.1) (2026-09-30)
 
 ### 🐛 Bug Fixes
