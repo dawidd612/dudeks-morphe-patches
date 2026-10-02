@@ -28,7 +28,10 @@ color with `setColorFilter`. Both resources are rectangles with 12dp corners;
 the outline has a 1dp stroke and the fill includes a ripple.
 
 Android 16+ drawable overrides retain those resource names and replace their
-mutable shape geometry with white/alpha nine-patch images. The xxxhdpi pixels
+mutable shape geometry with white/alpha nine-patch images. The PNGs are
+aapt2-compiled with Android npTc stretch chunks and stored under a single `.png`
+extension: Morphe copies binary resources without compiling raw nine-patch borders,
+and its resource-ID scanner removes only the last extension. The xxxhdpi pixels
 preserve 12dp corners and a 1dp outline. An 8px centre band stretches, with 4px
 of safe space on either side. The native theme tint, color-filter call, ripple
 structure and mask are retained. Original pre-36 XML, icon/date circles, month
@@ -65,7 +68,11 @@ Framework references:
   `kotlinc` (or `KOTLINC` path) and Pillow.
 - The Kotlin transformer compiled, resource contracts and row contracts passed,
   and aapt2 rebuilt the supported APK resources with Apktool 2.12.1. That resource
-  rebuild is not a fully Morphe-patched or device-tested APK.
+  rebuild alone does not prove Morphe compatibility. The hotfix was additionally
+  applied to the clean supported APK using Morphe Desktop 1.18.0: patch execution,
+  incremental resource encoding, DEX compilation and APK alignment completed.
+  The output retains both compiled npTc PNGs and their generated drawable IDs.
+  This is not a real-device test.
 - Calendar CI builds the extensions, patch bundle and metadata.
 - `scripts/VerifyCalendarWidgetDex.java` verifies entry Context initialization,
   all seven hooks, branch/register safety and wrapper resource in a patched APK.
