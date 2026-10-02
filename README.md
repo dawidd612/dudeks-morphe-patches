@@ -25,8 +25,8 @@ Choose a supported app version, select the patches you want and patch a clean AP
 |---|---|---|---|---|
 | 1 | [**AndroPods**](PATCHES.md#andropods-provitaliiandropods) | 2 | `1.5.30` | [`pro.vitalii.andropods`](https://play.google.com/store/apps/details?id=pro.vitalii.andropods) |
 | 2 | [**Gardenscapes**](PATCHES.md#gardenscapes-complayrixgardenscapes) | 1 | `experimental 9.9.0` | [`com.playrix.gardenscapes`](https://play.google.com/store/apps/details?id=com.playrix.gardenscapes) |
-| 3 | [**Good Coffee, Great Coffee**](PATCHES.md#good-coffee-great-coffee-comtapblazecoffeebusiness) | 3 | `experimental 1.24.0` | [`com.tapblaze.coffeebusiness`](https://play.google.com/store/apps/details?id=com.tapblaze.coffeebusiness) |
-| 4 | [**Good Pizza, Great Pizza**](PATCHES.md#good-pizza-great-pizza-comtapblazepizzabusiness) | 3 | `experimental 5.57.3` | [`com.tapblaze.pizzabusiness`](https://play.google.com/store/apps/details?id=com.tapblaze.pizzabusiness) |
+| 3 | [**Good Coffee, Great Coffee**](PATCHES.md#good-coffee-great-coffee-comtapblazecoffeebusiness) | 3 | `1.24.0` | [`com.tapblaze.coffeebusiness`](https://play.google.com/store/apps/details?id=com.tapblaze.coffeebusiness) |
+| 4 | [**Good Pizza, Great Pizza**](PATCHES.md#good-pizza-great-pizza-comtapblazepizzabusiness) | 3 | `5.57.3` | [`com.tapblaze.pizzabusiness`](https://play.google.com/store/apps/details?id=com.tapblaze.pizzabusiness) |
 | 5 | [**Google Calendar**](PATCHES.md#google-calendar-comgoogleandroidcalendar) | 1 | `experimental 2026.37.0-984865732-release` | [`com.google.android.calendar`](https://play.google.com/store/apps/details?id=com.google.android.calendar) |
 | 6 | [**Instagram**](PATCHES.md#instagram-cominstagramandroid) | 1 | `experimental 439.0.0.37.89` | [`com.instagram.android`](https://play.google.com/store/apps/details?id=com.instagram.android) |
 | 7 | [**Mapa Turystyczna**](PATCHES.md#mapa-turystyczna-plmapa_turystycznaapp) | 2 | `1.16.6` | [`pl.mapa_turystyczna.app`](https://play.google.com/store/apps/details?id=pl.mapa_turystyczna.app) |
@@ -76,8 +76,8 @@ See [native analysis, limitations and phone testing](docs/gardenscapes-star-repa
 **Stabilize schedule widget** is an experimental, default-selected patch for
 **2026.37.0-984865732-release** (APKM). On Android 16+, it rebuilds the contents of
 schedule widget rows during updates and uses nine-patch tile backgrounds to work
-around disappearing tiles, deformed shapes and stale recycled layouts. Intended for the reported Realme GT7 / Realme UI 7 issue;
-device confirmation is still needed. See [implementation, installation and testing](docs/google-calendar-widget.md).
+around disappearing tiles, deformed shapes and stale recycled layouts.
+Long-duration device confirmation is still needed. See [implementation, installation and testing](docs/google-calendar-widget.md).
 
 ### Good Pizza, Great Pizza
 
@@ -96,9 +96,8 @@ See [billing and visibility changes](docs/pizza-billing.md).
 
 **PL:** Odśwież źródło i ponownie spatchuj czysty APKM. Do logowania zainstaluj
 MicroG-RE 7.1.1 i dodaj w nim konto Google. Zachowaj dotychczasowy klucz podpisu
-Morphe przy aktualizacji; nie usuwaj danych gry. Patche są eksperymentalne -
-logowanie oraz rzeczywisty zapis i odtworzenie postępu wymagają potwierdzenia
-na telefonie. [Szczegóły i testy](docs/pizzabusiness-rewarded-ads.md).
+Morphe przy aktualizacji; nie usuwaj danych gry. Patche są oznaczone jako stabilne
+dla podanej wersji. [Szczegóły i testy](docs/pizzabusiness-rewarded-ads.md).
 
 ### Android blocks overlay access
 
@@ -126,7 +125,7 @@ Requires Java 21 and access to the Morphe Gradle dependencies.
 
 Based on [rushiranpise/morphe-patches](https://github.com/rushiranpise/morphe-patches) and the Morphe patch tooling. Licensed under [GPL-3.0](LICENSE); see [NOTICE](NOTICE) for retained terms. Maintained independently of Morphe and the patched app developers.
 
-### Good Coffee, Great Coffee (experimental development)
+### Good Coffee, Great Coffee
 
 Coffee **1.24.0 (1397), ARM64 APKM** has startup, rewarded-ad skipping and MicroG
 Games patches. Android gameplay, a real in-game +10 reward and in-game purchases

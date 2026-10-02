@@ -1,6 +1,6 @@
 # Pizza 5.57.3 initialization reconstruction
 
-This is an experimental ARM64 repair. The source build and emulator results are
+This is the ARM64 startup repair for the supported stable Pizza target. The source build and emulator results are
 recorded in `pizza-project-context.md`; they do not establish ARM32 support or
 physical-device compatibility. APKs, account data, signing keys and raw runtime
 snapshots are local ignored artifacts.

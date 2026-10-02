@@ -2,7 +2,7 @@
 
 **Skip rewarded ads** and **Google Play Games via MicroG-RE** target
 `com.tapblaze.pizzabusiness` **5.57.3 (2277)**, distributed as APKM.
-Both are selected by default and marked **experimental**. They share startup
+Both are selected by default and marked **stable** for this supported version. They share startup
 support and can also be selected independently.
 Static analysis used the supplied base APK and ARM64 native library. No APK,
 game assets, save files or user screenshots belong in this repository.

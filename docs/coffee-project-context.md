@@ -1,7 +1,7 @@
 # Good Coffee, Great Coffee - patch context
 
 Target: `com.tapblaze.coffeebusiness` **1.24.0 (1397)**, complete APKM, ARM64.
-Status: experimental. Gameplay and a requested rewarded action were exercised on
+Status: stable for the supported version. Gameplay and a requested rewarded action were exercised on
 Android; Google sign-in, cloud restore and paid checkout are not verified.
 
 ## Implementation

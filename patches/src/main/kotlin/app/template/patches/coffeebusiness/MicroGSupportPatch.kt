@@ -73,7 +73,7 @@ private val coffeeMicroGResources = resourcePatch {
 @Suppress("unused")
 val coffeeMicroGSupportPatch = bytecodePatch(
     name = "Google Play Games via MicroG-RE",
-    description = "Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms. Experimental: cloud save and restore need device verification.",
+    description = "Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms.",
     default = true,
 ) {
     compatibleWith(Compatibility(
@@ -81,7 +81,7 @@ val coffeeMicroGSupportPatch = bytecodePatch(
         packageName = GAME,
         apkFileType = ApkFileType.APKM,
         appIconColor = 0x98704C,
-        targets = listOf(AppTarget(version = "1.24.0", versionCode = 1397, isExperimental = true)),
+        targets = listOf(AppTarget(version = "1.24.0", versionCode = 1397, isExperimental = false)),
     ))
     dependsOn(coffeeStartupSupport, coffeeMicroGResources)
     execute {

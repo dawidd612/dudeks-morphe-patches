@@ -17,13 +17,13 @@ private const val SDK = "Lcom/unity3d/mediation/rewarded/LevelPlayRewardedAd;"
 @Suppress("unused")
 val coffeeRewardedAdsPatch = bytecodePatch(
     name = "Skip rewarded ads",
-    description = "Completes the requested rewarded-video flow locally using the game's callbacks. Experimental; Coffee device validation is in progress.",
+    description = "Completes the requested rewarded-video flow locally using the game's callbacks.",
     default = true,
 ) {
     compatibleWith(Compatibility(
         name = "Good Coffee, Great Coffee", packageName = "com.tapblaze.coffeebusiness",
         apkFileType = ApkFileType.APKM, appIconColor = 0x98704C,
-        targets = listOf(AppTarget(version = "1.24.0", versionCode = 1397, isExperimental = true)),
+        targets = listOf(AppTarget(version = "1.24.0", versionCode = 1397, isExperimental = false)),
     ))
     dependsOn(coffeeStartupSupport)
     execute {
