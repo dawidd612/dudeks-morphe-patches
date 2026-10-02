@@ -1,3 +1,12 @@
+## [1.33.3](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.2...v1.33.3) (2026-10-02)
+
+### 🐛 Bug Fixes
+
+* **calendar:** compare decoded corner dimensions semantically ([b84b79e](https://github.com/dawidd612/dudeks-morphe-patches/commit/b84b79e01c0b5a5714d6b86b8689e57f29e49ac4))
+* **calendar:** release Morphe resource compatibility hotfix ([f80e3da](https://github.com/dawidd612/dudeks-morphe-patches/commit/f80e3dad60cf5c438f58d7c74c766b0da8db7b86))
+* **calendar:** ship compiled nine-patch PNGs for Morphe resource encoding ([ada1a9e](https://github.com/dawidd612/dudeks-morphe-patches/commit/ada1a9e0d2ab6261a57d14d3feb05ceb6d101069))
+* **calendar:** support Morphe dimensions and compiled tile resources ([7a9b316](https://github.com/dawidd612/dudeks-morphe-patches/commit/7a9b31672c5d95ddbd2c4b75c00edfddda7b3c7c))
+
 ## [1.33.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.1...v1.33.2) (2026-10-02)
 
 ### 🐛 Bug Fixes

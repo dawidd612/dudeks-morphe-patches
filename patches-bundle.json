@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-02T18:37:26",
-  "description": "## [1.33.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.1...v1.33.2) (2026-10-02)\n\n### 🐛 Bug Fixes\n\n* **calendar:** preserve schedule tile geometry after delayed corruption ([ca11861](https://github.com/dawidd612/dudeks-morphe-patches/commit/ca11861009dca2f08c60d5407d8eca836bf59e8c))\n* publish Calendar tile repair and stable Pizza/Coffee targets ([3e3e286](https://github.com/dawidd612/dudeks-morphe-patches/commit/3e3e2869de46803929b2058a358c11acef3bd989))\n* stabilize Calendar tile geometry and mark Pizza/Coffee stable ([0093a73](https://github.com/dawidd612/dudeks-morphe-patches/commit/0093a7381f7dac28bdd19bc42a8aebd64bb5af8d))\n* **tapblaze:** mark supported Pizza and Coffee patches stable ([aa26b58](https://github.com/dawidd612/dudeks-morphe-patches/commit/aa26b58e70d63b2df66e5f7ee016bd897029787d))",
-  "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.33.2/patches-1.33.2.mpp",
+  "created_at": "2026-10-02T20:47:00",
+  "description": "## [1.33.3](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.2...v1.33.3) (2026-10-02)\n\n### 🐛 Bug Fixes\n\n* **calendar:** compare decoded corner dimensions semantically ([b84b79e](https://github.com/dawidd612/dudeks-morphe-patches/commit/b84b79e01c0b5a5714d6b86b8689e57f29e49ac4))\n* **calendar:** release Morphe resource compatibility hotfix ([f80e3da](https://github.com/dawidd612/dudeks-morphe-patches/commit/f80e3dad60cf5c438f58d7c74c766b0da8db7b86))\n* **calendar:** ship compiled nine-patch PNGs for Morphe resource encoding ([ada1a9e](https://github.com/dawidd612/dudeks-morphe-patches/commit/ada1a9e0d2ab6261a57d14d3feb05ceb6d101069))\n* **calendar:** support Morphe dimensions and compiled tile resources ([7a9b316](https://github.com/dawidd612/dudeks-morphe-patches/commit/7a9b31672c5d95ddbd2c4b75c00edfddda7b3c7c))",
+  "download_url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/download/v1.33.3/patches-1.33.3.mpp",
   "signature_download_url": "",
-  "version": "1.33.2"
+  "version": "1.33.3"
 }
