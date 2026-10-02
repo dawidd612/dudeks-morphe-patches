@@ -97,11 +97,33 @@ with tempfile.TemporaryDirectory(prefix='calendar-shapes-') as temporary:
     existing = snapshot(clean)
     run(clean, False)
     assert snapshot(clean) == existing, 'already patched input was modified'
-    for kind in ['radius', 'layout', 'variant', 'partial']:
+    # Resource-decoder equivalence: dp vs dip, integer vs float, inline vs reference.
+    for index, spelling in enumerate(['12dp', '12.0dp', '12dip', '12.000000dip', '+12.0dp']):
+        root = directory / f'normalized-{index}'
+        fixture(root)
+        (root / 'res/values/dimens.xml').write_text(f'<resources><dimen name="widget_chip_corner_radius">{spelling}</dimen></resources>')
+        for name in ['widget_chip_fill', 'widget_chip_outline']:
+            path = root / f'res/drawable/{name}.xml'
+            path.write_text(path.read_text().replace('@dimen/widget_chip_corner_radius', spelling).replace('12.0dip', spelling))
+        before = snapshot(root)
+        run(root)
+        after = snapshot(root)
+        assert all(after[name] == digest for name, digest in before.items())
+    root = directory / 'dimension-alias'
+    fixture(root)
+    (root / 'res/values/dimens.xml').write_text('<resources><dimen name="widget_chip_corner_radius">@dimen/corner_alias</dimen><dimen name="corner_alias">12dp</dimen></resources>')
+    run(root)
+    for kind in ['radius', 'layout', 'variant', 'partial', 'units', 'cycle', 'missing', 'inline-radius']:
         root = directory / kind
         fixture(root)
         if kind == 'radius':
             (root / 'res/values/dimens.xml').write_text('<resources><dimen name="widget_chip_corner_radius">18.0dip</dimen></resources>')
+        elif kind in ['units', 'cycle', 'missing']:
+            value = {'units': '12px', 'cycle': '@dimen/widget_chip_corner_radius', 'missing': '@dimen/absent'}[kind]
+            (root / 'res/values/dimens.xml').write_text(f'<resources><dimen name="widget_chip_corner_radius">{value}</dimen></resources>')
+        elif kind == 'inline-radius':
+            path = root / 'res/drawable/widget_chip_fill.xml'
+            path.write_text(path.read_text().replace('12.0dip', '18dp'))
         elif kind == 'layout':
             (root / 'res/layout/widgetschedule_chip_background.xml').write_text(FIXTURE['res/layout/widgetschedule_chip_background.xml'].replace('fitXY', 'centerCrop'))
         else:
@@ -111,4 +133,4 @@ with tempfile.TemporaryDirectory(prefix='calendar-shapes-') as temporary:
         before = snapshot(root)
         run(root, False)
         assert snapshot(root) == before, f'{kind}: rejected input partially modified'
-print('PASS: production transformer, native inputs, theme/tint/ripple, fixed corners at 4 sizes, clean-input rejection')
+print('PASS: dp/dip/reference normalization and invalid geometry rejection; production transformer, native inputs, theme/tint/ripple, fixed corners at 4 sizes, clean-input rejection')

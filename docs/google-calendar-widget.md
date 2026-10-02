@@ -35,7 +35,10 @@ structure and mask are retained. Original pre-36 XML, icon/date circles, month
 widget resources, layout dimensions and other backgrounds remain unchanged.
 
 Input checks require the expected ImageView, rectangular resource structures,
-12dp radius and no alternative qualified drawables. Changed or already-patched
+12dp radius and no alternative qualified drawables. Equivalent decoder spellings
+(`dp`/`dip`, numeric formatting, inline values and dimension references) are
+resolved before comparison; different radii, unsupported units and alias cycles
+are rejected with the offending value in the diagnostic. Changed or already-patched
 resources are rejected before adding new files.
 
 This is an experimental workaround for missing backgrounds and tile deformation.

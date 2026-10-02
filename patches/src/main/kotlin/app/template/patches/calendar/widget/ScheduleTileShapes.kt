@@ -26,6 +26,13 @@ internal object ScheduleTileShapes {
             view.getAttributeNS(ANDROID, "src") == "@drawable/widget_chip_fill" &&
             view.getAttributeNS(ANDROID, "scaleType") == "fitXY", "schedule background layout changed")
 
+        val dimensionDocument = xml.newDocumentBuilder().parse(resolve("res/values/dimens.xml"))
+        val dimensionNodes = dimensionDocument.getElementsByTagName("dimen")
+        val dimensions = (0 until dimensionNodes.length).map { dimensionNodes.item(it) as Element }
+            .associate { it.getAttribute("name") to it.textContent.trim() }
+        requireShape(dimensionDp("@dimen/widget_chip_corner_radius", dimensions) == 12.0,
+            "native tile radius changed: ${dimensions["widget_chip_corner_radius"]}")
+
         val specs = listOf(
             Triple("widget_chip_fill", FILL, "?widget_blue"),
             Triple("widget_chip_outline", OUTLINE, "?widget_blue"),
@@ -44,8 +51,10 @@ internal object ScheduleTileShapes {
                 val corners = shape.getElementsByTagName("corners")
                 requireShape(corners.length == 1, "$name corner definition changed")
                 val radius = (corners.item(0) as Element).getAttributeNS(ANDROID, "radius")
-                requireShape(radius == if (name == "widget_chip_fill" && i == 1) "12.0dip"
-                    else "@dimen/widget_chip_corner_radius", "$name radius changed")
+                // Resource decoders can emit dp/dip, inline the value, or retain
+                // a dimension reference. Compare resolved geometry, not XML spelling.
+                requireShape(dimensionDp(radius, dimensions) == 12.0,
+                    "$name radius changed: '$radius' (expected 12dp)")
             }
             document
         }
@@ -62,11 +71,6 @@ internal object ScheduleTileShapes {
             requireShape(!resolve("res/drawable-v36/$name.xml").exists(),
                 "input already contains tile overrides; use a clean APK")
         }
-        val dimensions = xml.newDocumentBuilder().parse(resolve("res/values/dimens.xml"))
-        val dimenNodes = dimensions.getElementsByTagName("dimen")
-        val radius = (0 until dimenNodes.length).map { dimenNodes.item(it) as Element }
-            .singleOrNull { it.getAttribute("name") == "widget_chip_corner_radius" }
-        requireShape(radius?.textContent?.trim() == "12.0dip", "native tile radius changed")
         for ((index, spec) in specs.withIndex()) {
             val (name, pixels, tint) = spec
             val pixelName = "dudeks_${name}_pixels"
@@ -89,6 +93,19 @@ internal object ScheduleTileShapes {
             output.parentFile.mkdirs()
             TransformerFactory.newInstance().newTransformer().transform(DOMSource(document), StreamResult(output))
         }
+    }
+
+    private fun dimensionDp(raw: String, dimensions: Map<String, String>,
+                            visited: Set<String> = emptySet()): Double? {
+        val value = raw.trim()
+        if (value.startsWith("@dimen/")) {
+            val name = value.removePrefix("@dimen/")
+            if (name in visited) return null
+            return dimensions[name]?.let { dimensionDp(it, dimensions, visited + name) }
+        }
+        val match = Regex("([+]?(?:[0-9]+(?:[.][0-9]*)?|[.][0-9]+))(?:dp|dip)")
+            .matchEntire(value) ?: return null
+        return match.groupValues[1].toDoubleOrNull()?.takeIf { it.isFinite() }
     }
 
     private fun requireShape(ok: Boolean, message: String) {
