@@ -75,8 +75,8 @@ See [native analysis, limitations and phone testing](docs/gardenscapes-star-repa
 
 **Stabilize schedule widget** is an experimental, default-selected patch for
 **2026.37.0-984865732-release** (APKM). On Android 16+, it rebuilds the contents of
-schedule widget rows during updates to work around disappearing tiles and stale
-recycled layouts. Intended for the reported Realme GT7 / Realme UI 7 issue;
+schedule widget rows during updates and uses nine-patch tile backgrounds to work
+around disappearing tiles, deformed shapes and stale recycled layouts. Intended for the reported Realme GT7 / Realme UI 7 issue;
 device confirmation is still needed. See [implementation, installation and testing](docs/google-calendar-widget.md).
 
 ### Good Pizza, Great Pizza

@@ -10,6 +10,9 @@ is changed only on Android 16 and newer.
 
 The supplied screenshot shows the schedule widget with missing event tile
 backgrounds. The user also reports overlapping/rearranged contents after use.
+On 2026-10-02 the user reported recurrence after several days: event and task
+backgrounds became long ellipses instead of rounded rectangular tiles. The
+first row-replacement workaround is therefore insufficient for this device.
 There are no device logs or a reproducible launcher trace. Recycling/reapplying
 rows is a plausible cause, not a proven diagnosis of the Realme launcher.
 
@@ -54,6 +57,36 @@ entry shape, return count, service/factory relationship, or already patched APK.
 The helper does not store a Context or row, resolves the added layout once, and
 retains original rows with a diagnostic if the resource is unexpectedly missing.
 
+### Tile geometry after the delayed recurrence
+
+The inspected clean APK uses `widgetschedule_chip_background.xml`, an ImageView
+with ID `agenda_item_color`, source `widget_chip_fill`, and `fitXY` scaling.
+The row binder (`cal.aaii.c`) selects `widget_chip_fill` (`0x7f080454`) or
+`widget_chip_outline` (`0x7f080456`) and applies the native event color with
+`setColorFilter`. Both drawables use rectangular GradientDrawable geometry,
+with a 12dp corner radius; the outline is 1dp. The fill also contains a ripple.
+The new screenshot establishes deformation, but does **not** prove whether the
+launcher, drawable state, theme handling or another component causes it.
+
+The patch now installs Android 16+ (`drawable-v36`) versions of those same
+resource names. It replaces mutable shape geometry with small, white/alpha
+nine-patch images at xxxhdpi: 12dp corners and a 1dp outline. An 8px centre band
+stretches with 4px of safe space on each side; fixed corners retain their geometry
+when the row gets wider or taller. The fill, ripple mask, theme tint and native
+color-filter call are retained. The original pre-36 XML stays unchanged. Icons,
+date circles, other secondary backgrounds, month drawables and layout dimensions
+are unchanged. The existing complete-row replacement still addresses stale
+contents. No polling or scheduled widget resets are added.
+
+Input checks require the inspected ImageView shape, both rectangular drawable
+structures, the native radius and no alternate qualified versions. Changed or
+already-patched resources are rejected before new files are written. This is an
+experimental workaround for the newly observed failure, not evidence that all
+OEM rendering errors have been eliminated.
+
+Nine-patch basis: [Android drawable resources](https://developer.android.com/guide/topics/resources/drawable-resource#NinePatch)
+and [resizable bitmaps](https://developer.android.com/studio/write/draw9patch).
+
 ## Validation
 
 - `python3 scripts/test_calendar_widget_rows.py` compiles the production Java
@@ -61,6 +94,14 @@ retains original rows with a diagnostic if the resource is unexpectedly missing.
   independent rows, concurrent initialization, idempotence, null/missing-resource
   fallback and Android-version gating. These are action-contract tests, not a
   rendering test on Android.
+- `python3 scripts/test_calendar_widget_tile_shapes.py` compiles and runs the
+  actual Kotlin resource transformer (requires a JDK, `kotlinc` and Pillow).
+  It checks theme tint/ripple preservation, unchanged original resources, fixed
+  corners at four widths/heights, and rejection without partial writes for
+  changed layout/radius, qualified variants and already-patched inputs.
+- The resource transformer was run on the original supplied APK's decoded
+  resources, and Apktool 2.12.1 rebuilt those resources with aapt2 successfully.
+  This resource-only APK is **not** a fully Morphe-patched or device-tested APK.
 - `.github/workflows/verify-calendar.yml` builds extensions, the `.mpp` bundle and
   patch metadata using Java 21 and Android SDK 36.
 - `scripts/VerifyCalendarWidgetDex.java` checks the actual patched APK: one
@@ -83,7 +124,11 @@ retains original rows with a diagnostic if the resource is unexpectedly missing.
 4. Przewin liste tam i z powrotem, zmien rozmiar widgetu, przelacz motyw jasny/ciemny,
    edytuj i zsynchronizuj wydarzenie, zablokuj/odblokuj ekran i uruchom telefon ponownie.
    Przetestuj tez dwa widgety o roznych rozmiarach.
-5. Korzystaj przez co najmniej dobe, bo blad zgloszono jako nawrotowy. Jezeli wroci,
+5. Korzystaj przez co najmniej 7 dni, bo blad wrocil dopiero po kilku dniach.
+   Sprawdz wyglad po instalacji oraz w dniach 1, 3 i 7: wypelnienie, narozniki,
+   obramowania, kafelki zadan i kolory w jasnym/ciemnym motywie. Uwzglednij
+   synchronizacje, zmiane daty, przewijanie, resize i restart launchera/telefonu.
+   Jednorazowy poprawny wyglad nie potwierdza skutecznosci. Jezeli blad wroci,
    podaj numer firmware i launchera oraz kroki/screen. Patch jest obejściem
    konkretnej sciezki renderowania, nie potwierdzona naprawa wszystkich bledow OEM.
 
