@@ -7,6 +7,8 @@ import hashlib
 import os
 from pathlib import Path
 import shutil
+import struct
+import zlib
 import subprocess
 import tempfile
 import xml.etree.ElementTree as ET
@@ -33,16 +35,15 @@ def fixture(root):
 
 def nine_patch(image, width, height):
     """Stretch the marked centre; copy all fixed edge/corner segments unchanged."""
-    w, h = image.size
-    xs = [i - 1 for i in range(1, w - 1) if image.getpixel((i, 0)) == (0, 0, 0, 255)]
-    ys = [i - 1 for i in range(1, h - 1) if image.getpixel((0, i)) == (0, 0, 0, 255)]
-    assert len(xs) >= 2 and len(ys) >= 2
-    assert xs == list(range(xs[0], xs[-1] + 1))
-    assert ys == list(range(ys[0], ys[-1] + 1))
-    assert image.getpixel((0, 0))[3] == 0
-    source = image.crop((1, 1, w - 1, h - 1))
-    sx = [0, xs[0], xs[-1] + 1, source.width]
-    sy = [0, ys[0], ys[-1] + 1, source.height]
+    # Pillow exposes the aapt2 npTc chunk; Android uses its compiled stretch divs.
+    chunk = image.info['npTc']
+    assert chunk[:4] == bytes([0, 2, 2, 9])
+    xs = struct.unpack_from('>2i', chunk, 32)
+    ys = struct.unpack_from('>2i', chunk, 40)
+    assert xs == ys == (52, 60)
+    source = image
+    sx = [0, *xs, source.width]
+    sy = [0, *ys, source.height]
     dx = [0, sx[1], width - (source.width - sx[2]), width]
     dy = [0, sy[1], height - (source.height - sy[2]), height]
     assert dx[2] > dx[1] and dy[2] > dy[1]
@@ -83,7 +84,22 @@ with tempfile.TemporaryDirectory(prefix='calendar-shapes-') as temporary:
         patches = list(document.iter('nine-patch'))
         assert len(patches) == count
         assert patches[0].get(ANDROID + 'tint') == '?widget_blue'
-        image = Image.open(clean / f'res/drawable-xxxhdpi/dudeks_{name}_pixels.9.png').convert('RGBA')
+        png = clean / f'res/drawable-xxxhdpi/dudeks_{name}_pixels.png'
+        data = png.read_bytes()
+        position = 8
+        chunks = {}
+        while position < len(data):
+            length = struct.unpack_from('>I', data, position)[0]
+            kind = data[position + 4:position + 8]
+            payload = data[position + 8:position + 8 + length]
+            crc = struct.unpack_from('>I', data, position + 8 + length)[0]
+            assert zlib.crc32(kind + payload) == crc, 'corrupt PNG chunk'
+            chunks[kind] = payload
+            position += length + 12
+        assert b'npTc' in chunks, 'Android nine-patch chunk missing'
+        image = Image.open(png).convert('RGBA')
+        image.info['npTc'] = chunks[b'npTc']
+        assert image.size == (112, 112), 'uncompiled border remains'
         for width, height in [(960, 144), (1920, 144), (960, 208), (2560, 320)]:
             rendered = nine_patch(image, width, height)
             assert rendered.getpixel((0, 0))[3] == 0
@@ -97,18 +113,40 @@ with tempfile.TemporaryDirectory(prefix='calendar-shapes-') as temporary:
     existing = snapshot(clean)
     run(clean, False)
     assert snapshot(clean) == existing, 'already patched input was modified'
-    for kind in ['radius', 'layout', 'variant', 'partial']:
+    # Resource-decoder equivalence: dp vs dip, integer vs float, inline vs reference.
+    for index, spelling in enumerate(['12dp', '12.0dp', '12dip', '12.000000dip', '+12.0dp']):
+        root = directory / f'normalized-{index}'
+        fixture(root)
+        (root / 'res/values/dimens.xml').write_text(f'<resources><dimen name="widget_chip_corner_radius">{spelling}</dimen></resources>')
+        for name in ['widget_chip_fill', 'widget_chip_outline']:
+            path = root / f'res/drawable/{name}.xml'
+            path.write_text(path.read_text().replace('@dimen/widget_chip_corner_radius', spelling).replace('12.0dip', spelling))
+        before = snapshot(root)
+        run(root)
+        after = snapshot(root)
+        assert all(after[name] == digest for name, digest in before.items())
+    root = directory / 'dimension-alias'
+    fixture(root)
+    (root / 'res/values/dimens.xml').write_text('<resources><dimen name="widget_chip_corner_radius">@dimen/corner_alias</dimen><dimen name="corner_alias">12dp</dimen></resources>')
+    run(root)
+    for kind in ['radius', 'layout', 'variant', 'partial', 'units', 'cycle', 'missing', 'inline-radius']:
         root = directory / kind
         fixture(root)
         if kind == 'radius':
             (root / 'res/values/dimens.xml').write_text('<resources><dimen name="widget_chip_corner_radius">18.0dip</dimen></resources>')
+        elif kind in ['units', 'cycle', 'missing']:
+            value = {'units': '12px', 'cycle': '@dimen/widget_chip_corner_radius', 'missing': '@dimen/absent'}[kind]
+            (root / 'res/values/dimens.xml').write_text(f'<resources><dimen name="widget_chip_corner_radius">{value}</dimen></resources>')
+        elif kind == 'inline-radius':
+            path = root / 'res/drawable/widget_chip_fill.xml'
+            path.write_text(path.read_text().replace('12.0dip', '18dp'))
         elif kind == 'layout':
             (root / 'res/layout/widgetschedule_chip_background.xml').write_text(FIXTURE['res/layout/widgetschedule_chip_background.xml'].replace('fitXY', 'centerCrop'))
         else:
-            path = root / ('res/drawable-night/widget_chip_fill.xml' if kind == 'variant' else 'res/drawable-xxxhdpi/dudeks_widget_chip_outline_pixels.9.png')
+            path = root / ('res/drawable-night/widget_chip_fill.xml' if kind == 'variant' else 'res/drawable-xxxhdpi/dudeks_widget_chip_outline_pixels.png')
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text('unexpected')
         before = snapshot(root)
         run(root, False)
         assert snapshot(root) == before, f'{kind}: rejected input partially modified'
-print('PASS: production transformer, native inputs, theme/tint/ripple, fixed corners at 4 sizes, clean-input rejection')
+print('PASS: dp/dip/reference normalization and invalid geometry rejection; production transformer, native inputs, theme/tint/ripple, fixed corners at 4 sizes, clean-input rejection')
