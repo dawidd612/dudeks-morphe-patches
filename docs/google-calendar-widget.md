@@ -1,90 +1,87 @@
 # Google Calendar schedule widget
 
-**Stabilize schedule widget** is selected by default and experimental. It targets
-Google Calendar `2026.37.0-984865732-release`, version code `2018314914`, supplied
-as an APKM. The reported device is Realme GT7 / Realme UI 7 / Android 16. The
-precise firmware build and launcher version were not supplied. Runtime behavior
-is changed only on Android 16 and newer.
+`Stabilize schedule widget` is experimental and selected by default. It supports
+Google Calendar `2026.37.0-984865732-release` (version code `2018314914`, APKM),
+package `com.google.android.calendar`. Runtime changes apply on Android 16+.
 
-## Evidence and scope
+## Complete row replacement
 
-The supplied screenshot shows the schedule widget with missing event tile
-backgrounds. The user also reports overlapping/rearranged contents after use.
-There are no device logs or a reproducible launcher trace. Recycling/reapplying
-rows is a plausible cause, not a proven diagnosis of the Realme launcher.
+The schedule RemoteViews factory builds a complete row with native content and
+fill-in click intents. Each finished row is wrapped in a FrameLayout whose
+RemoteViews removes its old child and adds the complete row in one transaction.
+This avoids reusing stale child visibility, dimensions and drawable instances.
+The adapter and native actions are retained; no empty intermediate widget update,
+polling, scheduled reset or `addStableView` is introduced.
 
-The actual base APK was inspected; SHA-256:
-`d7f155c7ecad7ecc5c57f2c6af15edd6a0a6444ce93b9d08c69623c18e4b1cf3`.
+The patch identifies the factory structurally and verifies its relationship to
+ScheduleViewWidgetService. All seven return paths are wrapped, including shared
+returns. Initialization uses the factory Context before registers are reused.
+Changed bytecode shapes and already-patched inputs are rejected. The helper does
+not retain a Context or row and falls back to native rows if its resource is absent.
 
-In this build, `ScheduleViewWidgetService` constructs `cal.aaiq`, a
-`RemoteViewsService.RemoteViewsFactory`. Its `getViewAt(int)` builds the complete
-row, binds native event/task/date content and fill-in click intents, then returns
-through seven branches. It declares 15 view types and **already returns false
-from hasStableIds()**; changing that flag is not this repair. Event tile binding
-is in `cal.aaii.c`, with resource-backed ImageView backgrounds. Obfuscated names
-are recorded as analysis evidence; the patch identifies the factory structurally.
+## Stable tile geometry
 
-## Implementation
+The supported build uses `widgetschedule_chip_background.xml`: an ImageView with
+ID `agenda_item_color`, source `widget_chip_fill`, and `fitXY` scaling. Native
+binding chooses `widget_chip_fill` or `widget_chip_outline` and applies event
+color with `setColorFilter`. Both resources are rectangles with 12dp corners;
+the outline has a 1dp stroke and the fill includes a ripple.
 
-Wrap the finished row in a small `FrameLayout` RemoteViews. Its two actions are
-`removeAllViews(android.R.id.content)` followed by `addView(..., originalRow)`.
-Both travel in the same returned RemoteViews, so there is no separate empty
-widget update. `addStableView` is deliberately avoided. On reapply, the child
-is inflated fresh instead of reusing stale drawables, visibility, or dimensions.
+Android 16+ drawable overrides retain those resource names and replace their
+mutable shape geometry with white/alpha nine-patch images. The xxxhdpi pixels
+preserve 12dp corners and a 1dp outline. An 8px centre band stretches, with 4px
+of safe space on either side. The native theme tint, color-filter call, ripple
+structure and mask are retained. Original pre-36 XML, icon/date circles, month
+widget resources, layout dimensions and other backgrounds remain unchanged.
 
-The launcher can keep its adapter and outer row. No periodic refresh, widget
-removal, root access, hidden APIs, battery exemption, or launcher patch is used.
-The month widget, calendar database, sync and notification code are untouched.
-Extra per-row inflation and one layout level are the performance tradeoff. This
-is not a guarantee that the launcher will preserve scroll under every update.
+Input checks require the expected ImageView, rectangular resource structures,
+12dp radius and no alternative qualified drawables. Changed or already-patched
+resources are rejected before adding new files.
 
-The original row and all native actions stay intact. Android 16 propagates the
-collection-child flag to nested RemoteViews and searches descendant response
-tags for collection clicks. Event, task, date and secondary-action taps still
-need phone verification. Framework basis:
+This is an experimental workaround for missing backgrounds and tile deformation.
+Resource inspection and build checks do not establish the runtime cause or prove
+that every launcher rendering error is eliminated. Extra row inflation is the
+performance tradeoff; scroll retention under every update is not guaranteed.
 
-- [Android 16 RemoteViews source](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android16-release/core/java/android/widget/RemoteViews.java):
-  `ViewGroupActionRemove`, `ViewGroupActionAdd`, `SetOnClickResponse`,
-  `SetPendingIntentTemplate.findRemoteResponseTag`.
-- [Public RemoteViews API](https://developer.android.com/reference/android/widget/RemoteViews).
+Framework references:
 
-Initialization uses the factory's Context before R8 reuses its registers. Every
-return is wrapped using only its result register. Guards reject an unexpected
-entry shape, return count, service/factory relationship, or already patched APK.
-The helper does not store a Context or row, resolves the added layout once, and
-retains original rows with a diagnostic if the resource is unexpectedly missing.
+- [Android 16 RemoteViews source](https://android.googlesource.com/platform/frameworks/base/+/refs/heads/android16-release/core/java/android/widget/RemoteViews.java)
+- [RemoteViews API](https://developer.android.com/reference/android/widget/RemoteViews)
+- [Nine-patch resources](https://developer.android.com/guide/topics/resources/drawable-resource#NinePatch)
+- [Resizable bitmaps](https://developer.android.com/studio/write/draw9patch)
 
 ## Validation
 
-- `python3 scripts/test_calendar_widget_rows.py` compiles the production Java
-  helper against Android fakes: repeated replacement, preserved native actions,
-  independent rows, concurrent initialization, idempotence, null/missing-resource
-  fallback and Android-version gating. These are action-contract tests, not a
-  rendering test on Android.
-- `.github/workflows/verify-calendar.yml` builds extensions, the `.mpp` bundle and
-  patch metadata using Java 21 and Android SDK 36.
-- `scripts/VerifyCalendarWidgetDex.java` checks the actual patched APK: one
-  factory, Context initialization, all seven hooks, branch/register safety,
-  extension and compiled wrapper XML. Compile/run with a dexlib2-containing JAR
-  on the classpath (for example the JADX all JAR).
-- Realme GT7 rendering and long-duration behavior have **not** been tested here.
+- `python3 scripts/test_calendar_widget_rows.py`: production Java helper action
+  contracts, native payload preservation, repeated replacement, concurrent
+  initialization, null/missing-resource fallback and Android-version gating.
+- `python3 scripts/test_calendar_widget_tile_shapes.py`: compiles and runs the
+  production Kotlin transformer; checks fixed corners at four widths/heights,
+  theme/ripple preservation, original resources and rejection without partial
+  writes for changed layout/radius, variants and patched inputs. Requires a JDK,
+  `kotlinc` (or `KOTLINC` path) and Pillow.
+- The Kotlin transformer compiled, resource contracts and row contracts passed,
+  and aapt2 rebuilt the supported APK resources with Apktool 2.12.1. That resource
+  rebuild is not a fully Morphe-patched or device-tested APK.
+- Calendar CI builds the extensions, patch bundle and metadata.
+- `scripts/VerifyCalendarWidgetDex.java` verifies entry Context initialization,
+  all seven hooks, branch/register safety and wrapper resource in a patched APK.
+- Real-device rendering and long-duration behavior remain unverified.
 
-## Installing and testing (PL)
+## Installation and device checks (PL)
 
-1. Uzyj czystego APKM wskazanej wersji i zaznacz `Stabilize schedule widget`.
-   W Morphe patch jest domyslnie zaznaczony; nie ma dodatkowego przelacznika w aplikacji.
-2. Zbuduj i zainstaluj aplikacje. Zmieniony APK ma podpis Morphe, a nie Google:
-   Android nie pozwoli nim nadpisac aplikacji podpisanej przez Google. Sam patch
-   nie omija tej kontroli. Jezeli system blokuje instalacje, zachowaj dane
-   niesynchronizowane i ustal sposob instalacji przed usuwaniem aplikacji.
-   Zmiana/ponowna instalacja moze wymagac jednorazowego dodania widgetu.
-3. Sprawdz kolorowe kafelki, wydarzenia calodniowe/wielodniowe, zadania, godziny
-   oraz klikniecia wydarzenia, zadania, daty, przycisku `+` i Meet/Chat, jesli wystepuja.
-4. Przewin liste tam i z powrotem, zmien rozmiar widgetu, przelacz motyw jasny/ciemny,
-   edytuj i zsynchronizuj wydarzenie, zablokuj/odblokuj ekran i uruchom telefon ponownie.
-   Przetestuj tez dwa widgety o roznych rozmiarach.
-5. Korzystaj przez co najmniej dobe, bo blad zgloszono jako nawrotowy. Jezeli wroci,
-   podaj numer firmware i launchera oraz kroki/screen. Patch jest obejściem
-   konkretnej sciezki renderowania, nie potwierdzona naprawa wszystkich bledow OEM.
+1. Uzyj czystego APKM podanej wersji i zaznacz `Stabilize schedule widget`.
+   Patch jest domyslnie zaznaczony; nie ma przelacznika w aplikacji.
+2. Zbuduj i zainstaluj aplikacje. Zmieniony APK ma podpis Morphe, a nie Google.
+   Android nie pozwala nim nadpisac aplikacji podpisanej przez Google. Zachowaj
+   niesynchronizowane dane przed zmiana instalacji. Moze byc konieczne jednorazowe
+   dodanie widgetu; sam patch nie wymaga jego regularnego resetowania.
+3. Sprawdz wydarzenia calodniowe, wielodniowe i z godzinami, zadania, kolory,
+   obramowania oraz klikniecia wydarzenia, zadania, daty, `+`, Meet/Chat.
+4. Sprawdz przewijanie, resize, dwa widgety o roznych rozmiarach, motyw jasny/ciemny,
+   synchronizacje, zmiane daty, blokowanie ekranu i restart launchera/telefonu.
+5. Korzystaj przez co najmniej 7 dni, aby sprawdzic stabilnosc dlugotrwalego uzycia.
+   Ocen wyglad po instalacji i w dniach 1, 3 i 7. Jednorazowy poprawny wyglad ani
+   brak crasha nie potwierdzaja skutecznosci.
 
-Do not publish the supplied APK or screenshot in this repository.
+Do not commit APKs, screenshots, device logs or account/calendar data.

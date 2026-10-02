@@ -24,6 +24,7 @@ internal val scheduleWidgetResources = resourcePatch {
     execute {
         val file = get("res/layout/dudeks_calendar_widget_row.xml")
         checkShape(!file.exists(), "input already contains the row wrapper; use a clean APK")
+        ScheduleTileShapes.install { get(it) }
         file.parentFile.mkdirs()
         file.writeText("""
             <?xml version="1.0" encoding="utf-8"?>
@@ -38,7 +39,7 @@ internal val scheduleWidgetResources = resourcePatch {
 @Suppress("unused")
 val stabilizeScheduleWidgetPatch = bytecodePatch(
     name = "Stabilize schedule widget",
-    description = "Rebuilds schedule widget row contents on Android 16+ to work around missing tiles and recycled layout corruption. Experimental; intended for Realme UI 7. Does not reset the widget.",
+    description = "Rebuilds schedule widget row contents on Android 16+ to work around missing tiles, deformed tile backgrounds and recycled layout corruption. Experimental; intended for Realme UI 7. Does not reset the widget.",
     default = true,
 ) {
     compatibleWith(Compatibility(
