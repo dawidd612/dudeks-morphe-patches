@@ -71,6 +71,10 @@ public final class CalendarAccountAccessActivity extends Activity {
     }
 
     private void openCalendar() {
+        if (CalendarMicroGAccessActivity.launchIfEnabled(this, getIntent())) {
+            finish();
+            return;
+        }
         Intent original = new Intent(getIntent());
         original.setComponent(new ComponentName(this, "com.android.calendar.event.LaunchInfoActivity"));
         startActivity(original);

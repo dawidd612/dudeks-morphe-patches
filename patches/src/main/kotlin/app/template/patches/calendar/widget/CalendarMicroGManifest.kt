@@ -6,6 +6,7 @@ import org.w3c.dom.Element
 /** Declare the verified original signer to MicroG-RE, without replacing Android accounts. */
 internal object CalendarMicroGManifest {
     const val MICROG = "app.revanced.android.gms"
+    const val GATE = "pl.dudek.extension.calendar.CalendarMicroGAccessActivity"
     const val PACKAGE = "com.google.android.calendar"
     // ApkVerifier verified the clean 2026.37.0 APK; this is its certificate SHA-1.
     const val SIGNER = "bd32424203e0fb25f36b57e5aa356f9bdd1da998"
@@ -22,6 +23,9 @@ internal object CalendarMicroGManifest {
         val apps = manifest.getElementsByTagName("application")
         requireShape(apps.length == 1, "expected one application")
         val app = apps.item(0) as Element
+        requireShape((0 until app.childNodes.length).none {
+            (app.childNodes.item(it) as? Element)?.let { node -> value(node, "name") == GATE } == true
+        }, "MicroG consent activity already present")
         val metadata = mapOf(
             "$MICROG.SPOOFED_PACKAGE_NAME" to PACKAGE,
             "$MICROG.SPOOFED_PACKAGE_SIGNATURE" to SIGNER,
@@ -39,6 +43,12 @@ internal object CalendarMicroGManifest {
                 setAttribute("android:value", text)
             })
         }
+        app.appendChild(manifest.ownerDocument.createElement("activity").apply {
+            setAttribute("android:name", GATE)
+            setAttribute("android:exported", "false")
+            setAttribute("android:excludeFromRecents", "true")
+            setAttribute("android:theme", "@android:style/Theme.Translucent.NoTitleBar")
+        })
         val query = (queries.item(0) as? Element) ?: manifest.ownerDocument.createElement("queries").also {
             manifest.appendChild(it)
         }

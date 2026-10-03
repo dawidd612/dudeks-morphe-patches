@@ -192,3 +192,36 @@ Primary sources checked:
 - https://github.com/MorpheApp/MicroG-RE/blob/7.1.1/play-services-core/src/main/java/org/microg/gms/auth/AuthManagerServiceImpl.java
 - https://github.com/MorpheApp/MicroG-RE/blob/7.1.1/play-services-core/src/main/java/org/microg/gms/auth/AuthManager.java
 - https://github.com/MorpheApp/MicroG-RE/blob/7.1.1/play-services-base/core/src/main/kotlin/org/microg/gms/common/PackageSpoofUtils.kt
+
+## MicroG consent and native sign-in correction (2026-10-04)
+
+Device feedback after 1.33.6 confirmed that seeing an Android account does not
+prove successful authentication. The native OneGoogle sign-in/add-account
+listener `cal.agpm.onClick` still invoked Android `addAccount("com.google", ...)`
+in one branch and `AddAccountActivity` in the other. The optional MicroG patch
+now replaces that listener with the explicit MicroG consent Activity. The same
+Activity runs after the launcher grants Google account visibility, only when
+MicroG metadata is present. Widget-only installations retain native routing.
+
+The helper selects an `app.revanced` account that matches a visible Android
+`com.google` account and requests a real OAuth Calendar token using
+`AccountManager.getAuthToken(..., Activity, callback, ...)`. Android launches the
+MicroG authenticator's consent/recovery UI. Empty tokens and exceptions never
+count as success. After a nonempty token, request manual sync for the original
+Google account on both native authorities, preserving sync settings and local
+data. A diagnostic toast confirms only token acquisition, not completed sync.
+Only exception categories are shown; no tokens, account names or provider error
+messages are logged or persisted. Failures leave native/offline use available.
+
+The pending authenticator future is retained across Activity rotation. Framework
+picker results are rechecked for visibility and an actual matching Android
+account; a success-looking result alone is insufficient. Consent refusal, empty
+tokens, missing MicroG, deferred success/failure, rotation, original Intent payload
+and actual sync requests are covered with production-source lifecycle tests.
+These tests use Android fakes and do not prove real Google authorization.
+
+Device follow-up: confirm that launch or the sign-in button opens MicroG consent,
+report the diagnostic category if token acquisition fails, then check existing
+calendar retrieval and a disposable event syncing in both directions. If token
+acquisition succeeds but synchronization fails, diagnose the actual native sync
+exception before changing any more account/provider code.
