@@ -38,7 +38,7 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 fun main(args: Array<String>) {
     val file = File(args[0])
-    val document = DocumentBuilderFactory.newInstance().apply { isNamespaceAware = true }
+    val document = DocumentBuilderFactory.newInstance().apply { isNamespaceAware = args[1].toBoolean() }
         .newDocumentBuilder().parse(file)
     ScheduleInstallManifest.prepare(document.documentElement)
     TransformerFactory.newInstance().newTransformer().transform(DOMSource(document), StreamResult(file))
@@ -49,17 +49,21 @@ fun main(args: Array<String>) {
     jar = directory / 'manifest.jar'
     production = ROOT / 'patches/src/main/kotlin/app/template/patches/calendar/widget/ScheduleInstallManifest.kt'
     subprocess.run([compiler, str(production), str(stub), str(harness), '-include-runtime', '-d', str(jar)], check=True)
-    for name, text, success in [
+    cases = [
         ('native', MANIFEST, True),
         ('no-max-sdk', MANIFEST.replace('android:sharedUserMaxSdkVersion="32"', ''), True),
         ('no-shared-uid', MANIFEST.replace('android:sharedUserId="com.google.android.calendar.uid.shared"', ''), True),
         ('wrong-uid', MANIFEST.replace('com.google.android.calendar.uid.shared', 'android.uid.system'), False),
         ('wrong-package', MANIFEST.replace('package="com.google.android.calendar"', 'package="another.app"'), False),
-    ]:
+        ('alternate-prefix', MANIFEST.replace('android:', 'a:').replace('xmlns:android', 'xmlns:a'), True),
+    ]
+    for name, text, success in [(name + '-' + aware, text, success) for aware in ['true', 'false']
+                                for name, text, success in cases]:
+        aware = name.rsplit('-', 1)[1]
         path = directory / (name + '.xml')
         path.write_text(text)
         before = path.read_bytes()
-        result = subprocess.run(['java', '-jar', str(jar), str(path)], capture_output=True, text=True)
+        result = subprocess.run(['java', '-jar', str(jar), str(path), aware], capture_output=True, text=True)
         assert (result.returncode == 0) == success, result.stderr
         if not success:
             assert path.read_bytes() == before, 'rejected input changed'
@@ -69,6 +73,6 @@ fun main(args: Array<String>) {
             expected.attrib.pop(ANDROID + attribute, None)
         output = ET.parse(path).getroot()
         assert structure(output) == structure(expected), 'unrelated manifest content changed'
-        subprocess.run(['java', '-jar', str(jar), str(path)], check=True)
+        subprocess.run(['java', '-jar', str(jar), str(path), aware], check=True)
         assert structure(ET.parse(path).getroot()) == structure(expected), 'repeat changed manifest'
 print('PASS: fresh-install shared UID removal, namespace handling, unchanged package/permissions/providers, invalid input rejection')
