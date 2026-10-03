@@ -7,6 +7,8 @@ on:
       - 'scripts/test_calendar_widget_rows.py'
       - 'scripts/test_calendar_widget_tile_shapes.py'
       - 'scripts/test_calendar_install_manifest.py'
+      - 'scripts/test_calendar_account_access.py'
+      - 'scripts/test_calendar_account_manifest.py'
       - 'scripts/VerifyCalendarWidgetDex.java'
       - '.github/workflows/verify-calendar.yml'
 permissions:
@@ -27,6 +29,8 @@ jobs:
           log-accepted-android-sdk-licenses: false
       - name: Check row replacement contract and guards
         run: python3 scripts/test_calendar_widget_rows.py
+      - name: Check account chooser lifecycle
+        run: python3 scripts/test_calendar_account_access.py
       - name: Set up Kotlin for resource contract tests
         run: |
           curl --fail --location --retry 2 https://github.com/JetBrains/kotlin/releases/download/v2.2.20/kotlin-compiler-2.2.20.zip -o "$RUNNER_TEMP/calendar-kotlin.zip"
@@ -37,6 +41,8 @@ jobs:
         run: python3 scripts/test_calendar_widget_tile_shapes.py
       - name: Check fresh-install manifest compatibility
         run: python3 scripts/test_calendar_install_manifest.py
+      - name: Check account entry manifest
+        run: python3 scripts/test_calendar_account_manifest.py
       - name: Compile patch bundle and metadata
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

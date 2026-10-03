@@ -15,7 +15,7 @@ public class VerifyCalendarWidgetDex {
         return i instanceof ReferenceInstruction r && r.getReference() instanceof MethodReference m?m:null;
     }
     public static void main(String[]args)throws Exception {
-        int factories=0,wraps=0,inits=0; boolean helper=false;
+        int factories=0,wraps=0,inits=0; boolean helper=false,accountGate=false,chooser=false,visibility=false;
         try(ZipFile zip=new ZipFile(args[0])) {
             var entries=zip.entries();
             while(entries.hasMoreElements()) {
@@ -23,6 +23,20 @@ public class VerifyCalendarWidgetDex {
                 var dex=DexBackedDexFile.fromInputStream(Opcodes.getDefault(),new ByteArrayInputStream(zip.getInputStream(entry).readAllBytes()));
                 for(ClassDef c:dex.getClasses()) {
                     if(c.getType().equals(HOOK)){helper=true;continue;}
+                    if(c.getType().equals("Lpl/dudek/extension/calendar/CalendarAccountAccessActivity;")) {
+                        require(c.getSuperclass().equals("Landroid/app/Activity;"),"Wrong account entry superclass");
+                        accountGate=true;
+                        for(Method m:c.getMethods()) {
+                            if(m.getImplementation()==null)continue;
+                            for(Instruction i:m.getImplementation().getInstructions()) {
+                                MethodReference ref=call(i);
+                                if(ref==null||!ref.getDefiningClass().equals("Landroid/accounts/AccountManager;"))continue;
+                                if(ref.getName().equals("newChooseAccountIntent"))chooser=true;
+                                if(ref.getName().equals("getAccountsByType"))visibility=true;
+                                require(!ref.getName().equals("addAccount")&&!ref.getName().equals("getAuthToken"),"Unexpected credential operation");
+                            }
+                        }
+                    }
                     for(Method m:c.getMethods()) {
                         if(m.getImplementation()==null)continue;
                         List<Instruction> code=new ArrayList<>();m.getImplementation().getInstructions().forEach(code::add);
@@ -72,6 +86,7 @@ public class VerifyCalendarWidgetDex {
             require(zip.getEntry("res/layout/dudeks_calendar_widget_row.xml")!=null,"Missing wrapper XML in output APK");
         }
         require(helper&&factories==1&&inits==1&&wraps==7,"Incomplete or overbroad patch");
+        require(accountGate&&chooser&&visibility,"Missing framework account entry/chooser/visibility check");
         System.out.println("PASS: Calendar extension, wrapper resource, entry context, all 7 returns and branch/register safety in emitted APK");
     }
 }

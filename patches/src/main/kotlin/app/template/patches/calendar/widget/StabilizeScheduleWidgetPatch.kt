@@ -26,6 +26,7 @@ internal val scheduleWidgetResources = resourcePatch {
         checkShape(!file.exists(), "input already contains the row wrapper; use a clean APK")
         document("AndroidManifest.xml").use { document ->
             ScheduleInstallManifest.prepare(document.documentElement)
+            AccountAccessManifest.install(document.documentElement)
         }
         ScheduleTileShapes.install { get(it) }
         file.parentFile.mkdirs()
