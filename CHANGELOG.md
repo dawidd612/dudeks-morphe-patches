@@ -1,3 +1,11 @@
+## [1.33.5](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.4...v1.33.5) (2026-10-03)
+
+### 🐛 Bug Fixes
+
+* **calendar:** release existing account visibility support ([10d275c](https://github.com/dawidd612/dudeks-morphe-patches/commit/10d275c4268651bfd1c0dfcf9386c89fdce8ea4c))
+* **calendar:** request existing Google account visibility through Android chooser ([f76ab18](https://github.com/dawidd612/dudeks-morphe-patches/commit/f76ab1846a8d9185f813cbc79160a17c3df133c6))
+* **calendar:** request visibility for an existing Google account ([56eda47](https://github.com/dawidd612/dudeks-morphe-patches/commit/56eda472cb653c646db87852b8d857730c56b8a0))
+
 ## [1.33.4](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.3...v1.33.4) (2026-10-03)
 
 ### 🐛 Bug Fixes
