@@ -2,7 +2,7 @@
 
 `Stabilize schedule widget` is experimental and selected by default. It supports
 Google Calendar `2026.37.0-984865732-release` (version code `2018314914`, APKM),
-package `com.google.android.calendar`. Runtime changes apply on Android 16+.
+package `com.google.android.calendar`. Widget runtime changes apply on Android 16+.
 
 ## Re-signed installation
 
@@ -23,6 +23,32 @@ Do not uninstall apps or clear provider data merely to test the patch. Preserve
 unsynchronised data before any installation change.
 
 Reference: [Android manifest shared-user ID and signing rules](https://developer.android.com/guide/topics/manifest/manifest-element#uid).
+
+## Existing Google account visibility
+
+After re-signing, Android may hide existing Google accounts from the Calendar UID.
+Native Calendar enumerates `AccountManager.getAccountsByType("com.google")` and
+its no-account onboarding calls `addAccount`; adding an account already on the
+device does not resolve visibility.
+
+The existing AllInOneActivity launcher alias now targets a small entry Activity.
+When a Google account is already visible, it forwards immediately to the original
+LaunchInfoActivity. Otherwise it opens the framework `AccountManager` chooser,
+which can reveal an existing account to the calling package with user consent.
+After the result, it rechecks actual account visibility before opening Calendar.
+Cancellation closes the entry, rotation does not duplicate the chooser, and an
+unavailable chooser falls back to the native entry. The latest original intent,
+including click data/extras/flags, is forwarded; other native entry points,
+providers, permissions and intent filters are preserved. No account names,
+credentials or tokens are stored by the helper.
+
+This requests account visibility; it does not manufacture Google authentication
+or prove successful cloud sync. Framework chooser behavior, Google token access
+and real-device synchronization still require device verification. Install the
+newly patched APK as an update signed with the existing Morphe key to preserve
+the application's private data.
+
+References: [Android AccountManager](https://developer.android.com/reference/android/accounts/AccountManager#newChooseAccountIntent(android.accounts.Account,java.util.List,java.lang.String[],java.lang.String,java.lang.String,java.lang.String[],android.os.Bundle)) and [Google AccountPicker](https://developers.google.com/android/reference/com/google/android/gms/common/AccountPicker).
 
 ## Complete row replacement
 
@@ -77,6 +103,13 @@ Framework references:
 - [Resizable bitmaps](https://developer.android.com/studio/write/draw9patch)
 
 ## Validation
+
+- `python3 scripts/test_calendar_account_access.py`: runs the production entry
+  Activity against framework fakes, checking real-visibility confirmation, native
+  intent preservation, cancellation, chooser failure and Activity recreation.
+- `python3 scripts/test_calendar_account_manifest.py`: validates the added entry
+  and existing launcher routing under both DOM modes; compares all remaining
+  manifest content and checks rejection without partial output.
 
 - `python3 scripts/test_calendar_install_manifest.py`: runs the production Kotlin
   transform and verifies removal of the shared UID metadata, unchanged package,
