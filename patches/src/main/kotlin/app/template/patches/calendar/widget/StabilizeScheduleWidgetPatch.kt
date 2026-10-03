@@ -24,6 +24,9 @@ internal val scheduleWidgetResources = resourcePatch {
     execute {
         val file = get("res/layout/dudeks_calendar_widget_row.xml")
         checkShape(!file.exists(), "input already contains the row wrapper; use a clean APK")
+        document("AndroidManifest.xml").use { document ->
+            ScheduleInstallManifest.prepare(document.documentElement)
+        }
         ScheduleTileShapes.install { get(it) }
         file.parentFile.mkdirs()
         file.writeText("""
