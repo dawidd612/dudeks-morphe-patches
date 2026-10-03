@@ -152,3 +152,43 @@ Framework references:
    brak crasha nie potwierdzaja skutecznosci.
 
 Do not commit APKs, screenshots, device logs or account/calendar data.
+
+
+## Optional MicroG-RE authentication (2026-10-03)
+
+After account visibility is granted, a re-signed Calendar can still fail to obtain
+Google tokens. `Google Calendar authentication via MicroG-RE` is an optional,
+experimental patch for the exact 2026.37.0 / 2018314914 input. Select it together
+with `Stabilize schedule widget`. It requires Google Play services on the device
+and **the same Google account in Android and MicroG-RE 7.1.1 or later**.
+
+Only the owning package of Calendar's existing `GetToken` component is changed
+to `app.revanced.android.gms`. The service's Java class name and Binder descriptor
+remain Google names, as in the inspected MicroG-RE 7.1.1 release APK. The shared
+component serves both token acquisition and invalidation. Android account types,
+both sync-adapter XMLs, provider authorities, native OAuth scopes, expiration,
+network-error handling and user-recovery Intents are preserved. It does not create
+an account, fabricate tokens or mark failed synchronization as successful.
+
+The clean input's original signing certificate was verified with ApkVerifier:
+SHA-1 `bd32424203e0fb25f36b57e5aa356f9bdd1da998`. This identity is declared using
+MicroG-RE's supported signature metadata. Source at tag `7.1.1`, commit
+`c9386dd`, implements the same `IAuthManagerService.getTokenWithAccount` transaction,
+`tokenDetails/TokenData`, consent `userRecoveryIntent`, and token invalidation.
+It finds its own account by name, allowing Android's existing `com.google`
+calendar records to keep their account identity. These are compatibility checks,
+not proof of successful server authentication on a real phone.
+
+Update MicroG-RE if necessary, confirm the matching account is present, patch a
+clean Calendar APK with both patches, and install over the previous patched app
+using the same Morphe signing key. Grant Calendar permission and accept the
+MicroG calendar-access consent when offered by the native sign-in recovery flow.
+Check that existing events load and that a disposable test event syncs in both
+directions. Do not uninstall Calendar or clear Calendar Storage to test this.
+Runtime OAuth and bidirectional synchronization require device verification;
+if they still fail, capture the actual auth exception before changing another path.
+
+Primary sources checked:
+- https://github.com/MorpheApp/MicroG-RE/blob/7.1.1/play-services-core/src/main/java/org/microg/gms/auth/AuthManagerServiceImpl.java
+- https://github.com/MorpheApp/MicroG-RE/blob/7.1.1/play-services-core/src/main/java/org/microg/gms/auth/AuthManager.java
+- https://github.com/MorpheApp/MicroG-RE/blob/7.1.1/play-services-base/core/src/main/kotlin/org/microg/gms/common/PackageSpoofUtils.kt
