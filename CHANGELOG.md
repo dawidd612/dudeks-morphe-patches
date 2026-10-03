@@ -1,3 +1,12 @@
+## [1.33.4](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.3...v1.33.4) (2026-10-03)
+
+### 🐛 Bug Fixes
+
+* **calendar:** allow independent re-signed fresh installations ([e5da00f](https://github.com/dawidd612/dudeks-morphe-patches/commit/e5da00fc1cb84bd77b5e3cfd7c7d12d509f926c7))
+* **calendar:** handle namespace-unaware Morphe manifest documents ([1e52333](https://github.com/dawidd612/dudeks-morphe-patches/commit/1e52333cd8fde2d94f300cde5b5d057f713670bf))
+* **calendar:** release shared UID installation compatibility ([ff1ff82](https://github.com/dawidd612/dudeks-morphe-patches/commit/ff1ff82b18a6403a88a718419496c95ae9b23692))
+* **calendar:** remove Google shared UID from re-signed fresh installs ([b0b52c8](https://github.com/dawidd612/dudeks-morphe-patches/commit/b0b52c81d3ba2f7188b15bb500c9f8af7bfca24a))
+
 ## [1.33.3](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.2...v1.33.3) (2026-10-02)
 
 ### 🐛 Bug Fixes
