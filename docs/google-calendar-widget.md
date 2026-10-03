@@ -4,6 +4,26 @@
 Google Calendar `2026.37.0-984865732-release` (version code `2018314914`, APKM),
 package `com.google.android.calendar`. Runtime changes apply on Android 16+.
 
+## Re-signed installation
+
+The original manifest requests `com.google.android.calendar.uid.shared`. Android
+requires matching signing certificates for members of that shared UID, so a
+Morphe-signed fresh install can fail with `INSTALL_FAILED_SHARED_USER_INCOMPATIBLE`.
+The patch removes `android:sharedUserId`, its label and its maximum-SDK metadata
+from the output manifest. The package name, components, provider authorities,
+permissions and Calendar Provider access remain unchanged.
+
+This prepares an independent fresh installation; it does not migrate an already
+installed Google-signed package or private data to a different signer or UID.
+A remaining Google-signed app with the same package cannot be updated by a
+Morphe-signed APK. Removing only system-app updates or disabling the app does not
+remove that package. Installation on devices retaining the system package may
+therefore need a separate package-name solution; this patch does not provide one.
+Do not uninstall apps or clear provider data merely to test the patch. Preserve
+unsynchronised data before any installation change.
+
+Reference: [Android manifest shared-user ID and signing rules](https://developer.android.com/guide/topics/manifest/manifest-element#uid).
+
 ## Complete row replacement
 
 The schedule RemoteViews factory builds a complete row with native content and
@@ -57,6 +77,10 @@ Framework references:
 - [Resizable bitmaps](https://developer.android.com/studio/write/draw9patch)
 
 ## Validation
+
+- `python3 scripts/test_calendar_install_manifest.py`: runs the production Kotlin
+  transform and verifies removal of the shared UID metadata, unchanged package,
+  permissions/providers/components, namespace handling and rejected inputs.
 
 - `python3 scripts/test_calendar_widget_rows.py`: production Java helper action
   contracts, native payload preservation, repeated replacement, concurrent

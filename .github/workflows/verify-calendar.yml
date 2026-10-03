@@ -6,6 +6,7 @@ on:
       - 'patches/src/main/kotlin/app/template/patches/calendar/**'
       - 'scripts/test_calendar_widget_rows.py'
       - 'scripts/test_calendar_widget_tile_shapes.py'
+      - 'scripts/test_calendar_install_manifest.py'
       - 'scripts/VerifyCalendarWidgetDex.java'
       - '.github/workflows/verify-calendar.yml'
 permissions:
@@ -34,6 +35,8 @@ jobs:
           python3 -m pip install Pillow==11.3.0
       - name: Check tile shape resource transformation
         run: python3 scripts/test_calendar_widget_tile_shapes.py
+      - name: Check fresh-install manifest compatibility
+        run: python3 scripts/test_calendar_install_manifest.py
       - name: Compile patch bundle and metadata
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
