@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.33.5** (`main`) - **14 patches** across **8 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.33.6** (`main`) - **15 patches** across **8 apps** - back to [README](README.md)
 
 ---
 
@@ -55,6 +55,7 @@
 
 | Patch | Details |
 |---|---|
+| **Google Calendar authentication via MicroG-RE** | Routes Calendar token requests and invalidation through MicroG-RE 7.1.1+. Requires Google Play services and the same account in Android and MicroG-RE. Experimental; device synchronization still needs verification. |
 | **Stabilize schedule widget** | Rebuilds schedule widget row contents on Android 16+ to work around missing tiles, deformed tile backgrounds and recycled layout corruption. Experimental; intended for Realme UI 7. Does not reset the widget. |
 
 ---

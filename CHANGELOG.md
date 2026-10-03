@@ -1,3 +1,11 @@
+## [1.33.6](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.5...v1.33.6) (2026-10-03)
+
+### 🐛 Bug Fixes
+
+* **calendar:** add optional MicroG-RE synchronization authentication ([a9f573e](https://github.com/dawidd612/dudeks-morphe-patches/commit/a9f573e75ebe1a70cd6e8f0cff703d68692e7576))
+* **calendar:** add optional MicroG-RE token transport for re-signed installs ([929ac5f](https://github.com/dawidd612/dudeks-morphe-patches/commit/929ac5fa760e255ed4a6981c45c8164a60694546))
+* **calendar:** release MicroG-RE synchronization token transport ([8541a86](https://github.com/dawidd612/dudeks-morphe-patches/commit/8541a86550470f56b20043835d1d638fdca2b112))
+
 ## [1.33.5](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.4...v1.33.5) (2026-10-03)
 
 ### 🐛 Bug Fixes
