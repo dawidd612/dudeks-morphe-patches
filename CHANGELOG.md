@@ -1,3 +1,11 @@
+## [1.33.7](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.6...v1.33.7) (2026-10-03)
+
+### 🐛 Bug Fixes
+
+* **calendar:** release genuine MicroG consent and sign-in routing ([9fda77e](https://github.com/dawidd612/dudeks-morphe-patches/commit/9fda77ed13a846592f45f3ee1e30266cc1aa9043))
+* **calendar:** request MicroG Calendar consent and redirect native sign-in ([eb49ab0](https://github.com/dawidd612/dudeks-morphe-patches/commit/eb49ab031e181601020a5437aac948b510244703))
+* **calendar:** route sign-in to genuine MicroG consent ([bbcd8a3](https://github.com/dawidd612/dudeks-morphe-patches/commit/bbcd8a3da16b0b733fdabd54e9265f4b5623d2e4))
+
 ## [1.33.6](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.5...v1.33.6) (2026-10-03)
 
 ### 🐛 Bug Fixes
