@@ -76,6 +76,15 @@ public final class VerifyCalendarMicroGDex {
                 }
             }
         }
+        var listener=methods(find(args[1],"Lcal/agpm;")).values().stream().filter(m->m.getName().equals("onClick")).findFirst().orElseThrow();
+        var code=new ArrayList<Instruction>();listener.getImplementation().getInstructions().forEach(code::add);
+        require(code.size()==2&&code.get(0) instanceof ReferenceInstruction r&&r.getReference() instanceof MethodReference ref&&ref.getDefiningClass().equals("Lpl/dudek/extension/calendar/CalendarMicroGAccessActivity;")&&ref.getName().equals("signIn")&&code.get(1).getOpcode()==com.android.tools.smali.dexlib2.Opcode.RETURN_VOID,"Sign-in still invokes native Google account creation");
+        require(code.get(0) instanceof RegisterRangeInstruction range&&range.getRegisterCount()==1&&range.getStartRegister()==listener.getImplementation().getRegisterCount()-1,"Wrong sign-in View register");
+        var consent=find(args[1],"Lpl/dudek/extension/calendar/CalendarMicroGAccessActivity;");
+        require(consent.getSuperclass().equals("Landroid/app/Activity;"),"Missing consent Activity");
+        boolean tokenRequest=false;
+        for(var method:consent.getMethods())if(method.getImplementation()!=null)for(var instruction:method.getImplementation().getInstructions())if(instruction instanceof ReferenceInstruction ri&&ri.getReference() instanceof MethodReference mr&&mr.getDefiningClass().equals("Landroid/accounts/AccountManager;")&&mr.getName().equals("getAuthToken"))tokenRequest=true;
+        require(tokenRequest,"No genuine authenticator consent request");
         require(changes==1,"Expected exactly one auth transport change, got "+changes);
         System.out.println("PASS: one MicroG transport change; native token parsing, expiry, invalidation, consent/recovery and exception branches preserved");
     }

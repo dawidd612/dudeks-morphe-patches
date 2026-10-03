@@ -5,6 +5,7 @@ import subprocess
 import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 SOURCES = {
+'pl/dudek/extension/calendar/CalendarMicroGAccessActivity.java': 'package pl.dudek.extension.calendar; import android.app.Activity;import android.content.Intent;public class CalendarMicroGAccessActivity {public static boolean launchIfEnabled(Activity a,Intent i){return false;}}',
 'android/content/Context.java': 'package android.content; public class Context {}',
 'android/content/ComponentName.java': '''package android.content; public class ComponentName { public String name; public ComponentName(Context c,String n){name=n;} }''',
 'android/content/Intent.java': '''package android.content; import java.util.*; public class Intent { public String action="original", data="event-data"; public int flags=42; public Map<String,String> extras=new HashMap<>(); public ComponentName component; public Intent(){} public Intent(Intent i){action=i.action;data=i.data;flags=i.flags;extras.putAll(i.extras);component=i.component;} public Intent setComponent(ComponentName c){component=c;return this;} }''',

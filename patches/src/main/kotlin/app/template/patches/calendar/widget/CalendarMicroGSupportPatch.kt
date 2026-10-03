@@ -1,6 +1,7 @@
 package app.template.patches.calendar.widget
 
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
+import app.template.patches.shared.replaceBody
 import app.morphe.patcher.patch.ApkFileType
 import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
@@ -71,6 +72,19 @@ val calendarMicroGSupportPatch = bytecodePatch(
         // MicroG-RE retains the Google Java service class name in its manifest.
         // Only the owning package changes. Android com.google accounts and both
         // Calendar sync-adapter account types remain unchanged.
+        val signIn = mutableClassDefBy("Lcal/agpm;").methods.singleOrNull {
+            it.name == "onClick" && it.parameterTypes == listOf("Landroid/view/View;") && it.returnType == "V"
+        } ?: throw PatchException("Calendar MicroG authentication: sign-in listener changed")
+        check(signIn.implementation!!.instructions.any {
+            val ref = (it as? ReferenceInstruction)?.reference as? MethodReference
+            ref?.definingClass == "Landroid/accounts/AccountManager;" && ref.name == "addAccount"
+        } && signIn.implementation!!.instructions.any {
+            ((it as? ReferenceInstruction)?.reference as? StringReference)?.string == "com.google"
+        }, "native Google add-account flow changed")
+        signIn.replaceBody("""
+            invoke-static/range {p1 .. p1}, Lpl/dudek/extension/calendar/CalendarMicroGAccessActivity;->signIn(Landroid/view/View;)V
+            return-void
+        """.trimIndent())
         init.replaceInstruction(index, "const-string v$register, \"${CalendarMicroGManifest.MICROG}\"")
     }
 }
