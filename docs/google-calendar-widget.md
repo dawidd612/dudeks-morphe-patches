@@ -1,6 +1,6 @@
 # Google Calendar schedule widget
 
-`Stabilize schedule widget` is experimental and selected by default. It supports
+`Stabilize schedule widget` is stable and selected by default. It supports
 Google Calendar `2026.37.0-984865732-release` (version code `2018314914`, APKM),
 package `com.google.android.calendar`. Widget runtime changes apply on Android 16+.
 
@@ -90,7 +90,7 @@ resolved before comparison; different radii, unsupported units and alias cycles
 are rejected with the offending value in the diagnostic. Changed or already-patched
 resources are rejected before adding new files.
 
-This is an experimental workaround for missing backgrounds and tile deformation.
+This is a workaround for missing backgrounds and tile deformation.
 Resource inspection and build checks do not establish the runtime cause or prove
 that every launcher rendering error is eliminated. Extra row inflation is the
 performance tradeoff; scroll retention under every update is not guaranteed.
@@ -158,7 +158,7 @@ Do not commit APKs, screenshots, device logs or account/calendar data.
 
 After account visibility is granted, a re-signed Calendar can still fail to obtain
 Google tokens. `Google Calendar authentication via MicroG-RE` is an optional,
-experimental patch for the exact 2026.37.0 / 2018314914 input. Select it together
+stable patch for the exact 2026.37.0 / 2018314914 input. Select it together
 with `Stabilize schedule widget`. It requires Google Play services on the device
 and **the same Google account in Android and MicroG-RE 7.1.1 or later**.
 
@@ -251,5 +251,20 @@ check cannot silently select the rejected identity again.
 After updating the patched Calendar with the same Morphe signing key, force-stop
 MicroG-RE once to discard its in-memory package/signature cache, then reopen
 Calendar and accept real Calendar access consent. Do not clear MicroG data,
-remove either account, or clear Calendar Storage. Server authorization and
-bidirectional event sync remain pending confirmation on the user's device.
+remove either account, or clear Calendar Storage. The user subsequently confirmed that 1.33.8 works on the device; see below.
+
+
+## Stable release after device confirmation (2026-10-04)
+
+The user confirmed that the Calendar correction in 1.33.8 works and requested
+official publication without the experimental label. Mark both Calendar targets
+as stable and remove the experimental wording from their displayed descriptions.
+The confirmation follows the realme RMX5061 / Android 16 authentication failure
+and the pre-rotation OAuth signer correction described above.
+
+This release changes classification and documentation only. Keep the verified
+authentication implementation, OAuth identity, supported Calendar version and
+patch selection defaults. The widget patch remains selected by default and the
+MicroG patch remains optional, requiring the same Google account in Android and
+MicroG-RE. The user's confirmation is not a seven-day widget stress test or a
+claim that every launcher or device has been tested.
