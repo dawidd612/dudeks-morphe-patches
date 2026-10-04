@@ -19,7 +19,7 @@ Choose a supported app version, select the patches you want and patch a clean AP
 ## Patches
 
 <!-- PATCHES_START -->
-> **[v1.33.8](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.33.8)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**15 patches** across **8 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+> **[v1.33.9](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.33.9)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**15 patches** across **8 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
 
 | # | App | Patches | Version | Package |
 |---|---|---|---|---|
@@ -27,7 +27,7 @@ Choose a supported app version, select the patches you want and patch a clean AP
 | 2 | [**Gardenscapes**](PATCHES.md#gardenscapes-complayrixgardenscapes) | 1 | `experimental 9.9.0` | [`com.playrix.gardenscapes`](https://play.google.com/store/apps/details?id=com.playrix.gardenscapes) |
 | 3 | [**Good Coffee, Great Coffee**](PATCHES.md#good-coffee-great-coffee-comtapblazecoffeebusiness) | 3 | `1.24.0` | [`com.tapblaze.coffeebusiness`](https://play.google.com/store/apps/details?id=com.tapblaze.coffeebusiness) |
 | 4 | [**Good Pizza, Great Pizza**](PATCHES.md#good-pizza-great-pizza-comtapblazepizzabusiness) | 3 | `5.57.3` | [`com.tapblaze.pizzabusiness`](https://play.google.com/store/apps/details?id=com.tapblaze.pizzabusiness) |
-| 5 | [**Google Calendar**](PATCHES.md#google-calendar-comgoogleandroidcalendar) | 2 | `experimental 2026.37.0-984865732-release` | [`com.google.android.calendar`](https://play.google.com/store/apps/details?id=com.google.android.calendar) |
+| 5 | [**Google Calendar**](PATCHES.md#google-calendar-comgoogleandroidcalendar) | 2 | `2026.37.0-984865732-release` | [`com.google.android.calendar`](https://play.google.com/store/apps/details?id=com.google.android.calendar) |
 | 6 | [**Instagram**](PATCHES.md#instagram-cominstagramandroid) | 1 | `experimental 439.0.0.37.89` | [`com.instagram.android`](https://play.google.com/store/apps/details?id=com.instagram.android) |
 | 7 | [**Mapa Turystyczna**](PATCHES.md#mapa-turystyczna-plmapa_turystycznaapp) | 2 | `1.16.6` | [`pl.mapa_turystyczna.app`](https://play.google.com/store/apps/details?id=pl.mapa_turystyczna.app) |
 | 8 | [**TikTok**](PATCHES.md#tiktok-comzhiliaoappmusically) | 1 | `47.0.3` | [`com.zhiliaoapp.musically`](https://play.google.com/store/apps/details?id=com.zhiliaoapp.musically) |

@@ -1,3 +1,11 @@
+## [1.33.9](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.8...v1.33.9) (2026-10-04)
+
+### 🐛 Bug Fixes
+
+* **calendar:** promote confirmed Calendar patches to stable ([c6e06c3](https://github.com/dawidd612/dudeks-morphe-patches/commit/c6e06c3a35443cc462b2042d6322ecfa813f2500))
+* **calendar:** promote device-confirmed Calendar patches to stable ([642a383](https://github.com/dawidd612/dudeks-morphe-patches/commit/642a383c6e49c5e4261af8232f6100fc94249197))
+* **calendar:** publish device-confirmed stable Calendar patches ([75848e3](https://github.com/dawidd612/dudeks-morphe-patches/commit/75848e35a017975a5ca0c7fd6582bd074c5f1d5c))
+
 ## [1.33.8](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.7...v1.33.8) (2026-10-04)
 
 ### 🐛 Bug Fixes
