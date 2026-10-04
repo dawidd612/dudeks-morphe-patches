@@ -8,8 +8,9 @@ internal object CalendarMicroGManifest {
     const val MICROG = "app.revanced.android.gms"
     const val GATE = "pl.dudek.extension.calendar.CalendarMicroGAccessActivity"
     const val PACKAGE = "com.google.android.calendar"
-    // ApkVerifier verified the clean 2026.37.0 APK; this is its certificate SHA-1.
-    const val SIGNER = "bd32424203e0fb25f36b57e5aa356f9bdd1da998"
+    // OAuth uses the pre-rotation signer in the clean APK's v2/v3 blocks.
+    // The Android 13+ v3.1 signer bd324... is rejected as UNREGISTERED_ON_API_CONSOLE.
+    const val SIGNER = "38918a453d07199354f8b19af05ec6562ced5788"
     private const val ANDROID = "http://schemas.android.com/apk/res/android"
     private fun value(element: Element, name: String) =
         element.getAttributeNS(ANDROID, name).ifEmpty { element.getAttribute("android:$name") }
