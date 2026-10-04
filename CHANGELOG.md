@@ -1,3 +1,11 @@
+## [1.33.8](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.7...v1.33.8) (2026-10-04)
+
+### 🐛 Bug Fixes
+
+* **calendar:** correct OAuth identity after signing-key rotation ([431c968](https://github.com/dawidd612/dudeks-morphe-patches/commit/431c968f7084d3d756f2b3f83bd5d2843e4a9d51))
+* **calendar:** publish OAuth signing-key rotation correction ([8a31617](https://github.com/dawidd612/dudeks-morphe-patches/commit/8a316170c00fc4603cfafbf33b01e1de55802ed4))
+* **calendar:** use pre-rotation OAuth signer instead of rejected Android 13 certificate ([2ce06d0](https://github.com/dawidd612/dudeks-morphe-patches/commit/2ce06d0152e8d71d457cc42b8323002c5a2506b9))
+
 ## [1.33.7](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.6...v1.33.7) (2026-10-03)
 
 ### 🐛 Bug Fixes
