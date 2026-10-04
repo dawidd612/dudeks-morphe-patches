@@ -170,8 +170,10 @@ both sync-adapter XMLs, provider authorities, native OAuth scopes, expiration,
 network-error handling and user-recovery Intents are preserved. It does not create
 an account, fabricate tokens or mark failed synchronization as successful.
 
-The clean input's original signing certificate was verified with ApkVerifier:
-SHA-1 `bd32424203e0fb25f36b57e5aa356f9bdd1da998`. This identity is declared using
+The clean input contains a signing-key rotation: the v2/v3 signer is SHA-1
+`38918a453d07199354f8b19af05ec6562ced5788`, while Android 13+ selects the
+v3.1 signer `bd32424203e0fb25f36b57e5aa356f9bdd1da998`. OAuth metadata uses
+the pre-rotation identity. This identity is declared using
 MicroG-RE's supported signature metadata. Source at tag `7.1.1`, commit
 `c9386dd`, implements the same `IAuthManagerService.getTokenWithAccount` transaction,
 `tokenDetails/TokenData`, consent `userRecoveryIntent`, and token invalidation.
@@ -225,3 +227,29 @@ report the diagnostic category if token acquisition fails, then check existing
 calendar retrieval and a disposable event syncing in both directions. If token
 acquisition succeeds but synchronization fails, diagnose the actual native sync
 exception before changing any more account/provider code.
+
+
+## OAuth signing-key rotation correction (2026-10-04)
+
+Device logs from 1.33.7 show `UNREGISTERED_ON_API_CONSOLE` in both
+`GmsAuthenticator` and `GmsAuthManagerSvc`. `SpoofUtils` confirms the old patch
+metadata was read correctly and sent `bd324...`. This is an OAuth client identity
+failure, subsequently wrapped as `IOException` / `NetworkError`, not evidence of
+a connectivity failure. No private account details or raw device logs are stored
+in this repository.
+
+The earlier check selected the APK's latest platform signer instead of its
+pre-rotation signer. The same clean base APK (SHA-256
+`d7f155c7ecad7ecc5c57f2c6af15edd6a0a6444ce93b9d08c69623c18e4b1cf3`)
+contains `38918a...` in v2/v3 and `bd324...` in v3.1. The patch now declares
+`38918a453d07199354f8b19af05ec6562ced5788` to MicroG for OAuth, retaining the
+package, native scopes, both token acquisition paths, and all local calendar data.
+The manifest test pins that identity; `VerifyCalendarOAuthIdentity.java` checks
+the actual clean APK cryptographically at API 32 and API 36 so a latest-signer
+check cannot silently select the rejected identity again.
+
+After updating the patched Calendar with the same Morphe signing key, force-stop
+MicroG-RE once to discard its in-memory package/signature cache, then reopen
+Calendar and accept real Calendar access consent. Do not clear MicroG data,
+remove either account, or clear Calendar Storage. Server authorization and
+bidirectional event sync remain pending confirmation on the user's device.

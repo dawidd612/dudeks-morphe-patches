@@ -31,7 +31,7 @@ fun main(args:Array<String>){val f=File(args[0]);val doc=DocumentBuilderFactory.
             root=ET.parse(p).getroot();app=root.find('application');queries=root.find('queries')
             metadata={n.get(A+'name'):n.get(A+'value') for n in app.findall('meta-data')}
             assert metadata[M+'.SPOOFED_PACKAGE_NAME']=='com.google.android.calendar'
-            assert metadata[M+'.SPOOFED_PACKAGE_SIGNATURE']=='bd32424203e0fb25f36b57e5aa356f9bdd1da998'
+            assert metadata[M+'.SPOOFED_PACKAGE_SIGNATURE']=='38918a453d07199354f8b19af05ec6562ced5788'
             assert metadata['app.revanced.MICROG_PACKAGE_NAME']==M
             packages=[n for n in queries if n.get(A+'name')==M];assert len(packages)==1
             gate=app.find('activity');assert gate.get(A+'name')=='pl.dudek.extension.calendar.CalendarMicroGAccessActivity' and gate.get(A+'exported')=='false';app.remove(gate)
