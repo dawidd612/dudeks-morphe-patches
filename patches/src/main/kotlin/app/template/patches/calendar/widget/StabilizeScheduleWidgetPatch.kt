@@ -43,7 +43,7 @@ internal val scheduleWidgetResources = resourcePatch {
 @Suppress("unused")
 val stabilizeScheduleWidgetPatch = bytecodePatch(
     name = "Stabilize schedule widget",
-    description = "Rebuilds schedule widget row contents on Android 16+ to work around missing tiles, deformed tile backgrounds and recycled layout corruption. Experimental; intended for Realme UI 7. Does not reset the widget.",
+    description = "Rebuilds schedule widget row contents on Android 16+ to work around missing tiles, deformed tile backgrounds and recycled layout corruption. Intended for Realme UI 7. Does not reset the widget.",
     default = true,
 ) {
     compatibleWith(Compatibility(
@@ -51,7 +51,7 @@ val stabilizeScheduleWidgetPatch = bytecodePatch(
         packageName = "com.google.android.calendar",
         apkFileType = ApkFileType.APKM,
         appIconColor = 0x4285F4,
-        targets = listOf(AppTarget(version = "2026.37.0-984865732-release", isExperimental = true)),
+        targets = listOf(AppTarget(version = "2026.37.0-984865732-release", isExperimental = false)),
     ))
     dependsOn(scheduleWidgetResources)
     extendWith("extensions/calendar.mpe")
