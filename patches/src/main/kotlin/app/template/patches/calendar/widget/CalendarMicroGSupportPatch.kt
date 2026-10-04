@@ -25,7 +25,7 @@ private val calendarMicroGResources = resourcePatch {
 @Suppress("unused")
 val calendarMicroGSupportPatch = bytecodePatch(
     name = "Google Calendar authentication via MicroG-RE",
-    description = "Routes Calendar token requests and invalidation through MicroG-RE 7.1.1+. Requires Google Play services and the same account in Android and MicroG-RE. Experimental; device synchronization still needs verification.",
+    description = "Routes Calendar token requests and invalidation through MicroG-RE 7.1.1+. Requires Google Play services and the same account in Android and MicroG-RE.",
     default = false,
 ) {
     compatibleWith(Compatibility(
@@ -34,7 +34,7 @@ val calendarMicroGSupportPatch = bytecodePatch(
         apkFileType = ApkFileType.APKM,
         appIconColor = 0x4285F4,
         targets = listOf(AppTarget(version = "2026.37.0-984865732-release", versionCode = 2018314914,
-            isExperimental = true)),
+            isExperimental = false)),
     ))
     dependsOn(stabilizeScheduleWidgetPatch, calendarMicroGResources)
     execute {
