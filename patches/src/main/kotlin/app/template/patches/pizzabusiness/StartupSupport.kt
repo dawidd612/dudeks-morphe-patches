@@ -8,7 +8,9 @@ import com.android.tools.smali.dexlib2.iface.value.StringEncodedValue
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 /** Narrow startup companion. Preserve protected SDK methods and their return types. */
 internal val pizzaStartupSupport = bytecodePatch {
@@ -27,7 +29,7 @@ internal val pizzaStartupSupport = bytecodePatch {
         requirePizza(attach.calls(signature, "verifyIntegrity") && attach.calls(license, "checkLicense") &&
             attach.calls(vm, "setContext"), "application startup changed")
         requirePizza(integrity.hasString("Apk signature is invalid.") && startup.calls(vm, "invoke") &&
-            (program?.initialValue as? StringEncodedValue)?.value == "87jzgtv0i2Sz3iNG" && checkLicense.implementation != null &&
+            (program?.initialValue as? StringEncodedValue)?.value == PizzaProfiles.forPackage(packageMetadata).startupProgram && checkLicense.implementation != null &&
             checkLicense.instructions.size > 1, "re-signed startup shape changed or already patched")
 
         // checkLicense is not the only entry: TrialClient/JNI and queued retries
@@ -64,10 +66,25 @@ internal val pizzaStartupSupport = bytecodePatch {
         // the worker crashes when it performs its normal unregister. Give only
         // this receiver the application lifetime; retain SDK UI contexts,
         // connection retries, callbacks and unregister/finally behavior.
-        val worker = pizzaMethod("Lck/f0;", "run", emptyList(), "V", static = false)
-        val stores = worker.instructions.withIndex().filter { (_, instruction) ->
+        val workers = classDefByStrings("android.net.conn.CONNECTIVITY_CHANGE").flatMap { cls ->
+            cls.methods.filter { it.name == "run" && it.parameterTypes.isEmpty() && it.returnType == "V" &&
+                it.hasString("android.net.conn.CONNECTIVITY_CHANGE") &&
+                it.calls(context, "registerReceiver") && it.calls(context, "unregisterReceiver") }
+        }
+        requirePizza(workers.size == 1, "Tapjoy connection receiver is missing or ambiguous")
+        val candidate = workers.single()
+        val worker = pizzaMethod(candidate.definingClass, "run", emptyList(), "V", static = false)
+        val workerCode = worker.instructions.toList()
+        val stores = workerCode.withIndex().filter { (index, instruction) ->
             val field = (instruction as? ReferenceInstruction)?.reference as? FieldReference
-            instruction.opcode == Opcode.IPUT_OBJECT && field?.definingClass == "Lck/f0;" && field.name == "e"
+            val previous = workerCode.getOrNull(index - 1)
+            val cast = (previous as? ReferenceInstruction)?.reference as? TypeReference
+            // R8 can merge the worker and erase its Context field to Object.
+            // In that layout, the preceding cast identifies the same receiver context.
+            instruction.opcode == Opcode.IPUT_OBJECT && field?.definingClass == worker.definingClass &&
+                (field.type == context || (field.type == "Ljava/lang/Object;" &&
+                    previous?.opcode == Opcode.CHECK_CAST && cast?.type == context &&
+                    (previous as OneRegisterInstruction).registerA == (instruction as TwoRegisterInstruction).registerA))
         }
         requirePizza(stores.size == 1 && worker.hasString("android.net.conn.CONNECTIVITY_CHANGE") &&
             worker.calls(context, "registerReceiver") && worker.calls(context, "unregisterReceiver"),

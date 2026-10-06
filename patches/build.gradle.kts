@@ -35,6 +35,7 @@ tasks {
 
         classpath = sourceSets["main"].runtimeClasspath + patchListGeneratorClasspath
         mainClass.set("app.morphe.util.PatchListGeneratorKt")
+        args(layout.buildDirectory.file("libs/${project.name}-${project.version}.mpp").get().asFile.absolutePath)
     }
 
     // Used by gradle-semantic-release-plugin.

@@ -14,12 +14,12 @@ import com.android.tools.smali.dexlib2.iface.reference.*;
 public class VerifyPizzaRewardDex {
     static final String BASE = "Lcom/tapblaze/pizzabusiness/BaseIronSourceWrapper;";
     static final String NATIVE = "Lcom/tapblaze/pizzabusiness/IronSourceWrapper;";
-    static final String REQUEST = "Lcom/tapblaze/pizzabusiness/BaseIronSourceWrapper$1;";
+    static String REQUEST;
     static final String ACTIVITY = "Lcom/tapblaze/pizzabusiness/BaseAppActivity;";
     static final String COCOS = "Lorg/cocos2dx/lib/Cocos2dxActivity;";
     static final String HELPER = "Lpl/dudek/extension/pizzabusiness/RewardedAds;";
     static final String INIT_REQUEST = "Lpl/dudek/extension/pizzabusiness/RewardedAds$1;";
-    static final String SDK_READY = "Lcom/tapblaze/pizzabusiness/BaseIronSourceWrapper$4$2$1$1;";
+    static String SDK_READY;
     static final String STRING = "Ljava/lang/String;";
     static final Object UNSET = new Object();
     static final Object REQUEST_OBJECT = new Object();
@@ -206,9 +206,20 @@ public class VerifyPizzaRewardDex {
     }
 
     public static void main(String[] arguments) throws Exception {
-        check(arguments.length >= 1 && arguments.length <= 2, "Usage: VerifyPizzaRewardDex patched.apk [original.apk]");
+        check(arguments.length == 2, "Usage: VerifyPizzaRewardDex patched.apk original.apk");
         var patched = classes(arguments[0]);
+        var input = classes(arguments[1]);
         Method show = method(patched, BASE, "showRewardedVideo", "V", STRING);
+        var requests = code(show).stream().filter(i -> i.getOpcode() == Opcode.NEW_INSTANCE)
+            .map(i -> ((TypeReference)((ReferenceInstruction)i).getReference()).getType()).toList();
+        check(requests.size() == 1, "Expected one reward request allocation");
+        REQUEST = requests.get(0);
+        var callbacks = new ArrayList<String>();
+        for (var cls : input.values()) if (cls.getType().startsWith(BASE.substring(0,BASE.length()-1)+"$"))
+            for (var m : cls.getMethods()) if (m.getName().equals("run") && m.getImplementation() != null &&
+                code(m).size() == 2 && key(call(code(m).get(0))).equals(NATIVE+"->onVideoReady()V")) callbacks.add(cls.getType());
+        check(callbacks.size() == 1, "Expected one original SDK readiness callback");
+        SDK_READY = callbacks.get(0);
         Method ready = method(patched, BASE, "isRewardedVideoReady", "Z", STRING);
         Method initialize = method(patched, BASE, "Initialize", "V", STRING, STRING, STRING, "Z", "I");
         Method runner = method(patched, REQUEST, "run", "V");

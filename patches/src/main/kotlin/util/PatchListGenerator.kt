@@ -10,30 +10,17 @@ import app.morphe.patcher.patch.loadPatchesFromJar
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import java.io.File
-import java.net.URLClassLoader
-import java.util.jar.Manifest
+import java.util.jar.JarFile
 
-fun main() {
-    val patchFiles = setOf(
-        File("build/libs/").listFiles { file ->
-            val fileName = file.name
-            !fileName.contains("javadoc") &&
-                    !fileName.contains("sources") &&
-                    fileName.endsWith(".mpp")
-        }!!.first()
-    )
+fun main(args: Array<String>) {
+    require(args.size == 1) { "Expected the current build's patch bundle path" }
+    val bundle = File(args.single())
+    require(bundle.isFile) { "Patch bundle missing: $bundle" }
+    val patchFiles = setOf(bundle)
     val loadedPatches = loadPatchesFromJar(patchFiles)
-    val patchClassLoader = URLClassLoader(patchFiles.map { it.toURI().toURL() }.toTypedArray())
-    val manifest = patchClassLoader.getResources("META-INF/MANIFEST.MF")
-
-    while (manifest.hasMoreElements()) {
-        Manifest(manifest.nextElement().openStream())
-            .mainAttributes
-            .getValue("Version")
-            ?.let {
-                generatePatchList(it, loadedPatches)
-            }
-    }
+    val version = JarFile(bundle).use { it.manifest.mainAttributes.getValue("Version") }
+        ?: error("Patch bundle has no Version: $bundle")
+    generatePatchList(version, loadedPatches)
 }
 
 @Suppress("DEPRECATION")

@@ -15,10 +15,18 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
     static final String LICENSE = "Lcom/pairip/licensecheck/LicenseClient;";
     static final String SCREEN = "Lcom/pairip/licensecheck/LicenseActivity;";
     static final String GMS = "app.revanced.android.gms";
-    static final String CLIENT = "Lcom/google/android/gms/common/internal/f;";
-    static final Map<String,String> CLIENTS = Map.of(
-        "Lcom/google/android/gms/internal/games_v2/zzp;", "games.internal.connect.service.START",
-        "Lld/d;", "games.service.START");
+    static Map<String,String> gamesClients(Map<String,ClassDef> original) {
+        var clients = new TreeMap<String,String>();
+        for (var cls : original.values()) for (var m : cls.getMethods()) {
+            if (!m.getName().equals("getStartServiceAction") || !m.getReturnType().equals(STRING) ||
+                    !m.getParameterTypes().isEmpty() || m.getImplementation() == null) continue;
+            for (var i : code(m)) if (i instanceof ReferenceInstruction r && r.getReference() instanceof StringReference s)
+                for (var action : List.of("games.internal.connect.service.START", "games.service.START"))
+                    if (s.getString().equals("com.google.android.gms." + action)) clients.put(cls.getType(), action);
+        }
+        check(clients.size() == 2 && new HashSet<>(clients.values()).size() == 2, "Original Games transport roles missing or ambiguous");
+        return clients;
+    }
 
     static void noEffect(Method m) {
         validateRegistersAndBranches(m);
@@ -76,6 +84,14 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
         boolean hidePaid = args.length == 5;
         var patched = classes(args[0]);
         var original = classes(args[1]);
+        var clients = gamesClients(original);
+        var transportHierarchy = new HashSet<String>();
+        var legacyPackages = new HashSet<String>();
+        for (var entry : clients.entrySet()) {
+            if (entry.getValue().equals("games.service.START")) legacyPackages.add(entry.getKey().substring(0, entry.getKey().lastIndexOf('/') + 1));
+            String owner = entry.getKey();
+            while (original.containsKey(owner) && transportHierarchy.add(owner)) owner = original.get(owner).getSuperclass();
+        }
         Map<String, Method> sdkRestorations = new HashMap<>();
         if (args.length >= 4) {
             for (ClassDef cls : classes(java.nio.file.Path.of(args[3], "sdk-receivers.dex").toString()).values())
@@ -121,7 +137,7 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
             check(code(resolution).stream().anyMatch(i -> key(call(i)).equals(
                 "Lcom/google/android/gms/games/internal/v2/resolution/a;->a(Landroid/app/Activity;Landroid/app/PendingIntent;)Lcom/google/android/gms/tasks/Task;")),
                 "Games authentication no longer launches the actual service resolution");
-            for (var entry : CLIENTS.entrySet()) {
+            for (var entry : clients.entrySet()) {
                 String owner = entry.getKey();
                 Method action = method(patched, owner, "getStartServiceAction", STRING);
                 allowed.add(key(action));
@@ -147,20 +163,19 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
 
         // Whole-class comparison: authentication callbacks, server-auth requests,
         // player IDs, errors, Binder descriptors and SDK/VM return values survive.
-        int preserved = 0, protectedMethods = 0, restored = 0, billingMethods = 0;
+        int preserved = 0, restored = 0, billingMethods = 0;
         for (ClassDef cls : original.values()) {
             // Preserve purchase results, verification, restoration and SDK
             // behavior. Only the explicitly selected checkout entry may differ.
             boolean billing = cls.getType().startsWith("Lcom/android/billingclient/") ||
                 cls.getType().startsWith("Lcom/google/android/gms/internal/play_billing/") ||
                 cls.getType().startsWith("Lcom/tapblaze/pizzabusiness/PurchasesManager");
-            boolean auth = cls.getType().equals(ACTIVITY) || cls.getType().equals(CLIENT) ||
+            boolean auth = cls.getType().equals(ACTIVITY) || transportHierarchy.contains(cls.getType()) ||
                 cls.getType().startsWith("Lcom/google/android/gms/internal/games_v2/") ||
-                cls.getType().startsWith("Lld/") || cls.getType().equals("Lcom/pairip/VMRunner;");
+                legacyPackages.stream().anyMatch(cls.getType()::startsWith) || cls.getType().equals("Lcom/pairip/VMRunner;");
             for (Method before : cls.getMethods()) {
                 boolean vm = before.getImplementation() != null && code(before).stream().anyMatch(i ->
                     call(i) != null && call(i).getDefiningClass().equals("Lcom/pairip/VMRunner;") && call(i).getName().equals("invoke"));
-                if (vm && !cls.getType().startsWith("Lcom/pairip/")) protectedMethods++;
                 if ((!auth && !billing && !(vm && !cls.getType().startsWith("Lcom/pairip/"))) || allowed.contains(key(before))) continue;
                 Method after = method(patched, cls.getType(), before.getName(), before.getReturnType(),
                     before.getParameterTypes().stream().map(Object::toString).toArray(String[]::new));
@@ -175,7 +190,14 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
                 preserved++;
             }
         }
-        check(protectedMethods == 20, "Protected SDK method count changed");
+        Set<String> expectedVmCallers = new HashSet<>(), actualVmCallers = new HashSet<>();
+        for (var entry : List.of(Map.entry(original, expectedVmCallers), Map.entry(patched, actualVmCallers)))
+            for (ClassDef cls : entry.getKey().values()) if (!cls.getType().startsWith("Lcom/pairip/"))
+                for (Method m : cls.getMethods()) if (m.getImplementation() != null && code(m).stream().anyMatch(i ->
+                    call(i) != null && call(i).getDefiningClass().equals("Lcom/pairip/VMRunner;") && call(i).getName().equals("invoke")))
+                    entry.getValue().add(key(m));
+        expectedVmCallers.removeAll(sdkRestorations.keySet());
+        check(actualVmCallers.equals(expectedVmCallers), "Protected caller set changed outside the recovered SDK receivers");
         check(restored == sdkRestorations.size(), "SDK restoration missing from emitted APK");
         if (args.length >= 4) {
             int constants = 0;
@@ -225,7 +247,7 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
             }
         }
         System.out.println("PASS: 10 licensing entry/retry/remediation/shutdown bodies have no side effects; restored screen only finishes itself");
-        System.out.println("PASS: " + preserved + " unchanged authentication/SDK methods; " + restored + " SDK receivers restored from upstream libraries");
+        System.out.println("PASS: " + preserved + " unchanged authentication/SDK methods; " + restored + " SDK methods restored from upstream libraries");
         System.out.println("PASS: " + billingMethods + " executable billing methods unchanged; " +
             (hidePaid ? "checkout cancellation requires runtime test; " : "checkout preserved; ") +
             "results and purchase processing preserved");

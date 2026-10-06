@@ -2,6 +2,101 @@
 
 Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
+## Pizza 5.58.0 update — runtime verification, 2026-10-06
+
+User requested 5.58.0 and easier future updates using origin/main 053d72f.
+The actual previous target is 5.57.3 (2277). Work is on codex/pizza-version-adaptive.
+Pre-existing economy-context notes below are unrelated and remain local.
+
+Input: Downloads good-pizza-great-pizza-5-58-0.xapk, 5.58.0 (2301), SHA256
+6f4c6f9faa13265d0533aa61c8b294938cbfbf439e971ba162fb5e51d3b8dc6b.
+All 67 APK splits passed integrity checks. Publisher signing SHA1 is unchanged:
+828d99f1d85e52eb473af06d690f84ee72904330. All gpdeku/DPI/language/assets retained.
+
+All three patches now use one manifest/version-code/profile registry. Resources
+for each target contain exact initialization, SDK and visibility deltas. Games
+clients, reward request/readiness and Tapjoy worker are found by behavior rather
+than obfuscated class names; Context and R8 Object/cast layouts are supported.
+Both targets are ARM64. Unknown native builds still require reviewed capture and
+an explicit profile, not a guessed universal delta. See pizza-update-workflow.md
+for read-only archive comparison, exact SDK recovery and ELF-driven reconstruction.
+Metadata generation explicitly uses the current MPP even when older bundles exist.
+
+Two independent original-signed debug starts recovered identical 1449 strings,
+50924 executable bytes, 3794 constant qwords and 200 imports. ELF reconstruction
+reproduces the reviewed native hash and rejects unresolved IFUNC pointers. See
+pizza-5580-provenance.json for hashes, SDK URLs and exact bindings. Ad Quality
+changed 9.9.0 -> 9.10.0. Five exact upstream receiver bodies (Fyber, Ad Quality,
+Tapjoy14.6.0) and one Google basement18.10.0 ProviderInstaller task are recovered.
+The task invokes the real installer and preserves Void[]/Integer bridging, both
+original error codes and untouched post-execute callbacks. Real installation
+returns0; injected unavailable17 and repairable2 return those actual codes.
+No authentication result or paid entitlement is substituted.
+
+Failure history is preserved under ignored artifacts/pizza-5580-20261006.
+The initial four-method candidate crashed in plain offline Activity recreation.
+SDK5 fixed that isolated case but failed the second user reboot (PID2795,
+uptime54s, libpairipcore.so+0x2f9b8). A two-PID query caused the matrix helper to
+miss that failure; full logs and top activity are authoritative. Restoring the
+exact provider task in SDK6 fixes the repeated reboot case. A trace helper that
+hooked System.loadLibrary also caused a separate caller-sensitive load failure;
+do not use that hook. Empty traces do not establish SDK correctness.
+
+Runtime-tested SDK6 APK SHA256:
+0e61ce808ad93b5b9c41a6a6fb7d9668e54b5a3021479dc7060c8fc35d75759a.
+Final clean-input APK pizza-5580-verified.apk SHA256:
+36d28d76f9d24ad4f714107736343d04055a630b4a3e1ca1ce37110056e0f281.
+All 8352 non-signature entries are byte-identical between those APKs. Final build
+and all three patches pass. DEX checks verify3412 unchanged authentication/SDK
+methods,6 exact recovered SDK methods,2165 unchanged billing methods,79 unchanged
+native bridges and5 interpreted reward placements. All67 splits,36 libraries
+and6653 assets are preserved. Updated5.57.3 has all6691 DEX/native/assets entries
+identical to verified v1.32.0 and passes the updated integration verifier.
+A synthetic four-role rename fixture patches and passes reward scenarios; it is
+never installed and does not imply arbitrary SDK/architectural changes work.
+
+User AVD5554: verified snapshot pizza-before-5580-20261006 and old installed APK
+preserved before same-key update. Signer SHA256 remains
+209e0c57bb4ecb1707c78e8d1e0c2e47344eb9cab74870c740ea46bf4d83a710.
+Two force-stop starts, background/resume and THREE full device reboots pass real
+Google sign-in with80s observation after each start and no game errors. The
+Chapter3/Day47/1.13K funds/1 gem regions are pixel-identical across starts,
+reboots and network recovery. Service logs include a real nonempty serverAuthCode
+and granted scopes; raw values stay local. Offline MicroG resolution can be
+cancelled with Back; restoring network and relaunching recovers the same menu.
+The user explicitly confirmed TapBlaze remains linked on5.58.0. This verifies
+continued linked session and local progress, not a fresh download from cloud.
+Only normal update/event dialogs were dismissed; no user gameplay/purchases.
+Never clear or uninstall5554. Its save and signing key must remain recoverable.
+
+Disposable5556: SDK6 repeats normal launches; actual PNN sponsor gives exactly
+one gem, with one started/watched/ended/ready sequence on GLThread66 despite
+repeated tap and Home/resume. Day2 cash121.98/gems4 persists after force-stop.
+Three checkout requests yield three GLThread cancellations, zero Billing entry
+and zero purchase-success callbacks. Some Premium products remain visible outside
+the FUNDS section. Preserve normal exchanges/rewards and existing verified tokens,
+acknowledgement and consumption; real-money checkout is not repaired.
+Before clean uninstall/reinstall5556, full345-entry data backup was verified:
+sdk6-reward-day2-save.tar SHA256
+4a0017997f6cc196125d6c6184c01be28e26da5d85a9934ec40a190f79c2e301.
+Fresh age setup and Day1 gameplay accept orders, prepare/bake/cut/box/sell pizzas.
+Three customers accepted completed pizzas; Night1 records revenue32.00, tips1.86,
+refunds0 and profit24.38. Free pepperoni unlock and transition to Day2 pass.
+Force-stop and full reboot preserve Chapter1/Day2/funds64.38/gems10 with identical
+menu regions and no fatal/receiver error markers in full logs.
+MicroG is enabled, font scale1.0 and networking enabled outside isolated tests.
+A transient System UI not-responding popup occurred during debug boot with two
+AVDs active; game subsequently recovered. It is recorded separately from game
+crashes. Repeated user reboot tests ran with the debug AVD closed.
+
+SDK6 plain offline Activity recreation also passes: three Activity creations in
+one process, no fatal/receiver errors. MicroG/font/network restored afterward.
+Release checks pass on these emulators. Keep5.58 experimental for untested ARM64
+physical devices/ARM32 and fresh cloud restoration. Do not infer cloud restore
+from cached menu or ask for credentials outside the app. APKs, full logs, snapshots,
+saves, official SDK downloads and signing keys remain ignored, outside Git.
+Ready for the authorized commit and GitHub release.
+
 ## Latest scope: hide paid offers — 2026-09-28
 
 The user accepted the alternative of hiding broken real-money offers and

@@ -3,9 +3,6 @@ package app.template.patches.pizzabusiness
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.removeInstruction
-import app.morphe.patcher.patch.ApkFileType
-import app.morphe.patcher.patch.AppTarget
-import app.morphe.patcher.patch.Compatibility
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.patch.resourcePatch
 import app.morphe.patcher.util.proxy.mutableTypes.MutableMethod
@@ -29,18 +26,13 @@ private const val GAME = "com.tapblaze.pizzabusiness"
 // SHA-1 of the verified APK signing certificate, not of the APK contents.
 private const val SIGNER = "828d99f1d85e52eb473af06d690f84ee72904330"
 private const val GAME_ACTIVITY = "Lcom/tapblaze/pizzabusiness/BaseAppActivity;"
-private const val GMS_CLIENT = "Lcom/google/android/gms/common/internal/f;"
-private val gamesClients = mapOf(
-    "Lcom/google/android/gms/internal/games_v2/zzp;" to "games.internal.connect.service.START",
-    "Lld/d;" to "games.service.START",
-)
+private val gamesActions = listOf("games.internal.connect.service.START", "games.service.START")
 
 private val pizzaMicroGResources = resourcePatch {
     execute {
         document("AndroidManifest.xml").use { document ->
             val manifest = document.documentElement
-            requirePizza(manifest.getAttribute("package") == GAME &&
-                manifest.getAttribute("android:versionCode") == "2277", "MicroG manifest target changed")
+            PizzaProfiles.forPackage(packageMetadata)
             val application = document.getElementsByTagName("application").item(0) as Element
             val metadata = mapOf(
                 "$MICROG.SPOOFED_PACKAGE_NAME" to GAME,
@@ -76,15 +68,28 @@ val pizzaMicroGSupportPatch = bytecodePatch(
     description = "Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms.",
     default = true,
 ) {
-    compatibleWith(Compatibility(
-        name = "Good Pizza, Great Pizza",
-        packageName = GAME,
-        apkFileType = ApkFileType.APKM,
-        appIconColor = 0xB47454,
-        targets = listOf(AppTarget(version = "5.57.3", versionCode = 2277, isExperimental = false)),
-    ))
+    compatibleWith(PizzaProfiles.compatibility)
     dependsOn(pizzaStartupSupport, pizzaMicroGResources)
     execute {
+        // SDK/R8 class names may change between releases. Service actions and
+        // inherited transport contracts identify the two clients instead.
+        val gamesClients = gamesActions.associate { action ->
+            val candidates = classDefByStrings("com.google.android.gms.$action").filter { cls ->
+                cls.methods.any { it.name == "getStartServiceAction" && it.parameterTypes.isEmpty() &&
+                    it.returnType == STRING && it.hasString("com.google.android.gms.$action") }
+            }
+            requirePizza(candidates.size == 1, "Games service client missing or ambiguous: $action")
+            candidates.single().type to action
+        }
+        fun inheritedOwner(client: String, name: String, returns: String): String {
+            var owner = classDefBy(client).superclass
+            while (owner != null) {
+                val cls = classDefBy(owner)
+                if (cls.methods.any { it.name == name && it.parameterTypes.isEmpty() && it.returnType == returns }) return owner
+                owner = cls.superclass
+            }
+            throw app.morphe.patcher.patch.PatchException("Pizza Games inherited transport method missing: $name")
+        }
         // Authentication still comes from the remote service. These overrides
         // select its transport; none returns an authenticated player or token.
         val overrides = mapOf(
@@ -92,13 +97,14 @@ val pizzaMicroGSupportPatch = bytecodePatch(
             "getUseDynamicLookup" to ("Z" to "const/4 v0, 0x0\nreturn v0"),
             "requiresGooglePlayServices" to ("Z" to "const/4 v0, 0x0\nreturn v0"),
         )
-        overrides.forEach { (name, shape) ->
-            val inherited = pizzaMethod(GMS_CLIENT, name, emptyList(), shape.first, static = false)
-            requirePizza(!AccessFlags.FINAL.isSet(inherited.accessFlags), "$name cannot be overridden")
+        gamesClients.keys.forEach { client ->
+            overrides.forEach { (name, shape) ->
+                val inherited = pizzaMethod(inheritedOwner(client, name, shape.first), name, emptyList(), shape.first, static = false)
+                requirePizza(!AccessFlags.FINAL.isSet(inherited.accessFlags), "$name cannot be overridden")
+            }
         }
         val actions = gamesClients.map { (owner, action) ->
-            requirePizza(classDefBy(owner).superclass == "Lcom/google/android/gms/common/internal/i;" &&
-                classDefBy(owner).methods.none { it.name in overrides }, "Games client inheritance changed")
+            requirePizza(classDefBy(owner).methods.none { it.name in overrides }, "Games client inheritance changed")
             pizzaMethod(owner, "getStartServiceAction", emptyList(), STRING, static = false).also {
                 requirePizza(it.hasString("com.google.android.gms.$action"), "Games service action changed")
             }

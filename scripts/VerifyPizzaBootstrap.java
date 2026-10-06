@@ -39,10 +39,10 @@ public class VerifyPizzaBootstrap {
         rejects(original, fixture(original, expected, 10), "out-of-bounds source range");
         rejects(original, Arrays.copyOf(delta, delta.length / 2), "truncated payload");
         System.out.println("PASS: native reconstruction, immutable source, wrong build/reapply/corrupt/range/truncation rejection");
-        if (args.length == 2) {
+        if (args.length == 3) {
             byte[] input = Files.readAllBytes(Path.of(args[0]));
             byte[] output;
-            try (var resource = PizzaBootstrap.INSTANCE.resource("arm64-init.delta.gz")) {
+            try (var resource = new FileInputStream(args[2])) {
                 output = PizzaBootstrap.INSTANCE.restoreNative(input, resource);
             }
             check(Arrays.equals(output, Files.readAllBytes(Path.of(args[1]))), "Packaged native repair differs from tested runtime reconstruction");

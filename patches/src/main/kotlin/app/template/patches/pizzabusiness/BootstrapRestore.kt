@@ -18,9 +18,6 @@ import java.util.zip.GZIPInputStream
 
 /** Version-specific initialization recovered from two original signed-app runs. */
 internal object PizzaBootstrap {
-    fun resource(name: String): InputStream = javaClass.getResourceAsStream("/pizzabusiness/5.57.3/$name")
-        ?: throw PatchException("Pizza bootstrap resource missing: $name")
-
     fun restoreNative(original: ByteArray, delta: InputStream): ByteArray =
         DataInputStream(GZIPInputStream(delta)).use { input ->
             val digest = MessageDigest.getInstance("SHA-256")
@@ -28,7 +25,7 @@ internal object PizzaBootstrap {
             val expectedInput = ByteArray(32).also(input::readFully)
             val expectedOutput = ByteArray(32).also(input::readFully)
             require(digest.digest(original).contentEquals(expectedInput)) {
-                "Pizza native initialization requires the original 5.57.3 (2277) ARM64 library."
+                "Pizza native initialization does not match this clean ARM64 library; capture a matching bootstrap profile."
             }
             val size = input.readInt()
             require(size in 1..64 * 1024 * 1024) { "Invalid Pizza library size" }
@@ -66,7 +63,8 @@ internal val pizzaNativeBootstrap = rawResourcePatch {
     execute {
         val library = get("lib/arm64-v8a/libcocos2dcpp.so")
         if (!library.isFile) throw PatchException("Pizza startup repair requires the complete ARM64 APKM.")
-        val restored = PizzaBootstrap.resource("arm64-init.delta.gz").use {
+        val profile = PizzaProfiles.forPackage(packageMetadata)
+        val restored = profile.resource("arm64-init.delta.gz").use {
             PizzaBootstrap.restoreNative(library.readBytes(), it)
         }
         library.writeBytes(restored)
@@ -74,7 +72,8 @@ internal val pizzaNativeBootstrap = rawResourcePatch {
 }
 
 internal fun BytecodePatchContext.restorePizzaBootstrap() {
-    val strings = GZIPInputStream(PizzaBootstrap.resource("strings.tsv.gz")).bufferedReader().use { reader ->
+    val profile = PizzaProfiles.forPackage(packageMetadata)
+    val strings = GZIPInputStream(profile.resource("strings.tsv.gz")).bufferedReader().use { reader ->
         reader.readLines().map { it.split('\t') }.groupBy { it[0] }
     }
     strings.forEach { (owner, rows) ->
@@ -88,9 +87,8 @@ internal fun BytecodePatchContext.restorePizzaBootstrap() {
         }
     }
 
-    // These methods retain the exact SDK behavior from Fyber 8.4.6 and Ad Quality
-    // 9.9.0. Empty receiver bodies would silently break SDK initialization.
-    val sdk = PizzaBootstrap.resource("sdk-receivers.dex").use {
+    // Recover matching SDK behavior, including receivers and async provider tasks.
+    val sdk = profile.resource("sdk-receivers.dex").use {
         DexBackedDexFile(Opcodes.getDefault(), ByteBuffer.wrap(it.readBytes()))
     }
     sdk.classes.forEach { restoredClass ->
@@ -98,7 +96,7 @@ internal fun BytecodePatchContext.restorePizzaBootstrap() {
         restoredClass.methods.forEach { replacement ->
             val old = target.methods.single { it.name == replacement.name &&
                 it.parameterTypes == replacement.parameterTypes && it.returnType == replacement.returnType }
-            requirePizza(old.calls("Lcom/pairip/VMRunner;", "invoke"), "SDK receiver changed or already restored")
+            requirePizza(old.calls("Lcom/pairip/VMRunner;", "invoke"), "SDK method changed or already restored")
             target.methods.remove(old)
             target.methods.add(MutableMethod(ImmutableMethod(old.definingClass, old.name, old.parameters,
                 old.returnType, old.accessFlags, old.annotations, old.hiddenApiRestrictions, replacement.implementation)))
