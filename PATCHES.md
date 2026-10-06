@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.33.9** (`main`) - **15 patches** across **8 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.34.0** (`main`) - **15 patches** across **8 apps** - back to [README](README.md)
 
 ---
 
@@ -39,12 +39,12 @@
 
 ## Good Pizza, Great Pizza (com.tapblaze.pizzabusiness)
 
-**Supported versions:** `5.57.3`
+**Supported versions:** `5.57.3` `experimental 5.58.0`
 
 | Patch | Details |
 |---|---|
 | **Google Play Games via MicroG-RE** | Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms. |
-| **Hide paid offers** | Hides real-money storefront sections and cancels Google Play checkout. Keeps in-game currency exchanges and existing purchase processing. Requires ARM64 Pizza 5.57.3. |
+| **Hide paid offers** | Hides real-money storefront sections and cancels Google Play checkout. Keeps in-game currency exchanges and existing purchase processing. Requires a supported ARM64 Pizza build. |
 | **Skip rewarded ads** | Completes the game's rewarded-video flow without playing an ad, keeping the requested placement and normal reward. Includes re-signed startup support. |
 
 ---

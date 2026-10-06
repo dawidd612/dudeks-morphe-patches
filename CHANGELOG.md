@@ -1,3 +1,9 @@
+## [1.34.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.9...v1.34.0) (2026-10-06)
+
+### ✨ New Features
+
+* **pizza:** support 5.58.0 with shared version profiles ([3e26d1f](https://github.com/dawidd612/dudeks-morphe-patches/commit/3e26d1f20eda26ac8bea76e5780ad073d8344bc2))
+
 ## [1.33.9](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.8...v1.33.9) (2026-10-04)
 
 ### 🐛 Bug Fixes
