@@ -37,6 +37,10 @@ val keepDmScrollPositionPatch = bytecodePatch(
         apkFileType = ApkFileType.APKM,
         appIconColor = 0xFC483C,
         targets = listOf(AppTarget(
+            version = "447.0.0.55.81",
+            versionCodes = mapOf(ARM64_V8A to 385311895),
+            isExperimental = true,
+        ), AppTarget(
             version = "439.0.0.37.89",
             versionCodes = mapOf(ARM64_V8A to 384510827),
             isExperimental = true,
@@ -46,12 +50,18 @@ val keepDmScrollPositionPatch = bytecodePatch(
     extendWith("extensions/instagram.mpe")
 
     execute {
-        val completed = DirectSendCompletedFingerprint.method
-        val callback = DirectTextSendFingerprint.method.calls().filter {
+        val senderCallbacks = DirectTextSendFingerprint.method.calls().filter {
+            it.returnType == "V" && it.parameterTypes.size == 4 && it.parameterTypes.last() == "I"
+        }
+        val completedFingerprint = DirectSendCompletedFingerprint(senderCallbacks)
+        checkShape(completedFingerprint.matchAll().size == 1,
+            "expected exactly one send-completed callback with a delayed scroll")
+        val completed = completedFingerprint.method
+        val callback = senderCallbacks.filter {
             it.name == completed.name && it.returnType == "V" &&
                 it.parameterTypes == completed.parameterTypes
         }.distinctBy { it.toString() }.single()
-        checkShape(callback.definingClass in DirectSendCompletedFingerprint.classDef.interfaces,
+        checkShape(callback.definingClass in completedFingerprint.classDef.interfaces,
             "the send-completed method no longer implements the sender's callback")
 
         val postIndex = completed.instructions.indexOfFirst {
