@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.34.0** (`main`) - **15 patches** across **8 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.34.1** (`main`) - **15 patches** across **8 apps** - back to [README](README.md)
 
 ---
 
@@ -62,7 +62,7 @@
 
 ## Instagram (com.instagram.android)
 
-**Supported versions:** `experimental 439.0.0.37.89`
+**Supported versions:** `experimental 447.0.0.55.81` `experimental 439.0.0.37.89`
 
 | Patch | Details |
 |---|---|

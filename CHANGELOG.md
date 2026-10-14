@@ -1,3 +1,9 @@
+## [1.34.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.34.0...v1.34.1) (2026-10-14)
+
+### 🐛 Bug Fixes
+
+* **instagram:** support DM scroll guard on 447.0.0.55.81 ([51ee032](https://github.com/dawidd612/dudeks-morphe-patches/commit/51ee03200f93b4005ec387a8acc1c3a92d0d5647))
+
 ## [1.34.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.33.9...v1.34.0) (2026-10-06)
 
 ### ✨ New Features
