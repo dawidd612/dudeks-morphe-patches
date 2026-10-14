@@ -14,13 +14,18 @@ internal object DirectTextSendFingerprint : Fingerprint(
     returnType = "Z",
 )
 
-// Structural checks in the patch additionally verify the callback interface from
-// DirectTextSendFingerprint, its reply argument and the delayed scroll runnable.
-internal object DirectSendCompletedFingerprint : Fingerprint(
-    strings = listOf("ig_direct", "wa_business_number_share_business_share", "page_id", "target_user_primary_name"),
+// Business-share logging strings disappeared from this callback in Instagram 447.
+// Follow the sender's callback contract instead; do not match arbitrary delayed work.
+internal class DirectSendCompletedFingerprint(callbacks: List<MethodReference>) : Fingerprint(
     returnType = "V",
-    custom = { method, _ ->
-        method.parameterTypes.size == 4 && method.parameterTypes.last() == "I" &&
+    custom = { method, classDef ->
+        method.parameterTypes.size == 4 && method.parameterTypes.last().toString() == "I" &&
+            callbacks.any {
+                it.definingClass in classDef.interfaces && it.name == method.name &&
+                    it.returnType == method.returnType &&
+                    it.parameterTypes.map { type -> type.toString() } ==
+                        method.parameterTypes.map { type -> type.toString() }
+            } &&
             method.calls().any {
                 it.definingClass == "Landroid/view/View;" && it.name == "postDelayed" &&
                     it.parameterTypes == listOf("Ljava/lang/Runnable;", "J")

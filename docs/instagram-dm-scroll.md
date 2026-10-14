@@ -94,8 +94,11 @@ an explicitly saved false preference remains false.
 
 - `DirectTextSendFingerprint`: the `DirectThreadFragment.sendTextMessage` and
   `DirectSendHelperImpl.sendSideChatContextualQuery` strings, with boolean return type.
-- `DirectSendCompletedFingerprint`: four strings in the send-completed callback,
+- `DirectSendCompletedFingerprint`: a callback contract obtained from the text sender,
   four parameters ending in an integer, and a `View.postDelayed(Runnable, long)` call.
+  Its declaring class must implement the sender's callback interface with the same
+  method name, return type and parameter types. Exactly one match is required.
+  Business-share logging strings are not required: Instagram 447 removed them.
 - Additional checks connect this callback to the sender's interface; resolve the
   runnable's controller constructor parameter; verify its resumed-fragment check;
   identify the immediate/smooth RecyclerView scroll paths; and resolve the
@@ -137,6 +140,28 @@ dataset updates. They are not modified. The normal update path in `X/04Wv.A00`
 already captures the at-latest predicate before updating the dataset.
 
 ## Phone test
+
+### Instagram 447 compatibility update
+
+The uploaded APKMirror variant is Instagram `447.0.0.55.81`, ARM64, version code
+`385311895`, APKM (480 dpi). It is added alongside the existing 439 target and stays
+experimental until physical-device confirmation. The runtime hook and preference
+are unchanged; the fix replaces only the callback identification.
+
+In this input the sender is `X/5y9.A07`, invoking `X/GuM.ARG` with the reply item as
+the third argument. `X/5Zd.ARG` implements that callback and posts `X/JDN` at original
+byte offset `0x0062`. `X/5Zb.A01(boolean)` and `X/5Zb.A02()` are the same scroll and
+at-latest roles as before. These names are audit evidence, not matching criteria.
+
+`scripts/VerifyInstagramDmFingerprints.java` exercises the production predicate with
+log-free callback fixtures and rejects unrelated interfaces, callback methods,
+reply types and callbacks without delayed work. An optional clean base-APK argument
+checks uniqueness of the production predicate against actual DEX classes.
+
+Local validation uses the unchanged v1.34.0 extension/resources with the updated
+Instagram patch classes, Morphe Desktop `1.17.0`, and Piko `3.10.0` **Add settings**.
+Full release bundle compilation is separately checked by GitHub Actions. This is
+patching/DEX validation, not a physical-device scroll/rendering test.
 
 ### Verification history
 
