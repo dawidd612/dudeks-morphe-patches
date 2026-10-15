@@ -1,3 +1,9 @@
+## [1.35.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.35.0...v1.35.1) (2026-10-15)
+
+### 🐛 Bug Fixes
+
+* **pizza:** mark 1000 PNN sponsor rewards as non-experimental ([90d6d29](https://github.com/dawidd612/dudeks-morphe-patches/commit/90d6d294ef602a45db425a28d6848d1dafc7cbe8))
+
 ## [1.35.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.34.1...v1.35.0) (2026-10-15)
 
 ### ✨ New Features
