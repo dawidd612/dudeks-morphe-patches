@@ -1,20 +1,29 @@
 package app.template.patches.pizzabusiness
 
 import app.morphe.patcher.patch.ApkFileType
+import app.morphe.patcher.patch.AppTarget
 import app.morphe.patcher.patch.Compatibility
+import app.morphe.patcher.patch.SupportedAbi
 import app.morphe.patcher.patch.rawResourcePatch
 import java.util.Base64
 
 @Suppress("unused")
 val pizzaPnnRewardsPatch = rawResourcePatch(
     name = "1000 PNN sponsor rewards",
-    description = "Zwieksza sekwencje reklam sponsora na poczatku dnia z 2 do 1000. Zachowuje zwykle nagrody i mozliwosc pominiecia. Wspolpracuje ze Skip rewarded ads. Pizza 5.58.0 ARM64; eksperymentalne.",
+    description = "Zwieksza sekwencje reklam sponsora na poczatku dnia z 2 do 1000. Zachowuje zwykle nagrody i mozliwosc pominiecia. Wspolpracuje ze Skip rewarded ads. Pizza 5.58.0 ARM64.",
     default = true,
 ) {
     compatibleWith(Compatibility(
         name = "Good Pizza, Great Pizza", packageName = "com.tapblaze.pizzabusiness",
         apkFileType = ApkFileType.APKM, appIconColor = 0xB47454,
-        targets = PizzaProfiles.profiles.filter { it.version == "5.58.0" }.map { it.target },
+        targets = PizzaProfiles.profiles.filter { it.version == "5.58.0" }.map { profile ->
+            AppTarget(
+                version = profile.version,
+                versionCodes = mapOf(SupportedAbi.ARM64_V8A to profile.versionCode.toInt()),
+                isExperimental = false,
+                description = "Requires complete ARM64 APKM/XAPK initialization resources.",
+            )
+        },
     ))
     dependsOn(pizzaStartupSupport)
     // Run after the optional funds-store delta has consumed its exact input hash.
