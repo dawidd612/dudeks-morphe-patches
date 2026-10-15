@@ -1,3 +1,9 @@
+## [1.35.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.34.1...v1.35.0) (2026-10-15)
+
+### ✨ New Features
+
+* **pizza:** add 1000 PNN sponsor rewards for 5.58.0 ARM64 ([33edfb7](https://github.com/dawidd612/dudeks-morphe-patches/commit/33edfb7fe3461baea0a44727a4f20f88eef1703f)), closes [#35](https://github.com/dawidd612/dudeks-morphe-patches/issues/35)
+
 ## [1.34.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.34.0...v1.34.1) (2026-10-14)
 
 ### 🐛 Bug Fixes
