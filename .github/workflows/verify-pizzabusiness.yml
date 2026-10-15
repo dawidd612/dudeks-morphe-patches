@@ -9,6 +9,10 @@ on:
       - 'scripts/VerifyPizzaIntegrationDex.java'
       - 'scripts/verify_pizza_assets.py'
       - 'scripts/test_pizza_assets.py'
+      - 'native/pizzabusiness/**'
+      - 'scripts/build_pizza_pnn_payload.py'
+      - 'scripts/test_pizza_pnn_arm64.py'
+      - 'scripts/VerifyPizzaPnnNative.java'
       - 'scripts/VerifyPizzaBootstrap.java'
       - 'scripts/VerifyPizzaProfiles.java'
       - 'scripts/InspectPizzaUpdate.java'
@@ -40,12 +44,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew :patches:buildAndroid :patches:generatePatchesList --no-daemon
+      - name: Execute PNN counter and selector on ARM64
+        run: |
+          python3 -m pip install keystone-engine==0.9.2 unicorn==2.1.4
+          python3 scripts/build_pizza_pnn_payload.py
+          python3 scripts/test_pizza_pnn_arm64.py
       - name: Compile emitted-APK verification tools
         run: |
           curl -fL --retry 2 https://github.com/MorpheApp/morphe-desktop/releases/download/v1.17.0/morphe-desktop-1.17.0-all.jar -o "$RUNNER_TEMP/morphe-cli.jar"
           echo "8cf6a9eab4ee9dab146bddc24681897851564f53116baec11f36ba2fa2f589be  $RUNNER_TEMP/morphe-cli.jar" | sha256sum -c -
           javac -cp "$RUNNER_TEMP/morphe-cli.jar" -d "$RUNNER_TEMP/pizza-verifiers" scripts/VerifyPizzaRewardDex.java scripts/VerifyPizzaIntegrationDex.java
           javac -cp "patches/build/classes/kotlin/main:$RUNNER_TEMP/morphe-cli.jar" -d "$RUNNER_TEMP/pizza-verifiers" scripts/VerifyPizzaBootstrap.java scripts/VerifyPizzaProfiles.java
+          javac -cp "patches/build/classes/kotlin/main:$RUNNER_TEMP/morphe-cli.jar" -d "$RUNNER_TEMP/pizza-verifiers" scripts/VerifyPizzaPnnNative.java
           java -cp "$RUNNER_TEMP/pizza-verifiers:patches/build/classes/kotlin/main:patches/build/resources/main:$RUNNER_TEMP/morphe-cli.jar" VerifyPizzaBootstrap
           java -cp "$RUNNER_TEMP/pizza-verifiers:patches/build/classes/kotlin/main:patches/build/resources/main:$RUNNER_TEMP/morphe-cli.jar" VerifyPizzaProfiles
           javac -cp "$RUNNER_TEMP/morphe-cli.jar" -d "$RUNNER_TEMP/pizza-verifiers" scripts/InspectPizzaUpdate.java scripts/ExtractPizzaSdkReceivers.java

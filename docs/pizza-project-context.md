@@ -2,6 +2,53 @@
 
 Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
+## PNN 1000 candidate - 2026-10-16
+
+User requested raising the start-of-day sponsor sequence from two to 1000,
+using the same 5.58.0 input. Work is on `feat/pizza-day-start-1000`.
+See `pizza-pnn-1000.md` for the reviewed native mechanism, compatibility
+and verification. This is a separate default-selected patch. It repeats
+PNN 999 times and then uses the original PNN2 final offer; it does not
+change the Java reward gateway or reward amount. Its counter is per layer,
+not the saved TODAY_PNN_WATCHED statistic. A clean input was retrieved and
+its SHA256 matches the previously verified 5.58.0 archive.
+
+Environment: Linux cloud workspace, Java17 runtime, no Android SDK/ADB or
+connected test device. Repository codebase-memory tooling/skill is not
+available; targeted source/ELF analysis was used. Local Gradle reaches the
+distribution but cannot resolve the authenticated Morphe plugin; complete
+bundle compilation must use the existing GitHub Actions workflow. Actual
+Kotlin native transform and shipped ARM64 code can be tested independently.
+No existing Android installation, save or signing key was changed. Do not
+claim full runtime success from native instruction tests or CI. Keep this
+candidate unreleased until the AGENTS.md runtime matrix passes.
+
+Local candidate verification completed: the new classes compile against the
+published Morphe desktop 1.17.0 API using Kotlin2.4.0. Published v1.34.1 MPP
+SHA256 f029073fdd6c170cf8a1e8500b41cf4bc61d010d15359ef62579ef395cca2ae6
+supplies the unchanged existing classes/resources. New classes are added;
+all patch classes are converted together with D8 8.3.37 (min API26).
+The MPP is labelled `1.34.1-pnn1000-test`, not an official release. Morphe
+loads it and patches the complete clean 67-split XAPK with all four Pizza
+patches. The resulting native library is byte-identical to the independent
+production Kotlin transform. Actual emitted DEX checks pass five reward
+placements,3412 unchanged authentication/SDK methods,6 exact SDK restorations
+and2165 unchanged billing methods. All36 unique native libraries and6653
+assets pass the all-split verifier;13 asset regression tests pass. Both
+bootstrap-only and funds-store native variants pass the production Java/Kotlin
+transform and actual ARM64 ELF instruction tests. Only seven reviewed native
+instructions and ELF header metadata change before the appended payload.
+
+Input/output/library hashes, local patching JSON and failure logs are retained
+under ignored artifacts/day-start-limit. No ADB runtime test was possible.
+An attempted second CLI run using its purged temporary merged APK did not run;
+do not count it as separate optional-selection coverage. The two native
+variants, plus the full four-patch clean-XAPK run, are the actual coverage.
+Automatic approval review rejected the attempted GitHub push as external
+publication not explicitly authorized by the current prepare-only request.
+No remote branch/PR/release was created. Ask for explicit push authorization
+before retrying; do not bypass the rejection through another connector.
+
 ## Pizza 5.58.0 update — runtime verification, 2026-10-06
 
 User requested 5.58.0 and easier future updates using origin/main 053d72f.
