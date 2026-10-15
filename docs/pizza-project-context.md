@@ -2,6 +2,23 @@
 
 Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
+## Published PNN 1000 - 2026-10-16
+
+The user explicitly authorized merging PR #35 to main and publishing the release,
+and reports that everything works. This supersedes the prepare-only publication
+hold in the candidate notes below. PR #35 merged as33edfb7; all three PR CI
+workflows passed. Release workflow38825065982 completed successfully.
+Published v1.35.0 includes the default-selected `1000 PNN sponsor rewards`
+patch for5.58.0 (2301) ARM64. The release MPP was downloaded, its ZIP integrity
+and SHA256SUMS verified, and its PNN payload matched the reviewed resource.
+MPP SHA256: a4531bdbc1b61d6116931ac2a567d3139f4c976d5db14ddb2858d9f019fa81d7.
+Release patches-list.json and patches-bundle.json both advertise1.35.0 and
+the correct download URL. No independent Android runtime matrix was executed
+in this cloud session; distinguish the user's confirmation from local evidence.
+No APK, save, raw logs, account data or signing key was published.
+
+Release: https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.35.0
+
 ## PNN 1000 candidate - 2026-10-16
 
 User requested raising the start-of-day sponsor sequence from two to 1000,
