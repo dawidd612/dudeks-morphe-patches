@@ -9,6 +9,7 @@ import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.TwoRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.reference.FieldReference
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 /** MicroG mode: stock GMS update UI cannot update the selected Games service. */
 internal fun BytecodePatchContext.suppressPizzaPlayServicesUpdatePrompts() {
@@ -16,16 +17,23 @@ internal fun BytecodePatchContext.suppressPizzaPlayServicesUpdatePrompts() {
     val result = "Lcom/google/android/gms/common/ConnectionResult;"
     val listener = "Landroid/content/DialogInterface\$OnCancelListener;"
     val activity = "Lcom/google/android/gms/common/api/GoogleApiActivity;"
-    val notify = pizzaMethod(owner, "g", listOf("Landroid/content/Context;", result), "V", static = false)
-    val direct = pizzaMethod(owner, "d", listOf(activity, "I", activity), "V", static = false)
-    val lifecycle = pizzaMethod(owner, "f", listOf("Landroid/app/Activity;",
-        "Lcom/google/android/gms/common/api/internal/l;", "I", listener), "V", static = false)
+    // Match transport/UI contracts, not R8 method names or lifecycle-interface names.
+    fun discover(parameters: (List<String>) -> Boolean) = classDefBy(owner).methods.filter {
+        it.returnType == "V" && parameters(it.parameterTypes.map(CharSequence::toString))
+    }.let { matches ->
+        requirePizza(matches.size == 1, "Play services UI role missing or ambiguous")
+        val method = matches.single()
+        pizzaMethod(owner, method.name, method.parameterTypes.map(CharSequence::toString), "V", static = false)
+    }
+    val notify = discover { it == listOf("Landroid/content/Context;", result) }
+    val direct = discover { it == listOf(activity, "I", activity) }
+    val lifecycle = discover { it.size == 4 && it[0] == "Landroid/app/Activity;" && it[2] == "I" && it[3] == listener }
     val original = notify.instructions.toList()
     val loadIndex = original.indexOfFirst {
         val field = (it as? ReferenceInstruction)?.reference as? FieldReference
         it.opcode == Opcode.IGET && field?.definingClass == result && field.type == "I"
     }
-    requirePizza(loadIndex == 3 && notify.hasString("GMS core API Availability. ConnectionResult=") &&
+    requirePizza(loadIndex in 0..16 && notify.hasString("GMS core API Availability. ConnectionResult=") &&
         notify.calls("Landroid/app/NotificationManager;", "notify") &&
         notify.calls("Landroid/os/Handler;", "sendEmptyMessageDelayed"), "Play services notification flow changed")
     val errorRegister = (original[loadIndex] as TwoRegisterInstruction).registerA
@@ -34,8 +42,11 @@ internal fun BytecodePatchContext.suppressPizzaPlayServicesUpdatePrompts() {
     requirePizza(firstBody.opcode == Opcode.CONST_STRING && errorRegister != scratch &&
         errorRegister in 0..15 && scratch in 0..15, "Play services notification scratch register changed")
     listOf(direct, lifecycle).forEach { method ->
-        requirePizza(method.hasString("GooglePlayServicesErrorDialog") && method.calls(owner, "e") &&
-            method.calls(owner, "i") && method.instructions.first().opcode == Opcode.CONST_STRING &&
+        val calls = method.instructions.mapNotNull { (it as? ReferenceInstruction)?.reference as? MethodReference }
+        requirePizza(method.hasString("GooglePlayServicesErrorDialog") &&
+            calls.any { it.definingClass == owner && it.returnType == "Landroid/app/AlertDialog;" } &&
+            calls.any { it.definingClass == owner && it.returnType == "V" && "Landroid/app/AlertDialog;" in it.parameterTypes } &&
+            method.instructions.first().opcode == Opcode.CONST_STRING &&
             (method.instructions.first() as OneRegisterInstruction).registerA == 0 &&
             method.implementation!!.tryBlocks.isEmpty(), "Play services dialog flow changed")
     }

@@ -2,6 +2,7 @@ import java.util.*;
 import com.android.tools.smali.dexlib2.*;
 import com.android.tools.smali.dexlib2.iface.*;
 import com.android.tools.smali.dexlib2.iface.instruction.*;
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference;
 
 /** Execute the emitted update-UI guards, preserving original errors/authentication. */
 public final class VerifyPizzaPlayServicesDex extends VerifyPizzaRewardDex {
@@ -41,7 +42,7 @@ public final class VerifyPizzaPlayServicesDex extends VerifyPizzaRewardDex {
     static int executeGuard(Method method, int error, boolean withListener, int start, int boundary) {
         var c=code(method);var indices=offsets(c);var values=new Object[method.getImplementation().getRegisterCount()];
         Arrays.fill(values,UNSET);
-        if(start==4) values[((TwoRegisterInstruction)c.get(3)).getRegisterA()]=error;
+        if(start>0) values[((TwoRegisterInstruction)c.get(start-1)).getRegisterA()]=error;
         else {values[values.length-2]=error;values[values.length-1]=withListener?LISTENER:null;}
         int pc=0;for(int n=0;n<start;n++)pc+=c.get(n).getCodeUnits();
         int cancels=0;
@@ -69,22 +70,34 @@ public final class VerifyPizzaPlayServicesDex extends VerifyPizzaRewardDex {
     }
 
     static Set<String> verify(Map<String,ClassDef> patched,Map<String,ClassDef> original,boolean microg) {
-        var signatures=List.of(
-            new String[]{"g","Landroid/content/Context;",RESULT},
-            new String[]{"d","Lcom/google/android/gms/common/api/GoogleApiActivity;","I","Lcom/google/android/gms/common/api/GoogleApiActivity;"},
-            new String[]{"f","Landroid/app/Activity;","Lcom/google/android/gms/common/api/internal/l;","I","Landroid/content/DialogInterface$OnCancelListener;"});
+        var roles=new ArrayList<Method>();
+        for(var m:original.get(OWNER).getMethods()) {
+            var p=m.getParameterTypes();
+            if(m.getReturnType().equals("V") && (
+                p.equals(List.of("Landroid/content/Context;",RESULT)) ||
+                p.equals(List.of("Lcom/google/android/gms/common/api/GoogleApiActivity;","I","Lcom/google/android/gms/common/api/GoogleApiActivity;")) ||
+                (p.size()==4 && p.get(0).equals("Landroid/app/Activity;") && p.get(2).equals("I") && p.get(3).equals("Landroid/content/DialogInterface$OnCancelListener;"))))roles.add(m);
+        }
+        check(roles.size()==3,"Missing or ambiguous availability UI roles");
         Set<String> changed=new HashSet<>();
-        for(var signature:signatures) {
-            String[] parameters=Arrays.copyOfRange(signature,1,signature.length);
-            var before=method(original,OWNER,signature[0],"V",parameters);
-            var after=method(patched,OWNER,signature[0],"V",parameters);
+        for(var before:roles) {
+            var after=method(patched,OWNER,before.getName(),"V",before.getParameterTypes().stream().map(Object::toString).toArray(String[]::new));
             if(!microg) {check(canonical(before).equals(canonical(after)), "Stock-only mode changed GMS UI");continue;}
-            boolean notification=signature[0].equals("g");int start=notification?4:0;int added=notification?5:8;
+            boolean notification=before.getParameterTypes().equals(List.of("Landroid/content/Context;",RESULT));
+            int start=0;int added=notification?5:8;
+            if(notification) {
+                var originalCode=code(before);
+                for(int n=0;n<originalCode.size();n++) {
+                    var i=originalCode.get(n);
+                    if(i.getOpcode()==Opcode.IGET && i instanceof ReferenceInstruction r && r.getReference() instanceof FieldReference f && f.getDefiningClass().equals(RESULT) && f.getType().equals("I")) {start=n+1;break;}
+                }
+                check(start>0,"Missing notification error-code load");
+            }
             originalBody(before,after,start,added);changed.add(key(after));
             for(int error=-1;error<=24;error++)for(boolean listener:List.of(false,true)) {
                 int actual=executeGuard(after,error,listener,start,start+added);
                 int expected=error==2||error==18 ? (!notification&&listener?1:0) : -1;
-                check(actual==expected,"Wrong update/auth error handling: "+signature[0]+" error="+error);
+                check(actual==expected,"Wrong update/auth error handling: "+before.getName()+" error="+error);
             }
             for(int repeat=0;repeat<50;repeat++)check(executeGuard(after,2,true,start,start+added)==(notification?0:1),"Repeated updates reached UI");
         }
