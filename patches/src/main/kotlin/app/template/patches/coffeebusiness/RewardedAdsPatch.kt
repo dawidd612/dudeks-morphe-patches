@@ -20,11 +20,7 @@ val coffeeRewardedAdsPatch = bytecodePatch(
     description = "Completes the requested rewarded-video flow locally using the game's callbacks.",
     default = true,
 ) {
-    compatibleWith(Compatibility(
-        name = "Good Coffee, Great Coffee", packageName = "com.tapblaze.coffeebusiness",
-        apkFileType = ApkFileType.APKM, appIconColor = 0x98704C,
-        targets = listOf(AppTarget(version = "1.24.0", versionCode = 1397, isExperimental = false)),
-    ))
+    compatibleWith(CoffeeProfiles.compatibility)
     dependsOn(coffeeStartupSupport)
     execute {
         val constructor = coffeeMethod(REWARD, "<init>", listOf(STRING,

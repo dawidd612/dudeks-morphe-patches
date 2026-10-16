@@ -24,7 +24,7 @@ import com.android.tools.smali.dexlib2.iface.reference.StringReference
 internal const val STRING = "Ljava/lang/String;"
 
 internal fun checkCoffee(value: Boolean, message: String) {
-    if (!value) throw PatchException("Coffee: $message. Use clean Good Coffee, Great Coffee 1.24.0 (1397).")
+    if (!value) throw PatchException("Coffee: $message. Use a clean supported Good Coffee, Great Coffee APKM.")
 }
 
 internal fun Method.calls(owner: String, name: String): Boolean =

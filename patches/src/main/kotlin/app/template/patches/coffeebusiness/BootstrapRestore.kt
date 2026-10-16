@@ -18,9 +18,6 @@ import java.util.zip.GZIPInputStream
 
 /** Version-specific initialization recovered from two original signed-app runs. */
 internal object CoffeeBootstrap {
-    fun resource(name: String): InputStream = javaClass.getResourceAsStream("/coffeebusiness/1.24.0/$name")
-        ?: throw PatchException("Coffee bootstrap resource missing: $name")
-
     fun restoreNative(original: ByteArray, delta: InputStream): ByteArray =
         DataInputStream(GZIPInputStream(delta)).use { input ->
             val digest = MessageDigest.getInstance("SHA-256")
@@ -28,7 +25,7 @@ internal object CoffeeBootstrap {
             val expectedInput = ByteArray(32).also(input::readFully)
             val expectedOutput = ByteArray(32).also(input::readFully)
             require(digest.digest(original).contentEquals(expectedInput)) {
-                "Coffee native initialization requires the original 1.24.0 (1397) ARM64 library."
+                "Coffee native initialization requires a matching clean ARM64 library."
             }
             val size = input.readInt()
             require(size in 1..128 * 1024 * 1024) { "Invalid Coffee library size" }
@@ -64,17 +61,18 @@ internal object CoffeeBootstrap {
 
 internal val coffeeNativeBootstrap = rawResourcePatch {
     execute {
+        val profile = CoffeeProfiles.forPackage(packageMetadata)
         listOf("assets/bin/Data/datapack.unity3d", "assets/bin/Data/data.unity3d", "assets/aa/settings.json").forEach {
             if (!get(it).isFile) throw PatchException("Coffee requires all Unity asset-pack splits: $it")
         }
         get("assets/morphe/coffee-asset-packs.tsv.gz").apply {
             parentFile.mkdirs()
-            writeBytes(CoffeeBootstrap.resource("asset-packs.tsv.gz").use { it.readBytes() })
+            writeBytes(profile.resource("asset-packs.tsv.gz").use { it.readBytes() })
         }
         listOf("libunity.so", "libil2cpp.so").forEach { name ->
             val library = get("lib/arm64-v8a/$name")
             if (!library.isFile) throw PatchException("Coffee startup requires the complete ARM64 APKM.")
-            library.writeBytes(CoffeeBootstrap.resource("$name.delta.gz").use {
+            library.writeBytes(profile.resource("$name.delta.gz").use {
                 CoffeeBootstrap.restoreNative(library.readBytes(), it)
             })
         }
@@ -82,11 +80,12 @@ internal val coffeeNativeBootstrap = rawResourcePatch {
 }
 
 internal fun BytecodePatchContext.restoreCoffeeBootstrap() {
+    val profile = CoffeeProfiles.forPackage(packageMetadata)
     // Restore stock Fyber 8.4.6, Ad Quality 9.9.0 and Singular 12.6.1 callbacks.
     // Restore their SDK behavior, including initialization, instead of no-oping them.
     checkCoffee(coffeeMethod("Lcom/singular/sdk/internal/Constants;", "<clinit>", emptyList(), "V")
         .hasString("Singular/v12.6.1"), "Singular SDK version changed")
-    val sdk = CoffeeBootstrap.resource("sdk-receivers.dex").use {
+    val sdk = profile.resource("sdk-receivers.dex").use {
         DexBackedDexFile(Opcodes.getDefault(), ByteBuffer.wrap(it.readBytes()))
     }
     sdk.classes.forEach { cls ->
@@ -100,7 +99,7 @@ internal fun BytecodePatchContext.restoreCoffeeBootstrap() {
                 old.returnType, old.accessFlags, old.annotations, old.hiddenApiRestrictions, replacement.implementation)))
         }
     }
-    val strings = GZIPInputStream(CoffeeBootstrap.resource("strings.tsv.gz")).bufferedReader().use {
+    val strings = GZIPInputStream(profile.resource("strings.tsv.gz")).bufferedReader().use {
         it.readLines().map { row -> row.split('\t') }.groupBy { row -> row[0] }
     }
     strings.forEach { (owner, rows) ->
@@ -115,7 +114,7 @@ internal fun BytecodePatchContext.restoreCoffeeBootstrap() {
     }
     // Static recovered wrappers take their receiver as the first parameter.
     // Their register layout is identical to the original instance method.
-    val dex = CoffeeBootstrap.resource("startup-methods.dex").use {
+    val dex = profile.resource("startup-methods.dex").use {
         DexBackedDexFile(Opcodes.getDefault(), ByteBuffer.wrap(it.readBytes()))
     }
     dex.classes.forEach { cls ->

@@ -1,7 +1,8 @@
 # Good Coffee, Great Coffee - patch context
 
-Target: `com.tapblaze.coffeebusiness` **1.24.0 (1397)**, complete APKM, ARM64.
-Status: stable for the supported version. Gameplay and a requested rewarded action were exercised on
+Targets: `com.tapblaze.coffeebusiness` **1.24.0 (1397)** and **1.25.1 (1454)**,
+complete APKM, ARM64. The new 1.25.1 profile is experimental pending broader device testing.
+Status: gameplay and a requested rewarded action were exercised on
 Android; Google sign-in, cloud restore and paid checkout are not verified.
 
 ## Implementation
@@ -247,3 +248,55 @@ The remaining diagnostic blocker is the exact failing Samsung source/cache:
 the user cannot attach the phone now. Do not claim a ZIP fix from another patch
 bundle release. Keep the original format available and the premerged APK merely
 as a workaround. Real TapBlaze authentication still requires user credentials.
+
+## Coffee 1.25.1 update — 2026-10-16
+
+Input: user-supplied 1.25.1 /1454,439959161 bytes, SHA256
+`7172bcfad15a35bef16f93f2da91f13675c1f22a790d969a3fbceaf1e6c081d3`.
+See `coffee-1251-provenance.json` and `coffee-update-workflow.md`. Native libraries
+changed despite unchanged Unity6000.3.10f1. Two independent publisher-signed
+starts recovered1472 constants, six startup wrappers and both native
+initializations with200 imports each and zero unresolved pointers. Ad Quality
+9.10.0 replaces9.9.0; the old callback has missing references in the new game.
+Five SDK receiver restorations pass reference validation against the actual new
+DEX. Singular remains12.6.1. Embedded Firebase DEX is byte-identical to the old
+resource. Both native reconstructions and all seven resources replay byte-for-byte.
+
+Profiles own both version/code pairs, startup programs and Games R8 bindings.
+1.24.0 is retained;1.25.1 stays experimental pending broader device testing.
+Asset extraction now uses a manifest-content-addressed helper directory, so
+updates cannot mix stale files from another pack version. No save is moved.
+
+Private evidence: `artifacts/coffee-20261016/`. The candidate bundle was locally
+versioned1.34.1 before discovering remote main had advanced; publication must
+use the current upstream base/version. Game APK SHA256:
+`a2185d4a3ae9275c11109d47de80b79ffa62315259540a6d53ba5e495c56c4ad`.
+Both defaults, FULL rebuild and signing pass from the unchanged APKM.
+`apksigner verify` passes; asset audit passes16 splits /46 libraries /2542 assets.
+The new bundle also patches clean1.24.0 with both defaults successfully.
+
+All game starts used hidden/windowless AVDs with `-no-audio`, audio input/output
+disabled and media volume verified0. New disposable `Morphe_Coffee_Update_API35`
+(5562) reached actual Day1 Maisie gameplay, then the menu after force-stop.
+The isolated reward callback contract passed one loaded/displayed/rewarded/closed
+sequence on main, duplicate suppression and reload. Network transitions and
+Home/resume were exercised. Reboot loading was long, with black intermediate
+screens; do not call these a clean reboot pass. MicroG7.1.1 was then installed
+on5562 and a force-stop restart reached the menu. No real account was supplied.
+A second full reboot is being observed with MicroG already installed.
+
+On existing test5556, private files/preferences were backed up to
+`coffee-before1251.tar` (983552 bytes); external files to `pre1251-external/`.
+A same-key1.24.0 ->1.25.1 update reached Day2 and preserved cash139.04/crystals2.
+The actual CNS Watch button granted one requested reward without video:2 ->3.
+`reward-settled.png` and `day2-balances.png` show crystals3 and actual Day2 Carl
+gameplay with cash139.04. Loading/entering the day were slow but completed.
+Signing keys and the user's other AVDs were preserved.
+
+Preparation timing: cold3.006s, verified repeat0.891s (3.37x for this phase).
+No measured3x whole-port claim. Cache recovery/incomplete-input tests pass,
+as do six archive tests, thirteen asset-verifier tests and positive/negative
+packaged profile checks. `um publish check` on the MPP/LICENSE/README distribution
+passed3 files,0 failures,0 warnings. Real authentication/cloud restoration,
+physical ARM64/API36 runtime, long-term stability and paid checkout remain
+unverified. No charge was attempted.

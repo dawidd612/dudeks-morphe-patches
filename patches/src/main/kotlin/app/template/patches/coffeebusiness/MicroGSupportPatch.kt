@@ -30,17 +30,13 @@ private const val GAME = "com.tapblaze.coffeebusiness"
 private const val SIGNER = "aa6e781863cdfb8d32b8f7b368534ace25a0ae7e"
 private const val GAME_ACTIVITY = "Lcom/tapblaze/coffeebusiness/MyUnityActivity;"
 private const val GMS_CLIENT = "Lyt;"
-private val gamesClients = mapOf(
-    "Log6;" to "games.internal.connect.service.START",
-    "Lyg5;" to "games.service.START",
-)
 
 private val coffeeMicroGResources = resourcePatch {
     execute {
         document("AndroidManifest.xml").use { document ->
             val manifest = document.documentElement
             checkCoffee(manifest.getAttribute("package") == GAME &&
-                manifest.getAttribute("android:versionCode") == "1397", "MicroG manifest target changed")
+                manifest.getAttribute("android:versionCode") == CoffeeProfiles.forPackage(packageMetadata).versionCode, "MicroG manifest target changed")
             val application = document.getElementsByTagName("application").item(0) as Element
             val metadata = mapOf(
                 "$MICROG.SPOOFED_PACKAGE_NAME" to GAME,
@@ -76,15 +72,12 @@ val coffeeMicroGSupportPatch = bytecodePatch(
     description = "Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms.",
     default = true,
 ) {
-    compatibleWith(Compatibility(
-        name = "Good Coffee, Great Coffee",
-        packageName = GAME,
-        apkFileType = ApkFileType.APKM,
-        appIconColor = 0x98704C,
-        targets = listOf(AppTarget(version = "1.24.0", versionCode = 1397, isExperimental = false)),
-    ))
+    compatibleWith(CoffeeProfiles.compatibility)
     dependsOn(coffeeStartupSupport, coffeeMicroGResources)
     execute {
+        val profile = CoffeeProfiles.forPackage(packageMetadata)
+        val gamesClients = mapOf(profile.gamesConnect to "games.internal.connect.service.START",
+            profile.gamesService to "games.service.START")
         // Authentication still comes from the remote service. These overrides
         // select its transport; none returns an authenticated player or token.
         val overrides = mapOf(
@@ -97,7 +90,7 @@ val coffeeMicroGSupportPatch = bytecodePatch(
             checkCoffee(!AccessFlags.FINAL.isSet(inherited.accessFlags), "$name cannot be overridden")
         }
         val actions = gamesClients.map { (owner, action) ->
-            checkCoffee(classDefBy(owner).superclass == "Lti1;" &&
+            checkCoffee(classDefBy(owner).superclass == profile.gamesParent &&
                 classDefBy(owner).methods.none { it.name in overrides }, "Games client inheritance changed")
             coffeeMethod(owner, "getStartServiceAction", emptyList(), STRING, static = false).also {
                 checkCoffee(it.hasString("com.google.android.gms.$action"), "Games service action changed")
@@ -109,7 +102,7 @@ val coffeeMicroGSupportPatch = bytecodePatch(
         create.addInstructions(returns.single().index,
             "invoke-static {p0}, Lcom/google/android/gms/games/PlayGamesSdk;->initialize(Landroid/content/Context;)V")
 
-        val resolutionOwner = "Lhl5;"
+        val resolutionOwner = profile.resolutionOwner
         val resolution = coffeeMethod(resolutionOwner, "d", listOf(
             "Lcom/google/android/gms/tasks/TaskCompletionSource;", "I", "Landroid/app/PendingIntent;", "Z", "Z"),
             "V", static = false)
@@ -141,8 +134,8 @@ val coffeeMicroGSupportPatch = bytecodePatch(
         // argument before its version probe. Preserve these live values.
         val keep = resolutionCode.take(start).withIndex().filter { (_, instruction) ->
             val ref = (instruction as? ReferenceInstruction)?.reference
-            (ref is FieldReference && ((ref.definingClass == "Lhl5;" && ref.name == "a") ||
-                (ref.definingClass == "Ljk5;" && ref.name == "d"))) ||
+            (ref is FieldReference && ((ref.definingClass == resolutionOwner && ref.name == "a") ||
+                (ref.definingClass == profile.retryOwner && ref.name == "d"))) ||
                 (ref is StringReference && ref.string == "GamesApiManager") ||
                 (instruction.opcode == Opcode.CONST_4 && (instruction as OneRegisterInstruction).registerA == 3)
         }.map { it.index }.toSet()

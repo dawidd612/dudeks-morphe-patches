@@ -17,13 +17,7 @@ val coffeeStartupSupport = bytecodePatch(
     description = "Restores version-specific Unity startup after re-signing.",
     default = false,
 ) {
-    compatibleWith(app.morphe.patcher.patch.Compatibility(
-        name = "Good Coffee, Great Coffee",
-        packageName = "com.tapblaze.coffeebusiness",
-        apkFileType = app.morphe.patcher.patch.ApkFileType.APKM,
-        appIconColor = 0x98704C,
-        targets = listOf(app.morphe.patcher.patch.AppTarget(version = "1.24.0", versionCode = 1397, isExperimental = false)),
-    ))
+    compatibleWith(CoffeeProfiles.compatibility)
     dependsOn(coffeeNativeBootstrap)
     extendWith("extensions/coffeebusiness.mpe")
     // Exact Firebase C++ SDK classes embedded in this version's native library.
@@ -44,7 +38,7 @@ val coffeeStartupSupport = bytecodePatch(
         checkCoffee(attach.calls(signature, "verifyIntegrity") && attach.calls(license, "checkLicense") &&
             attach.calls(vm, "setContext"), "application startup changed")
         checkCoffee(integrity.hasString("Apk signature is invalid.") && startup.calls(vm, "invoke") &&
-            (program?.initialValue as? StringEncodedValue)?.value == "imqaW4jbjlFCmGCP" && checkLicense.implementation != null &&
+            (program?.initialValue as? StringEncodedValue)?.value == CoffeeProfiles.forPackage(packageMetadata).startupProgram && checkLicense.implementation != null &&
             checkLicense.instructions.size > 1, "re-signed startup shape changed or already patched")
 
         // checkLicense is not the only entry: TrialClient/JNI and queued retries

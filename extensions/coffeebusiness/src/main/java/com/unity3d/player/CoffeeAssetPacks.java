@@ -49,7 +49,6 @@ public final class CoffeeAssetPacks {
         }
     }
     private static File extract(Context app) throws Exception {
-        File root = new File(app.getNoBackupFilesDir(), "morphe-coffee-1397");
         byte[] manifest;
         try (InputStream input = app.getAssets().open("morphe/coffee-asset-packs.tsv.gz")) {
             ByteArrayOutputStream buffer = new ByteArrayOutputStream();
@@ -58,6 +57,9 @@ public final class CoffeeAssetPacks {
             manifest = buffer.toByteArray();
         }
         byte[] identity = MessageDigest.getInstance("SHA-256").digest(manifest);
+        StringBuilder packId = new StringBuilder();
+        for (byte b : identity) packId.append(String.format(java.util.Locale.ROOT, "%02x", b & 255));
+        File root = new File(app.getNoBackupFilesDir(), "morphe-coffee/" + packId);
         File marker = new File(root, ".complete");
         if (marker.isFile() && Arrays.equals(identity, readMarker(marker))) return root;
         if (!root.isDirectory() && !root.mkdirs()) throw new IOException("Cannot create bundled asset directory");
