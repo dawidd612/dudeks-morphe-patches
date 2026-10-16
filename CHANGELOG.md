@@ -1,3 +1,9 @@
+## [1.35.3](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.35.2...v1.35.3) (2026-10-16)
+
+### 🐛 Bug Fixes
+
+* **coffeebusiness:** support 1.25.1 with reproducible update profiles ([669b070](https://github.com/dawidd612/dudeks-morphe-patches/commit/669b070c9137f6df853c263a1175934b948755a5))
+
 ## [1.35.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.35.1...v1.35.2) (2026-10-16)
 
 ### 🐛 Bug Fixes
