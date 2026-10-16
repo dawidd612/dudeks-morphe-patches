@@ -338,3 +338,20 @@ all3793 non-signature entries match the runtime-tested candidate byte-for-byte.
 The published APK's signature verifies. Public release notes were explicitly
 updated and read back, including experimental status, measured preparation-only
 speedup and unverified authentication/physical-device limitations.
+
+### Official non-experimental 1.35.4 - 2026-10-16
+
+At the user's explicit request, commit9e8e7a8 promotes Coffee1.25.1 by setting
+the shared profile's experimental flag to false. Release commitc7a4b26 / tag
+v1.35.4 is published as a non-draft, non-prerelease and latest GitHub release.
+Release run38886769748 and Coffee verification run38886769701 both passed.
+The downloaded public MPP passes archive CRC and its published checksum:
+`1834cf8786b8a6eedb57f40e8421fe7bc033fcf63a79dd67b0a3358cf4c3a151`.
+All three Coffee patches expose 1.25.1 with isExperimental=false in published
+metadata. Compared with1.35.3, the only changed Coffee resource is that profile;
+runtime resources and the extension remain unchanged. Local build and packaged
+profile selection checks pass. Release notes were edited and read back.
+This classification-only change did not rerun game tests or establish real
+account authentication, cloud restore or physical-device verification. Those
+limits remain explicit in the public notes. Private verification report:
+`artifacts/coffee-20261016/official-1354-verification.json`.
