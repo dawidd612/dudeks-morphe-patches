@@ -101,7 +101,9 @@ original embedded Firebase DEX, builds the current pack manifest, emits two PZB2
 deltas and resource hashes. All seven 1.25.1 outputs replayed byte-for-byte.
 Add a reviewed `profile.properties` and its directory to `profiles.txt` only when
 the exact APK version/code, startup token and Games mappings are identified.
-Keep a new target experimental while runtime limitations remain.
+Start new targets as experimental. Promote a reviewed target when the release
+owner authorizes official support; document remaining verification limits even
+after promotion. Coffee 1.25.1 was promoted at the user's request on 2026-10-16.
 
 ## 5. Build, patch and verify
 

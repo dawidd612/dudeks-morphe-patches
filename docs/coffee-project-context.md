@@ -1,7 +1,9 @@
 # Good Coffee, Great Coffee - patch context
 
 Targets: `com.tapblaze.coffeebusiness` **1.24.0 (1397)** and **1.25.1 (1454)**,
-complete APKM, ARM64. The new 1.25.1 profile is experimental pending broader device testing.
+complete APKM, ARM64. The 1.25.1 profile is officially non-experimental, promoted
+at the user's request on 2026-10-16. This changes release classification only;
+the runtime behavior and previously documented verification limits remain.
 Status: gameplay and a requested rewarded action were exercised on
 Android; Google sign-in, cloud restore and paid checkout are not verified.
 
