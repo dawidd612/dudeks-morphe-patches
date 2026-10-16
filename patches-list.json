@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.35.3",
+  "version": "1.35.4",
   "patches": [
     {
       "name": "Coffee startup support",
@@ -32,7 +32,7 @@
               "versionCodes": {
                 "ARM64_V8A": 1454
               },
-              "isExperimental": true,
+              "isExperimental": false,
               "minSdk": null,
               "description": "Requires complete ARM64 APKM/XAPK initialization resources."
             }
@@ -106,7 +106,7 @@
               "versionCodes": {
                 "ARM64_V8A": 1454
               },
-              "isExperimental": true,
+              "isExperimental": false,
               "minSdk": null,
               "description": "Requires complete ARM64 APKM/XAPK initialization resources."
             }
@@ -445,7 +445,7 @@
               "versionCodes": {
                 "ARM64_V8A": 1454
               },
-              "isExperimental": true,
+              "isExperimental": false,
               "minSdk": null,
               "description": "Requires complete ARM64 APKM/XAPK initialization resources."
             }

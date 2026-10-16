@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.35.3** (`main`) - **15 patches** across **8 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.35.4** (`main`) - **15 patches** across **8 apps** - back to [README](README.md)
 
 ---
 
@@ -27,7 +27,7 @@
 
 ## Good Coffee, Great Coffee (com.tapblaze.coffeebusiness)
 
-**Supported versions:** `1.24.0` `experimental 1.25.1`
+**Supported versions:** `1.24.0` `1.25.1`
 
 | Patch | Details |
 |---|---|

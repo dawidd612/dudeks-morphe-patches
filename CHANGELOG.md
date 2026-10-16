@@ -1,3 +1,9 @@
+## [1.35.4](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.35.3...v1.35.4) (2026-10-16)
+
+### 🐛 Bug Fixes
+
+* **coffeebusiness:** mark 1.25.1 non-experimental ([9e8e7a8](https://github.com/dawidd612/dudeks-morphe-patches/commit/9e8e7a87615f9f9d9dc894ed84c6b32ba39f39ca))
+
 ## [1.35.3](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.35.2...v1.35.3) (2026-10-16)
 
 ### 🐛 Bug Fixes
