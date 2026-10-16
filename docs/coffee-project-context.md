@@ -320,3 +320,19 @@ All3793 non-signature APK entries match the runtime-tested candidate byte-for-by
 including DEX, manifest, libraries and assets. Signature verification passes.
 Packaged profile checks and all21 Python regression cases pass on this upstream
 build. Broader device/authentication limitations above remain unchanged.
+
+### Published 1.35.3
+
+Code commit669b070 and verification8da53b7 were pushed on current main. Release
+commit eff41f4 / tagv1.35.3 was generated successfully. Release run38885521029
+and Coffee verification run38885521019 both passed. The downloaded public MPP's
+SHA256 matches its checksum file:
+`bb3c9372309fc04af620d1e639f684d6bd55a32893df4aee9fdf3e8c7bf7cb2c`.
+All23 Coffee resources/extension entries match the tested local bundle (text
+line endings normalized). The downloaded public bundle was then used to patch
+the unchanged original APKM successfully. Its signed APK SHA256 is
+`769eb8bafb86ab93cabe92027ca66ad0c528777acfca10bda525b6299e9844d6`;
+all3793 non-signature entries match the runtime-tested candidate byte-for-byte.
+The published APK's signature verifies. Public release notes were explicitly
+updated and read back, including experimental status, measured preparation-only
+speedup and unverified authentication/physical-device limitations.
