@@ -65,12 +65,13 @@ private val pizzaMicroGResources = resourcePatch {
 @Suppress("unused")
 val pizzaMicroGSupportPatch = bytecodePatch(
     name = "Google Play Games via MicroG-RE",
-    description = "Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms.",
+    description = "Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+ and suppresses obsolete stock Play services update prompts. Requires app.revanced.android.gms.",
     default = true,
 ) {
     compatibleWith(PizzaProfiles.compatibility)
     dependsOn(pizzaStartupSupport, pizzaMicroGResources)
     execute {
+        suppressPizzaPlayServicesUpdatePrompts()
         // SDK/R8 class names may change between releases. Service actions and
         // inherited transport contracts identify the two clients instead.
         val gamesClients = gamesActions.associate { action ->

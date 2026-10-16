@@ -2,69 +2,43 @@
 
 Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
-## Published PNN 1000 - 2026-10-16
+## Current change - remove extended sponsors and stop stock GMS update prompts (2026-10-16)
 
-The user explicitly authorized merging PR #35 to main and publishing the release,
-and reports that everything works. This supersedes the prepare-only publication
-hold in the candidate notes below. PR #35 merged as33edfb7; all three PR CI
-workflows passed. Release workflow38825065982 completed successfully.
-Published v1.35.0 includes the default-selected `1000 PNN sponsor rewards`
-patch for5.58.0 (2301) ARM64. The release MPP was downloaded, its ZIP integrity
-and SHA256SUMS verified, and its PNN payload matched the reviewed resource.
-MPP SHA256: a4531bdbc1b61d6116931ac2a567d3139f4c976d5db14ddb2858d9f019fa81d7.
-Release patches-list.json and patches-bundle.json both advertise1.35.0 and
-the correct download URL. No independent Android runtime matrix was executed
-in this cloud session; distinguish the user's confirmation from local evidence.
-No APK, save, raw logs, account data or signing key was published.
+The user withdrew the extended sponsor feature entirely and requested a normal
+non-experimental release repairing recurring Google Play services update UI.
+Its implementation, payload, documentation and tests are removed. The original
+native sponsor sequence is restored by simply omitting that optional patch.
+Current supported inputs remain 5.57.3 (2277) and 5.58.0 (2301), ARM64.
+The 5.58.0 profile is marked non-experimental at the user's request, following
+their prior confirmation that the existing game/auth/reward patches work.
 
-Release: https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.35.0
+The MicroG patch now scopes stock GoogleApiAvailability update UI handling to
+SERVICE_VERSION_UPDATE_REQUIRED (2) and SERVICE_UPDATING (18): its notification
+entry returns without creating a notification or delayed availability retry;
+its two error-dialog entries invoke the real cancellation listener once and
+return. Other errors, actual availability results, real PendingIntent sign-in
+and account/server callbacks retain their original bodies. Stock mode, with
+MicroG support disabled, retains all original availability UI.
 
-## PNN 1000 candidate - 2026-10-16
-
-User requested raising the start-of-day sponsor sequence from two to 1000,
-using the same 5.58.0 input. Work is on `feat/pizza-day-start-1000`.
-See `pizza-pnn-1000.md` for the reviewed native mechanism, compatibility
-and verification. This is a separate default-selected patch. It repeats
-PNN 999 times and then uses the original PNN2 final offer; it does not
-change the Java reward gateway or reward amount. Its counter is per layer,
-not the saved TODAY_PNN_WATCHED statistic. A clean input was retrieved and
-its SHA256 matches the previously verified 5.58.0 archive.
-
-Environment: Linux cloud workspace, Java17 runtime, no Android SDK/ADB or
-connected test device. Repository codebase-memory tooling/skill is not
-available; targeted source/ELF analysis was used. Local Gradle reaches the
-distribution but cannot resolve the authenticated Morphe plugin; complete
-bundle compilation must use the existing GitHub Actions workflow. Actual
-Kotlin native transform and shipped ARM64 code can be tested independently.
-No existing Android installation, save or signing key was changed. Do not
-claim full runtime success from native instruction tests or CI. Keep this
-candidate unreleased until the AGENTS.md runtime matrix passes.
-
-Local candidate verification completed: the new classes compile against the
-published Morphe desktop 1.17.0 API using Kotlin2.4.0. Published v1.34.1 MPP
-SHA256 f029073fdd6c170cf8a1e8500b41cf4bc61d010d15359ef62579ef395cca2ae6
-supplies the unchanged existing classes/resources. New classes are added;
-all patch classes are converted together with D8 8.3.37 (min API26).
-The MPP is labelled `1.34.1-pnn1000-test`, not an official release. Morphe
-loads it and patches the complete clean 67-split XAPK with all four Pizza
-patches. The resulting native library is byte-identical to the independent
-production Kotlin transform. Actual emitted DEX checks pass five reward
-placements,3412 unchanged authentication/SDK methods,6 exact SDK restorations
-and2165 unchanged billing methods. All36 unique native libraries and6653
-assets pass the all-split verifier;13 asset regression tests pass. Both
-bootstrap-only and funds-store native variants pass the production Java/Kotlin
-transform and actual ARM64 ELF instruction tests. Only seven reviewed native
-instructions and ELF header metadata change before the appended payload.
-
-Input/output/library hashes, local patching JSON and failure logs are retained
-under ignored artifacts/day-start-limit. No ADB runtime test was possible.
-An attempted second CLI run using its purged temporary merged APK did not run;
-do not count it as separate optional-selection coverage. The two native
-variants, plus the full four-patch clean-XAPK run, are the actual coverage.
-Automatic approval review rejected the attempted GitHub push as external
-publication not explicitly authorized by the current prepare-only request.
-No remote branch/PR/release was created. Ask for explicit push authorization
-before retrying; do not bypass the rejection through another connector.
+No device/ADB is connected in this cloud session. The observed APK flow can be
+verified from emitted DEX; no runtime reproduction or attribution from device
+logs is claimed. Verification completed on the full clean5.58.0 XAPK: all three original
+Pizza patches apply together; the extended-sponsor patch is absent. The
+notification/dialog DEX guard interpreter passes errors-1..24, nullable
+listeners,50 repeated update requests and original-body/exception parity.
+Existing reward,3412 authentication/SDK-method and2165 billing-method checks
+pass. All67 input splits,36 native libraries and6653 assets are preserved.
+The native output hash equals the original funds-store output exactly, with
+no extended-sponsor segment. All13 asset-verifier regression tests pass.
+A stock-mode clean-XAPK run confirms all23 scoped availability/result/activity
+methods are unchanged. Its full integration verifier encounters duplicate
+unrelated Deku outline classes from raw-resource packaging; this run does not
+establish full stock-mode APK validity. No packaging behavior was changed.
+Full MicroG-mode integration (the user's default selection) passes. CI and
+publication remain pending.
+The user also requested full withdrawal: the release workflow retires only
+v1.35.0/v1.35.1 and the unchanged abandoned feature branch after v1.35.2 is
+published. Commit history is retained; no history rewrite is performed.
 
 ## Pizza 5.58.0 update — runtime verification, 2026-10-06
 

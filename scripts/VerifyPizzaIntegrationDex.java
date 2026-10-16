@@ -121,6 +121,7 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
             screen.getImplementation().getTryBlocks().isEmpty(), "Restored screen can open Play or close game tasks");
 
         Set<String> allowed = new HashSet<>();
+        allowed.addAll(VerifyPizzaPlayServicesDex.verify(patched, original, microg));
         if (hidePaid) {
             Method checkout = method(patched, "Lcom/tapblaze/pizzabusiness/PurchasesManager;", "purchase", "V", STRING);
             validateRegistersAndBranches(checkout);
