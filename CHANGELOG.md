@@ -1,3 +1,9 @@
+## [1.35.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.35.1...v1.35.2) (2026-10-16)
+
+### 🐛 Bug Fixes
+
+* **pizza:** remove extended sponsors and stop repeated Play services update prompts ([a25fc93](https://github.com/dawidd612/dudeks-morphe-patches/commit/a25fc93b2c7320903ab482b479f915b657aeb872))
+
 ## [1.35.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.35.0...v1.35.1) (2026-10-15)
 
 ### 🐛 Bug Fixes

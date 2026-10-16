@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.35.1** (`main`) - **16 patches** across **8 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.35.2** (`main`) - **15 patches** across **8 apps** - back to [README](README.md)
 
 ---
 
@@ -39,12 +39,11 @@
 
 ## Good Pizza, Great Pizza (com.tapblaze.pizzabusiness)
 
-**Supported versions:** `5.58.0`
+**Supported versions:** `5.57.3` `5.58.0`
 
 | Patch | Details |
 |---|---|
-| **1000 PNN sponsor rewards** | Zwieksza sekwencje reklam sponsora na poczatku dnia z 2 do 1000. Zachowuje zwykle nagrody i mozliwosc pominiecia. Wspolpracuje ze Skip rewarded ads. Pizza 5.58.0 ARM64. |
-| **Google Play Games via MicroG-RE** | Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms. |
+| **Google Play Games via MicroG-RE** | Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+ and suppresses obsolete stock Play services update prompts. Requires app.revanced.android.gms. |
 | **Hide paid offers** | Hides real-money storefront sections and cancels Google Play checkout. Keeps in-game currency exchanges and existing purchase processing. Requires a supported ARM64 Pizza build. |
 | **Skip rewarded ads** | Completes the game's rewarded-video flow without playing an ad, keeping the requested placement and normal reward. Includes re-signed startup support. |
 
