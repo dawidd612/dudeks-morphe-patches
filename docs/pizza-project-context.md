@@ -2,6 +2,26 @@
 
 Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
+## Published replacement v1.35.2 - 2026-10-16
+
+The user's full withdrawal and normal-release request is complete. PR #36
+merged as a25fc93. All three PR CI workflows and release38828516707 passed.
+Published MPP SHA256:147a3d7a678a588f05c0292c858b140d7743a5093d507bca24339df7233a365d.
+Downloaded release ZIP integrity and SHA256SUMS pass. The bundle has no
+extended-sponsor classes/payload/patch entry. Its three original Pizza patches
+are default-selected and non-experimental for5.57.3/5.58.0 ARM64. New update
+UI guards are integrated into the existing MicroG patch. Full5.58.0 combined
+patching, emitted guard execution, auth/billing/reward parity and all-split
+asset/native checks passed on the final candidate. Scoped stock availability
+checks preserve26 methods; retain the raw-packaging limitation documented below.
+No independent Android device reproduction was available in this session.
+
+The release workflow successfully deleted abandoned releases/tags v1.35.0 and
+v1.35.1 and the unchanged feat/pizza-day-start-1000 branch. GitHub release and
+branch listings confirm withdrawal. Existing Git commit/PR history is retained.
+The one-time retirement workflow step is removed after successful execution.
+Release: https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.35.2
+
 ## Current change - remove extended sponsors and stop stock GMS update prompts (2026-10-16)
 
 The user withdrew the extended sponsor feature entirely and requested a normal
@@ -30,7 +50,7 @@ Existing reward,3412 authentication/SDK-method and2165 billing-method checks
 pass. All67 input splits,36 native libraries and6653 assets are preserved.
 The native output hash equals the original funds-store output exactly, with
 no extended-sponsor segment. All13 asset-verifier regression tests pass.
-A stock-mode clean-XAPK run confirms all23 scoped availability/result/activity
+A stock-mode clean-XAPK run confirms all26 scoped availability/result/activity
 methods are unchanged. Its full integration verifier encounters duplicate
 unrelated Deku outline classes from raw-resource packaging; this run does not
 establish full stock-mode APK validity. No packaging behavior was changed.
