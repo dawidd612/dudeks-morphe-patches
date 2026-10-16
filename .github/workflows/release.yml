@@ -59,6 +59,24 @@ jobs:
           subject-name: "Dudek's patches ${{ steps.release.outputs.new_release_git_tag }}"
           subject-path: patches/build/libs/patches-*.mpp
 
+      # The owner explicitly withdrew the extended-sponsor feature and its
+      # published bundles. Retire only those two exact releases after replacement.
+      - name: Withdraw abandoned extended-sponsor releases
+        if: steps.release.outputs.new_release_published == 'true' && steps.release.outputs.new_release_git_tag == 'v1.35.2'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          for retired_tag in v1.35.0 v1.35.1; do
+            if gh release view "$retired_tag" --json tagName >/dev/null 2>&1; then
+              gh release delete "$retired_tag" --cleanup-tag --yes
+            fi
+          done
+          retired_branch_sha=$(gh api "repos/$GH_REPO/git/ref/heads/feat/pizza-day-start-1000" --jq '.object.sha' 2>/dev/null || true)
+          if [ "$retired_branch_sha" = '5824ae9ad6f55a81428ece920c5bd37da8dd54fe' ]; then
+            gh api --method DELETE "repos/$GH_REPO/git/refs/heads/feat/pizza-day-start-1000"
+          fi
+
       # Always verify compilation when semantic-release did not publish a release.
       # This covers non-main/dev branches, chore commits, docs commits, etc.
       - name: Verify project compiles
