@@ -285,6 +285,12 @@ screens; do not call these a clean reboot pass. MicroG7.1.1 was then installed
 on5562 and a force-stop restart reached the menu. No real account was supplied.
 A second full reboot is being observed with MicroG already installed.
 
+The second full reboot with MicroG7.1.1 already installed reached the main menu
+in the original post-boot process1676, without another force-stop. Evidence:
+`second-reboot-later.png`, `second-reboot-process.log` (no fatal/verification/
+missing-class exception). Loading remained slow.5556 Home/resume returned to the
+same Day2 process3727 after the actual reward. No credentials were entered.
+
 On existing test5556, private files/preferences were backed up to
 `coffee-before1251.tar` (983552 bytes); external files to `pre1251-external/`.
 A same-key1.24.0 ->1.25.1 update reached Day2 and preserved cash139.04/crystals2.
@@ -300,3 +306,17 @@ packaged profile checks. `um publish check` on the MPP/LICENSE/README distributi
 passed3 files,0 failures,0 warnings. Real authentication/cloud restoration,
 physical ARM64/API36 runtime, long-term stability and paid checkout remain
 unverified. No charge was attempted.
+
+### Final upstream build
+
+The update was cherry-picked onto current remote main10d1c8f in managed worktree
+`coffee-1251-release`; the original workspace's dirty Pizza documentation was
+left intact. Final local bundle version1.35.3 builds successfully. All23 Coffee
+resource/extension entries match the tested interim MPP byte-for-byte. A new
+clean-input patch with this final bundle passes both defaults, FULL rebuild and
+signing. Final APK SHA256:
+`1e0162cdca5ce55747b91ce80c66b8c1a06cb80cab43e3dc0df9670a013deecb`.
+All3793 non-signature APK entries match the runtime-tested candidate byte-for-byte,
+including DEX, manifest, libraries and assets. Signature verification passes.
+Packaged profile checks and all21 Python regression cases pass on this upstream
+build. Broader device/authentication limitations above remain unchanged.
