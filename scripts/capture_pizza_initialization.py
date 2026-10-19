@@ -64,7 +64,7 @@ function strings() {
   }
   send({kind: 'strings', values: out});
 }
-Java.perform(function () {
+function hookVm() {
   const VM = Java.use('com.pairip.VMRunner');
   const invoke = VM.invoke.overload('java.lang.String', '[Ljava.lang.Object;');
   invoke.implementation = function (name, args) {
@@ -85,7 +85,22 @@ Java.perform(function () {
     }
     return result;
   };
-  send({kind: 'ready'});
+  send({kind: 'ready-vm'});
+}
+// VMRunner.setContext is part of the original attachBaseContext path. Wait for
+// that path to initialize its native library naturally on the app thread;
+// resolving VMRunner's static methods while the app is spawn-suspended can
+// initialize PairIP on Frida's worker and deadlock the original startup.
+Java.performNow(function () {
+  const Application = Java.use('android.app.Application');
+  const attach = Application.attach.overload('android.content.Context');
+  attach.implementation = function (context) {
+    const result = attach.call(this, context);
+    Java.classFactory.loader = context.getClassLoader();
+    hookVm();
+    return result;
+  };
+  send({kind: 'ready-framework'});
 });
 """
 
@@ -147,8 +162,10 @@ def main():
         run(*adb, "shell", "am", "force-stop", PACKAGE)
         done = threading.Event()
         failure = []
+        print(f"{label}: spawning original package", flush=True)
         pid = device.spawn([PACKAGE])
         session = device.attach(pid)
+        print(f"{label}: attached; loading framework observer", flush=True)
         with (out / f"capture-{label}.jsonl").open("w") as log:
             def message(item, data):
                 log.write(json.dumps(item, ensure_ascii=False) + "\n")
@@ -171,6 +188,7 @@ def main():
             agent.on("message", message)
             try:
                 agent.load()
+                print(f"{label}: observer loaded; resuming app", flush=True)
                 device.resume(pid)
                 if not done.wait(180):
                     raise TimeoutError("No completed native initialization capture")
