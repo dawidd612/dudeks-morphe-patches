@@ -45,8 +45,11 @@ function nativeBase(text) {
 function dump(base, prefix) {
   for (let i = 0; i < segments.length; i++) {
     const s = segments[i];
-    send({kind: 'dump', name: prefix + '-' + i, bytes: s.p_filesz},
-      base.add(s.p_vaddr).readByteArray(s.p_filesz));
+    for (let offset = 0; offset < s.p_filesz; offset += 1024 * 1024) {
+      const count = Math.min(1024 * 1024, s.p_filesz - offset);
+      send({kind: 'dump', name: prefix + '-' + i, bytes: s.p_filesz, offset: offset},
+        base.add(s.p_vaddr + offset).readByteArray(count));
+    }
   }
 }
 function strings() {
@@ -64,43 +67,31 @@ function strings() {
   }
   send({kind: 'strings', values: out});
 }
-function hookVm() {
+Java.perform(function () {
   const VM = Java.use('com.pairip.VMRunner');
   const invoke = VM.invoke.overload('java.lang.String', '[Ljava.lang.Object;');
   invoke.implementation = function (name, args) {
     const m = maps(), base = nativeBase(m);
-    const take = base !== null && !captured;
+    let take = base !== null && !captured;
     send({kind: 'invoke', program: String(name), nativeBase: base === null ? null : base.toString()});
     if (take) {
       captured = true;
       send({kind: 'native-base', base: base.toString()});
       send({kind: 'all-maps', maps: m});
-      dump(base, 'native-before');
+      try { dump(base, 'native-before'); }
+      catch (e) { send({kind: 'capture-error', stage: 'before', error: String(e)}); take = false; }
     }
     const result = invoke.call(this, name, args);
     if (take) {
-      dump(base, 'native-after');
-      strings();
-      send({kind: 'native-complete'});
+      try {
+        dump(base, 'native-after');
+        strings();
+        send({kind: 'native-complete'});
+      } catch (e) { send({kind: 'capture-error', stage: 'after', error: String(e)}); }
     }
     return result;
   };
   send({kind: 'ready-vm'});
-}
-// VMRunner.setContext is part of the original attachBaseContext path. Wait for
-// that path to initialize its native library naturally on the app thread;
-// resolving VMRunner's static methods while the app is spawn-suspended can
-// initialize PairIP on Frida's worker and deadlock the original startup.
-Java.performNow(function () {
-  const Application = Java.use('android.app.Application');
-  const attach = Application.attach.overload('android.content.Context');
-  attach.implementation = function (context) {
-    const result = attach.call(this, context);
-    Java.classFactory.loader = context.getClassLoader();
-    hookVm();
-    return result;
-  };
-  send({kind: 'ready-framework'});
 });
 """
 
@@ -165,7 +156,7 @@ def main():
         print(f"{label}: spawning original package", flush=True)
         pid = device.spawn([PACKAGE])
         session = device.attach(pid)
-        print(f"{label}: attached; loading framework observer", flush=True)
+        print(f"{label}: attached; loading VM observer", flush=True)
         with (out / f"capture-{label}.jsonl").open("w") as log:
             def message(item, data):
                 log.write(json.dumps(item, ensure_ascii=False) + "\n")
@@ -174,11 +165,19 @@ def main():
                 if item.get("type") == "error":
                     failure.append(item.get("description", "Agent error"))
                     done.set()
+                if p.get("kind") == "capture-error":
+                    failure.append(p.get("stage", "") + ": " + p.get("error", "Capture failed"))
+                    done.set()
                 if p.get("kind") == "dump":
-                    if data is None or len(data) != p["bytes"]:
-                        failure.append("Truncated native segment")
+                    target = out / f"{p['name']}-{label}.bin"
+                    offset = p["offset"]
+                    expected = min(1024 * 1024, p["bytes"] - offset)
+                    if data is None or len(data) != expected or (target.stat().st_size if target.exists() else 0) != offset:
+                        failure.append("Truncated or out-of-order native segment")
+                        done.set()
                     else:
-                        (out / f"{p['name']}-{label}.bin").write_bytes(data)
+                        with target.open("ab") as destination:
+                            destination.write(data)
                 elif p.get("kind") == "strings":
                     (out / f"string-values-{label}.json").write_text(
                         json.dumps(p["values"], ensure_ascii=False, sort_keys=True))
