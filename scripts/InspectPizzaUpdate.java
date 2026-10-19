@@ -30,6 +30,7 @@ public class InspectPizzaUpdate {
         var roles = new TreeMap<String, String>();
         var versions = new TreeMap<String, String>();
         var protectedMethods = new TreeSet<String>();
+        var stringHolderClasses = new TreeSet<String>();
         int holders = 0, constants = 0;
         for (var cls : classes.values()) {
             var fields = new ArrayList<Field>(); cls.getFields().forEach(fields::add);
@@ -37,6 +38,7 @@ public class InspectPizzaUpdate {
             if (methods.isEmpty() && !fields.isEmpty() && fields.stream().allMatch(f ->
                     AccessFlags.STATIC.isSet(f.getAccessFlags()) && f.getType().equals("Ljava/lang/String;") && f.getInitialValue() == null)) {
                 holders++; constants += fields.size();
+                stringHolderClasses.add(cls.getType());
             }
             for (var field : fields) {
                 if (field.getInitialValue() instanceof StringEncodedValue value && field.getName().contains("VERSION")) versions.put(cls.getType()+"->"+field.getName(), value.getValue());
@@ -70,7 +72,7 @@ public class InspectPizzaUpdate {
             var nativeEntry = zip.getEntry("lib/arm64-v8a/libcocos2dcpp.so");
             System.out.println("{\"package\":"+quote(manifest.getPackageName())+",\"version\":"+quote(manifest.getVersionName())+
                 ",\"version_code\":"+manifest.getVersionCode()+",\"native_sha256\":"+(nativeEntry == null ? "null" : quote(hash(zip.getInputStream(nativeEntry))))+
-                ",\"classes\":"+classes.size()+",\"string_holders\":"+holders+",\"uninitialized_strings\":"+constants+",\"protected_methods\":"+protectedMethods.size()+
+                ",\"classes\":"+classes.size()+",\"string_holders\":"+holders+",\"string_holder_classes\":["+String.join(",",stringHolderClasses.stream().map(InspectPizzaUpdate::quote).toList())+"],\"uninitialized_strings\":"+constants+",\"protected_methods\":"+protectedMethods.size()+
                 ",\"protected_method_signatures\":["+String.join(",",protectedMethods.stream().map(InspectPizzaUpdate::quote).toList())+"],\"roles\":{"+String.join(",", roles.entrySet().stream().map(e -> quote(e.getKey())+":"+quote(e.getValue())).toList())+"},\"sdk_versions\":{"+
                 String.join(",", versions.entrySet().stream().map(e -> quote(e.getKey())+":"+quote(e.getValue())).toList())+"}}");
         }
