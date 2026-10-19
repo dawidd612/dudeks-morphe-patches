@@ -28,7 +28,7 @@ jobs:
           sudo chmod 666 /dev/kvm
       - uses: android-actions/setup-android@v3
         with:
-          packages: 'platform-tools emulator system-images;android-30;google_apis;x86_64 build-tools;36.0.0'
+          packages: 'platform-tools emulator system-images;android-35;google_apis;x86_64 build-tools;36.0.0'
           log-accepted-android-sdk-licenses: false
       - name: Prepare pinned input and diagnostic tools
         run: |
@@ -52,11 +52,12 @@ jobs:
           ANDROID_AVD_HOME: ${{ runner.temp }}/pizza-avd
         run: |
           mkdir -p "$ANDROID_AVD_HOME"
-          echo no | avdmanager create avd -n Pizza5590Capture -k 'system-images;android-30;google_apis;x86_64' --device pixel_2 --force
-          "$ANDROID_HOME/emulator/emulator" -avd Pizza5590Capture -no-window -no-audio -no-boot-anim -no-snapshot -accel on -gpu swiftshader_indirect -cores 2 -memory 2048 > "$RUNNER_TEMP/pizza-input/emulator.log" 2>&1 &
+          echo no | avdmanager create avd -n Pizza5590Capture -k 'system-images;android-35;google_apis;x86_64' --device pixel_2 --force
+          "$ANDROID_HOME/emulator/emulator" -avd Pizza5590Capture -no-window -no-audio -no-boot-anim -no-snapshot -accel on -gpu swiftshader_indirect -cores 2 -memory 2048 -show-kernel > "$RUNNER_TEMP/pizza-input/emulator.log" 2>&1 &
           timeout 180 adb -s emulator-5554 wait-for-device
-          for attempt in $(seq 1 120); do
-            if [ "$(adb -s emulator-5554 shell getprop sys.boot_completed | tr -d '\r')" = '1' ]; then exit 0; fi
+          deadline=$((SECONDS + 240))
+          while [ "$SECONDS" -lt "$deadline" ]; do
+            if [ "$(timeout 8 adb -s emulator-5554 shell getprop sys.boot_completed | tr -d '\r')" = '1' ]; then exit 0; fi
             sleep 2
           done
           tail -80 "$RUNNER_TEMP/pizza-input/emulator.log"
@@ -75,6 +76,8 @@ jobs:
         if: always()
         with:
           name: pizza-5590-initialization-evidence
-          path: ${{ runner.temp }}/pizza-capture/
+          path: |
+            ${{ runner.temp }}/pizza-capture/
+            ${{ runner.temp }}/pizza-input/emulator.log
           retention-days: 5
           if-no-files-found: warn
