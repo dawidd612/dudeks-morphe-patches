@@ -1,3 +1,9 @@
+## [1.36.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.35.4...v1.36.0) (2026-10-20)
+
+### ✨ New Features
+
+* **pizza:** support Good Pizza, Great Pizza 5.59.0 ([90efcb9](https://github.com/dawidd612/dudeks-morphe-patches/commit/90efcb9c8772eb6a25fe0e05f408ac980b10ed0f))
+
 ## [1.35.4](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.35.3...v1.35.4) (2026-10-16)
 
 ### 🐛 Bug Fixes

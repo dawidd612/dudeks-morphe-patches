@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.35.4** (`main`) - **15 patches** across **8 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.36.0** (`main`) - **15 patches** across **8 apps** - back to [README](README.md)
 
 ---
 
@@ -39,7 +39,7 @@
 
 ## Good Pizza, Great Pizza (com.tapblaze.pizzabusiness)
 
-**Supported versions:** `5.57.3` `5.58.0`
+**Supported versions:** `5.57.3` `5.58.0` `5.59.0`
 
 | Patch | Details |
 |---|---|
