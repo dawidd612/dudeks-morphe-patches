@@ -6,6 +6,17 @@ DEX role discovery are reused. Future protected native layouts still require
 a matching, verified initialization profile; unknown binaries are not patched
 with stale offsets.
 
+Published in [v1.36.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.36.0),
+PR37 / merge90efcb9 / release commit ee6b8eb. Release39480495633 passes.
+Downloaded MPP SHA256:
+b8a42988cfefef13505e6a28eed782bb8bc74f4dcb91a40facff990be534c247.
+Checksum, ZIP integrity and GitHub attestation verify. All30 scoped Pizza bundle
+entries, including Android classes.dex, the extension and profile resources,
+match the tested local build. Published metadata exposes three non-experimental
+5.59.0 targets. The final APK is byte-identical to the runtime candidate across
+all8162 non-signature entries and passes another real Google/server-auth launch
+with the same Day56/wallet state.
+
 Publisher-signed APKPure XAPK SHA256:
 085a7462ec672c22bebbefc0d79a0480ae1d68b72cb3ad7f6b5ecc501b39b99d.
 All five embedded APK signatures and CRCs passed the initial audit. The original

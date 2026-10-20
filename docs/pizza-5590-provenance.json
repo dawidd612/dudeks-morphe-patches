@@ -1,5 +1,5 @@
 {
-  "status": "official_profile_validated_pending_publication",
+  "status": "published_verified",
   "game_version": "5.59.0",
   "version_code": 2322,
   "package": "com.tapblaze.pizzabusiness",
@@ -363,14 +363,7 @@
       "account_identity_visible": false
     }
   },
-  "current_release_probe": {
-    "version": "1.35.4",
-    "result": "all three Pizza patches skipped for incompatible 5.59.0; CLI exit 0 means no patch was applied",
-    "is_supported": false
-  },
-  "required_work": [
-    "Publish the verified non-experimental bundle and verify downloaded release provenance."
-  ],
+  "required_work": [],
   "runtime_status": "PASS: repeated starts, Home/resume, two full user-environment reboots, genuine Google Play Games sign-in and ServerAuthCode result auth=true with granted scopes. TapBlaze linked-session UI has Log Out and no login control. Chapter3/Day56/funds496.98/gems181 stable; user confirmed expected save on2026-10-20. Guest reward, checkout cancellation, reboot, offline Activity recreation and disposable clean Day1 setup/relaunch pass.",
   "sdk_inputs": [
     {
@@ -486,5 +479,37 @@
     "granted_scopes_reported": true,
     "game_foreground": true,
     "fatal_markers": 0
+  },
+  "previous_release_probe": {
+    "version": "1.35.4",
+    "result": "all three Pizza patches skipped for incompatible 5.59.0; CLI exit 0 means no patch was applied",
+    "is_supported": false
+  },
+  "publication": {
+    "release": "v1.36.0",
+    "mpp_sha256": "b8a42988cfefef13505e6a28eed782bb8bc74f4dcb91a40facff990be534c247",
+    "checksum": "PASS",
+    "zip_integrity": "PASS",
+    "matching_pizza_entries": 30,
+    "android_classes_dex_identical": true,
+    "pizza_extension_identical": true,
+    "non_experimental_5590_targets": 3,
+    "url": "https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.36.0",
+    "pull_request": 37,
+    "merge_revision": "90efcb9c8772eb6a25fe0e05f408ac980b10ed0f",
+    "release_revision": "ee6b8eb",
+    "release_workflow_run": 39480495633,
+    "release_workflow_result": "success",
+    "github_attestation_verification": "PASS",
+    "pr_code_checks_revision": "ffc81da56860ca7822a7500db4ddb7cbbd6d138d",
+    "following_doc_only_revision": "90ced26318fea9d749917abbac271a83ffd8438f"
+  },
+  "official_final_save_parity": {
+    "funds_pixels_match": true,
+    "gems_pixels_match": true,
+    "progress": [
+      "Chapter 3",
+      "Day 56"
+    ]
   }
 }

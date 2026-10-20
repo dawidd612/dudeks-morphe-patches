@@ -18,14 +18,26 @@ confirmed this is the expected save. Fresh credential entry, wiped cloud restore
 physical ARM64 devices and ARM32 are not claimed. Paid checkout still cancels;
 some cosmetic promotions remain visible. No fake purchase success is introduced.
 
-Official release publication and downloaded artifact/provenance verification
-remain. Details: pizza-5590-update.md and pizza-5590-provenance.json. Full private
+Published v1.36.0: https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.36.0
+PR37 merged as90efcb9; release commit ee6b8eb. All three PR code checks passed
+on ffc81da; the following90ced26 commit only fixes documentation encoding.
+Release39480495633 and its attestation step pass. Downloaded MPP SHA256:
+b8a42988cfefef13505e6a28eed782bb8bc74f4dcb91a40facff990be534c247.
+SHA256SUMS, ZIP integrity and GitHub attestation verification pass. All30 scoped
+Pizza entries match the tested local bundle, including Android classes.dex,
+extension and all profile resources. Published metadata has three normal5.59.0
+ARM64 targets. The final normal APK has8162 identical non-signature entries
+to the full-matrix candidate; its fresh installation/80s launch passes real
+Google/server authorization and no error markers. Chapter3/Day56 and wallet
+pixels match the matrix. Leave copied account AVD5554 running; debug5556 is closed.
+
+Details: pizza-5590-update.md and pizza-5590-provenance.json. Full private
 evidence is ignored artifacts/pizza-5590-20261020 and E:/Codex-Morphe-Pizza-5590-20261020.
 Original C: AVDs, signing key and verified backups are retained. The old installed
 v1.34.0/game5.58 control has a separate PairIP/Play Store failure. Diagnostic
 manifest-only debuggable copies were used solely for private backup reads.
-Original local context edits are preserved in a named stash and patch; restore
-them after publication without committing them as part of this change.
+Original local context edits are preserved in a named stash and patch and are
+restored locally after this publication record, outside the release commit.
 
 ## Published replacement v1.35.2 - 2026-10-16
 
