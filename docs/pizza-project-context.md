@@ -2,6 +2,31 @@
 
 Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
+## Pizza 5.59.0 official support - 2026-10-20
+
+PR37 now contains the complete, validated ARM64 profile for5.59.0(2322),
+marked non-experimental. All three default patches reuse the existing registry.
+Full build/clean patch, native/DEX/all-split preservation, actual PNN reward,
+checkout cancellation, pepperoni preparation/serving, repeat starts, reboot,
+offline recreation and disposable clean Day1 setup/relaunch pass.
+
+The copied user API35 environment passes two force-stop starts, Home/resume
+and two full reboots with real Google Play Games sign-in and server-auth
+presence/scopes confirmed. TapBlaze account UI shows the existing linked session
+(Log Out). Chapter3/Day56/funds496.98/gems181 are stable and the user explicitly
+confirmed this is the expected save. Fresh credential entry, wiped cloud restore,
+physical ARM64 devices and ARM32 are not claimed. Paid checkout still cancels;
+some cosmetic promotions remain visible. No fake purchase success is introduced.
+
+Official release publication and downloaded artifact/provenance verification
+remain. Details: pizza-5590-update.md and pizza-5590-provenance.json. Full private
+evidence is ignored artifacts/pizza-5590-20261020 and E:/Codex-Morphe-Pizza-5590-20261020.
+Original C: AVDs, signing key and verified backups are retained. The old installed
+v1.34.0/game5.58 control has a separate PairIP/Play Store failure. Diagnostic
+manifest-only debuggable copies were used solely for private backup reads.
+Original local context edits are preserved in a named stash and patch; restore
+them after publication without committing them as part of this change.
+
 ## Published replacement v1.35.2 - 2026-10-16
 
 The user's full withdrawal and normal-release request is complete. PR #36
