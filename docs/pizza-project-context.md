@@ -2,21 +2,30 @@
 
 Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
-## Pizza5.59.0 official-support work -2026-10-20
+## Pizza 5.59.0 official support - 2026-10-20
 
-User explicitly requested official5.59 support. Continue PR37 from820ab6c;
-the prior port was incomplete, but successful capture39280529797 now supplies
-both independent starts. A new profile is active and experimental during runtime
-validation. Build/clean patch, native/DEX/Play-services/all5-split integrity checks
-pass. Actual sponsor reward and checkout cancellation pass; Day2 pepperoni order
-is prepared/baked/cut/served. Repeat-start/reboot, offline recreation, clean install
-and real account/save tests remain before switching to normal support/publication.
-Details: pizza-5590-update.md and pizza-5590-provenance.json. Evidence is ignored
-artifacts/pizza-5590-20261020 plus E:/Codex-Morphe-Pizza-5590-20261020. C: is nearly
-full; copied AVDs run from E:, originals are untouched. No passwords/tokens/APKs/
-saves/signing keys in Git. Original local context changes from the coffee branch
-are preserved in a named Git stash and the evidence folder; do not drop them.
+PR37 now contains the complete, validated ARM64 profile for5.59.0(2322),
+marked non-experimental. All three default patches reuse the existing registry.
+Full build/clean patch, native/DEX/all-split preservation, actual PNN reward,
+checkout cancellation, pepperoni preparation/serving, repeat starts, reboot,
+offline recreation and disposable clean Day1 setup/relaunch pass.
 
+The copied user API35 environment passes two force-stop starts, Home/resume
+and two full reboots with real Google Play Games sign-in and server-auth
+presence/scopes confirmed. TapBlaze account UI shows the existing linked session
+(Log Out). Chapter3/Day56/funds496.98/gems181 are stable and the user explicitly
+confirmed this is the expected save. Fresh credential entry, wiped cloud restore,
+physical ARM64 devices and ARM32 are not claimed. Paid checkout still cancels;
+some cosmetic promotions remain visible. No fake purchase success is introduced.
+
+Official release publication and downloaded artifact/provenance verification
+remain. Details: pizza-5590-update.md and pizza-5590-provenance.json. Full private
+evidence is ignored artifacts/pizza-5590-20261020 and E:/Codex-Morphe-Pizza-5590-20261020.
+Original C: AVDs, signing key and verified backups are retained. The old installed
+v1.34.0/game5.58 control has a separate PairIP/Play Store failure. Diagnostic
+manifest-only debuggable copies were used solely for private backup reads.
+Original local context edits are preserved in a named stash and patch; restore
+them after publication without committing them as part of this change.
 
 ## Published replacement v1.35.2 - 2026-10-16
 
@@ -76,7 +85,7 @@ The user also requested full withdrawal: the release workflow retires only
 v1.35.0/v1.35.1 and the unchanged abandoned feature branch after v1.35.2 is
 published. Commit history is retained; no history rewrite is performed.
 
-## Pizza 5.58.0 update — runtime verification, 2026-10-06
+## Pizza 5.58.0 update â€” runtime verification, 2026-10-06
 
 User requested 5.58.0 and easier future updates using origin/main 053d72f.
 The actual previous target is 5.57.3 (2277). Work is on codex/pizza-version-adaptive.
@@ -171,7 +180,7 @@ from cached menu or ask for credentials outside the app. APKs, full logs, snapsh
 saves, official SDK downloads and signing keys remain ignored, outside Git.
 Ready for the authorized commit and GitHub release.
 
-## Latest scope: hide paid offers — 2026-09-28
+## Latest scope: hide paid offers â€” 2026-09-28
 
 The user accepted the alternative of hiding broken real-money offers and
 cancelling checkout, preserving in-game rewards/exchanges and their save. This
@@ -217,7 +226,7 @@ work; retain user AVD and diagnostic artifacts.
 
 Original-context checkpoints below remain historical evidence.
 
-## Latest user confirmation and billing investigation — 2026-09-28
+## Latest user confirmation and billing investigation â€” 2026-09-28
 
 Published [v1.31.1](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.31.1):
 implementation commit `de4d708`, automated release commit `bf05114`.
@@ -243,7 +252,7 @@ the same APK opens the shop and the stock checkout with this renderer. User data
 and accounts have not been cleared or reinstalled. Debug AVD was closed cleanly.
 Current billing evidence is under ignored `artifacts/billing-20260928`.
 
-## Validated application checkpoint — 2026-09-28, 14:46 UTC
+## Validated application checkpoint â€” 2026-09-28, 14:46 UTC
 
 The final candidate is `artifacts/session-20260928/pizza-accepted-activity.apk`
 (SHA-256 `21c0e913150194d710152fc16db807893fed099fa062a11e2ff0eb99a1bf7b63`).

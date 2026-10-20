@@ -155,7 +155,7 @@
               "versionCodes": {
                 "ARM64_V8A": 2322
               },
-              "isExperimental": true,
+              "isExperimental": false,
               "minSdk": null,
               "description": "Requires complete ARM64 APKM/XAPK initialization resources."
             }
@@ -238,7 +238,7 @@
               "versionCodes": {
                 "ARM64_V8A": 2322
               },
-              "isExperimental": true,
+              "isExperimental": false,
               "minSdk": null,
               "description": "Requires complete ARM64 APKM/XAPK initialization resources."
             }
@@ -511,7 +511,7 @@
               "versionCodes": {
                 "ARM64_V8A": 2322
               },
-              "isExperimental": true,
+              "isExperimental": false,
               "minSdk": null,
               "description": "Requires complete ARM64 APKM/XAPK initialization resources."
             }

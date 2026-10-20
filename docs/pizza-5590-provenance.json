@@ -1,5 +1,5 @@
 {
-  "status": "active_profile_local_runtime_validation",
+  "status": "official_profile_validated_pending_publication",
   "game_version": "5.59.0",
   "version_code": 2322,
   "package": "com.tapblaze.pizzabusiness",
@@ -63,7 +63,7 @@
       "Lcom/fyber/inneractive/sdk/flow/storepromo/ui/b;->onReceive(Landroid/content/Context;Landroid/content/Intent;)V",
       "Lcom/fyber/inneractive/sdk/mraid/IAMraidKit;->onReceive(Landroid/content/Context;Landroid/content/Intent;)V",
       "Lcom/fyber/inneractive/sdk/util/y;->onReceive(Landroid/content/Context;Landroid/content/Intent;)V",
-      "Lcom/ironsource/adqualitysdk/sdk/i/ὶ;->onReceive(Landroid/content/Context;Landroid/content/Intent;)V",
+      "Lcom/ironsource/adqualitysdk/sdk/i/\u00e1\u02dd\u00b6;->onReceive(Landroid/content/Context;Landroid/content/Intent;)V",
       "Lcom/ironsource/sdk/service/Connectivity/BroadcastReceiverStrategy$1;->onReceive(Landroid/content/Context;Landroid/content/Intent;)V",
       "Lcom/mbridge/msdk/click/retry/a$a;->onReceive(Landroid/content/Context;Landroid/content/Intent;)V",
       "Lcom/mbridge/msdk/config/component/status/c$b;->onReceive(Landroid/content/Context;Landroid/content/Intent;)V",
@@ -208,6 +208,159 @@
       "input_apks": 5,
       "verified_native_libraries": 17,
       "verified_assets": 6772
+    },
+    "debug_runtime_matrix": [
+      {
+        "test": "debug-force-1",
+        "pids": [
+          "5251"
+        ],
+        "game_foreground": true,
+        "errors": []
+      },
+      {
+        "test": "debug-force-2",
+        "pids": [
+          "5763"
+        ],
+        "game_foreground": true,
+        "errors": []
+      },
+      {
+        "test": "debug-background-resume",
+        "pids": [
+          "5763"
+        ],
+        "game_foreground": true,
+        "errors": []
+      },
+      {
+        "test": "debug-reboot",
+        "pids": [
+          "3111"
+        ],
+        "game_foreground": true,
+        "errors": []
+      }
+    ],
+    "debug_save_parity": {
+      "debug-force-2": {
+        "funds": true,
+        "gems": true,
+        "progress": [
+          "Chapter 1",
+          "Day 2"
+        ]
+      },
+      "debug-background-resume": {
+        "funds": true,
+        "gems": true,
+        "progress": [
+          "Chapter 1",
+          "Day 2"
+        ]
+      },
+      "debug-reboot": {
+        "funds": true,
+        "gems": true,
+        "progress": [
+          "Chapter 1",
+          "Day 2"
+        ]
+      }
+    },
+    "offline_activity_recreation": {
+      "pid": "3758",
+      "pid_after": "3758",
+      "creations": 3,
+      "errors": [],
+      "status": "PASS"
+    },
+    "clean_install": "PASS: new age setup, new Day1/funds40 game and force-stop relaunch; no fatal/receiver markers",
+    "account_runtime_matrix": [
+      {
+        "test": "account-force-1",
+        "pids": [
+          "7457"
+        ],
+        "game_foreground": true,
+        "google_sign_in": true,
+        "error_markers": 0
+      },
+      {
+        "test": "account-force-2",
+        "pids": [
+          "8155"
+        ],
+        "game_foreground": true,
+        "google_sign_in": true,
+        "error_markers": 0
+      },
+      {
+        "test": "account-background-resume",
+        "pids": [
+          "8155"
+        ],
+        "game_foreground": true,
+        "google_sign_in": true,
+        "error_markers": 0
+      },
+      {
+        "test": "account-reboot-1",
+        "pids": [
+          "3400"
+        ],
+        "game_foreground": true,
+        "google_sign_in": true,
+        "error_markers": 0
+      },
+      {
+        "test": "account-reboot-2",
+        "pids": [
+          "3441"
+        ],
+        "game_foreground": true,
+        "google_sign_in": true,
+        "error_markers": 0
+      }
+    ],
+    "account_server_authorization": {
+      "account-5590-first": {
+        "google_sign_in": true,
+        "server_auth_presence_flag_true": true,
+        "granted_scopes_reported": true,
+        "raw_auth_code_logged": false
+      },
+      "account-force-1": {
+        "google_sign_in": true,
+        "server_auth_presence_flag_true": true,
+        "granted_scopes_reported": true,
+        "raw_auth_code_logged": false
+      },
+      "account-force-2": {
+        "google_sign_in": true,
+        "server_auth_presence_flag_true": true,
+        "granted_scopes_reported": true,
+        "raw_auth_code_logged": false
+      },
+      "account-reboot-1": {
+        "google_sign_in": true,
+        "server_auth_presence_flag_true": true,
+        "granted_scopes_reported": true,
+        "raw_auth_code_logged": false
+      },
+      "account-reboot-2": {
+        "google_sign_in": true,
+        "server_auth_presence_flag_true": true,
+        "granted_scopes_reported": true,
+        "raw_auth_code_logged": false
+      }
+    },
+    "tapblaze_linked_session": {
+      "tapblaze_account_control_opened": true,
+      "logout_control_present": true,
+      "login_control_present": false,
+      "account_identity_visible": false
     }
   },
   "current_release_probe": {
@@ -216,9 +369,9 @@
     "is_supported": false
   },
   "required_work": [
-    "Finish repeat-start/reboot, offline recreation, clean-install and actual account/save tests before official publication."
+    "Publish the verified non-experimental bundle and verify downloaded release provenance."
   ],
-  "runtime_status": "5.58 ->5.59 same-key guest update reads Day2/funds64.38/gems10; PNN gives exactly one gem(10->11) with one GLThread66 sequence under double tap/Home/resume. Three checkout invocations cancel on GLThread with zero Billing entry/success. Actual pepperoni order prepared/baked/cut/served. Further matrix pending.",
+  "runtime_status": "PASS: repeated starts, Home/resume, two full user-environment reboots, genuine Google Play Games sign-in and ServerAuthCode result auth=true with granted scopes. TapBlaze linked-session UI has Log Out and no login control. Chapter3/Day56/funds496.98/gems181 stable; user confirmed expected save on2026-10-20. Guest reward, checkout cancellation, reboot, offline Activity recreation and disposable clean Day1 setup/relaunch pass.",
   "sdk_inputs": [
     {
       "url": "https://repo.maven.apache.org/maven2/com/fyber/marketplace-sdk/8.4.6/marketplace-sdk-8.4.6.aar",
@@ -284,7 +437,7 @@
   "resources": {
     "arm64-init.delta.gz": "4a2f04eeaf713e64fc67c48418816d718ea4c6869d79ccc3d4e6a8b9cfd3c2ac",
     "funds-store.delta.gz": "d6e6100b9fc0693430a643a6d4ba91b7b4fb05d94faba72ea644d935535cfc96",
-    "profile.properties": "85cedaa9787ffd094fcfaf39f3700cf84d26a8a37884e12a8a5802326605fbc5",
+    "profile.properties": "3fccf922caf5da286d8c0ba44d5afa1f3da74e408e496873b919d789df5e1658",
     "sdk-receivers.dex": "b2ad34377b0e3ac886e1a3d68508c6f4ecff1379292f3a110ba7f15008ca5691",
     "strings.tsv.gz": "c7d8c8540b22579e3bebf678d33651d85dbe0c9dfc4f519001d69e4e489927c0"
   },
@@ -294,5 +447,44 @@
     "independent_original_signed_starts": 2,
     "identical_strings": 1477,
     "ifunc": "Exact same reviewed libc.so SHA256 2ff4bf0e733a1103333d0742890d66e88d7aabe05c0f977f3b2d1ae470269b4c, memmove resolver0xaccbc -> target0x443c0; no process pointer embedded"
+  },
+  "user_save_confirmation": {
+    "date": "2026-10-20",
+    "expected_save_confirmed": true,
+    "chapter": 3,
+    "day": 56,
+    "funds": "496.98",
+    "gems": 181
+  },
+  "limitations": [
+    "ARM64 only; tested on API35 emulator with ARM64 translation, not a physical device.",
+    "Existing linked TapBlaze session verified; fresh credential entry and wiped-device cloud restoration not claimed.",
+    "Paid checkout cancels under replacement signing; some cosmetic promotions remain visible. Existing verified purchase processing and ordinary exchanges/rewards are preserved.",
+    "Complete fresh Day1 playthrough not claimed."
+  ],
+  "old_control": {
+    "installed_bundle": "v1.34.0",
+    "game_version": "5.58.0",
+    "result": "PairIP native crash and Play Store remediation; separate old installed control, not a failure of5.59 or the current5.58 profile.",
+    "diagnostic_apks": "Manifest-only debuggable copies used solely for private backup reads, not runtime success claims or publication."
+  },
+  "official_output_parity": {
+    "non_signature_entries": 8162,
+    "different_entries": [],
+    "candidate_sha256": "efeebf17214fd1b70962dd0c16dae9212cf24f6225d2431bbb3140e0f4b6cfd2",
+    "official_sha256": "c86d5ac30af155b1d9583cb5dfa95ae6b3c4bb9e3904e956b8a1e09e7fb03d13"
+  },
+  "official_output_preservation": {
+    "status": "PASS",
+    "input_apks": 5,
+    "verified_native_libraries": 17,
+    "verified_assets": 6772
+  },
+  "official_output_runtime": {
+    "google_sign_in": true,
+    "server_auth_presence_flag_true": true,
+    "granted_scopes_reported": true,
+    "game_foreground": true,
+    "fatal_markers": 0
   }
 }
