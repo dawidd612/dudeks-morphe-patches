@@ -1,5 +1,5 @@
 {
-  "status": "intake_verified_port_incomplete",
+  "status": "active_profile_local_runtime_validation",
   "game_version": "5.59.0",
   "version_code": 2322,
   "package": "com.tapblaze.pizzabusiness",
@@ -201,7 +201,14 @@
     "publisher_signatures": "PASS: five APKs verified by ApkVerifier",
     "asset_verifier_regressions": "13/13 PASS",
     "archive_audit_regressions": "6/6 PASS",
-    "emitted_apk_verifiers": "Java compilation PASS; no newly patched APK available"
+    "emitted_apk_verifiers": "PASS: 3418 auth/SDK methods, 2165 billing methods, 87 native bridges, 6 exact SDK restorations, 5 reward scenarios",
+    "play_services_guards": "PASS: codes2/18 suppressed, nullable cancellation once;23 other methods unchanged",
+    "all_split_assets": {
+      "status": "PASS",
+      "input_apks": 5,
+      "verified_native_libraries": 17,
+      "verified_assets": 6772
+    }
   },
   "current_release_probe": {
     "version": "1.35.4",
@@ -209,17 +216,9 @@
     "is_supported": false
   },
   "required_work": [
-    "Capture startup strings and all ARM64 PT_LOAD segments before/after initialization from two independent original-signed starts.",
-    "Reconstruct the exact new native bootstrap and review import/IFUNC resolution.",
-    "Review newly protected SDK methods and recover matching official SDK bodies.",
-    "Review new store visibility locations; retain normal exchanges and verified existing purchases.",
-    "Build, patch clean XAPK and run DEX, native, asset and available runtime tests."
+    "Finish repeat-start/reboot, offline recreation, clean-install and actual account/save tests before official publication."
   ],
-  "runtime_status": "Native capture pending. Disposable software emulator reached Android init, but remained ADB offline during encrypted data initialization. A second cold boot with EncryptUserData disabled is under diagnosis.",
-  "inactive_resources": {
-    "sdk-receivers.dex": "b2ad34377b0e3ac886e1a3d68508c6f4ecff1379292f3a110ba7f15008ca5691",
-    "note": "Six matching official SDK methods recovered and target-reference contracts validated. This inactive resource is not a complete bootstrap profile and is not listed in profiles.txt."
-  },
+  "runtime_status": "5.58 ->5.59 same-key guest update reads Day2/funds64.38/gems10; PNN gives exactly one gem(10->11) with one GLThread66 sequence under double tap/Home/resume. Three checkout invocations cancel on GLThread with zero Billing entry/success. Actual pepperoni order prepared/baked/cut/served. Further matrix pending.",
   "sdk_inputs": [
     {
       "url": "https://repo.maven.apache.org/maven2/com/fyber/marketplace-sdk/8.4.6/marketplace-sdk-8.4.6.aar",
@@ -239,7 +238,7 @@
     }
   ],
   "store_visibility_candidates": {
-    "status": "Reviewed matching instruction context in ORIGINAL library, not yet applied to reconstructed output. Reconstruction can shift file offsets. These are NOT a published visibility delta.",
+    "status": "Original instruction candidates matched uniquely in reconstructed output and applied at +0x1000; exact published delta is recorded under store_visibility.",
     "original_file_offsets": [
       "0x185aa08",
       "0x167364c"
@@ -252,5 +251,48 @@
       "19088052",
       "00008052c0035fd6"
     ]
+  },
+  "native_reconstruction": {
+    "restored_executable_bytes": 50923,
+    "constant_qwords": 3798,
+    "relative_relocations": 0,
+    "imports": 200,
+    "removed_init": "0x22b0000",
+    "input_sha256": "c97e83fd73d3c871d26d2f2587c1f9c99279505a5a70f6787220572c958afe26",
+    "output_sha256": "b54a7104f95b6ca89f5fb59ac5250a2ffde40922446b505c61f14f211ed36135",
+    "first_run": "first",
+    "second_run": "second"
+  },
+  "store_visibility": {
+    "input_sha256": "b54a7104f95b6ca89f5fb59ac5250a2ffde40922446b505c61f14f211ed36135",
+    "output_sha256": "94bcdf5583791deb65d921d017c2303ba2cb74f5e85988ed6e3737dbf7ffff19",
+    "edits": [
+      {
+        "offset": "0x185ba08",
+        "original_offset": "0x185aa08",
+        "before": "f903022a",
+        "after": "19088052"
+      },
+      {
+        "offset": "0x167464c",
+        "original_offset": "0x167364c",
+        "before": "ff4301d1fd7b02a9",
+        "after": "00008052c0035fd6"
+      }
+    ]
+  },
+  "resources": {
+    "arm64-init.delta.gz": "4a2f04eeaf713e64fc67c48418816d718ea4c6869d79ccc3d4e6a8b9cfd3c2ac",
+    "funds-store.delta.gz": "d6e6100b9fc0693430a643a6d4ba91b7b4fb05d94faba72ea644d935535cfc96",
+    "profile.properties": "85cedaa9787ffd094fcfaf39f3700cf84d26a8a37884e12a8a5802326605fbc5",
+    "sdk-receivers.dex": "b2ad34377b0e3ac886e1a3d68508c6f4ecff1379292f3a110ba7f15008ca5691",
+    "strings.tsv.gz": "c7d8c8540b22579e3bebf678d33651d85dbe0c9dfc4f519001d69e4e489927c0"
+  },
+  "initialization_capture": {
+    "workflow_run": 39280529797,
+    "revision": "820ab6c5eac51de7d1bd48b3bbe0454662b30833",
+    "independent_original_signed_starts": 2,
+    "identical_strings": 1477,
+    "ifunc": "Exact same reviewed libc.so SHA256 2ff4bf0e733a1103333d0742890d66e88d7aabe05c0f977f3b2d1ae470269b4c, memmove resolver0xaccbc -> target0x443c0; no process pointer embedded"
   }
 }

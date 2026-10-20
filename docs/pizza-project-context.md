@@ -2,6 +2,22 @@
 
 Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
+## Pizza5.59.0 official-support work -2026-10-20
+
+User explicitly requested official5.59 support. Continue PR37 from820ab6c;
+the prior port was incomplete, but successful capture39280529797 now supplies
+both independent starts. A new profile is active and experimental during runtime
+validation. Build/clean patch, native/DEX/Play-services/all5-split integrity checks
+pass. Actual sponsor reward and checkout cancellation pass; Day2 pepperoni order
+is prepared/baked/cut/served. Repeat-start/reboot, offline recreation, clean install
+and real account/save tests remain before switching to normal support/publication.
+Details: pizza-5590-update.md and pizza-5590-provenance.json. Evidence is ignored
+artifacts/pizza-5590-20261020 plus E:/Codex-Morphe-Pizza-5590-20261020. C: is nearly
+full; copied AVDs run from E:, originals are untouched. No passwords/tokens/APKs/
+saves/signing keys in Git. Original local context changes from the coffee branch
+are preserved in a named Git stash and the evidence folder; do not drop them.
+
+
 ## Published replacement v1.35.2 - 2026-10-16
 
 The user's full withdrawal and normal-release request is complete. PR #36
