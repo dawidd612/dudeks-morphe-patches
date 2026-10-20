@@ -85,7 +85,7 @@ The user also requested full withdrawal: the release workflow retires only
 v1.35.0/v1.35.1 and the unchanged abandoned feature branch after v1.35.2 is
 published. Commit history is retained; no history rewrite is performed.
 
-## Pizza 5.58.0 update â€” runtime verification, 2026-10-06
+## Pizza 5.58.0 update — runtime verification, 2026-10-06
 
 User requested 5.58.0 and easier future updates using origin/main 053d72f.
 The actual previous target is 5.57.3 (2277). Work is on codex/pizza-version-adaptive.
@@ -180,7 +180,7 @@ from cached menu or ask for credentials outside the app. APKs, full logs, snapsh
 saves, official SDK downloads and signing keys remain ignored, outside Git.
 Ready for the authorized commit and GitHub release.
 
-## Latest scope: hide paid offers â€” 2026-09-28
+## Latest scope: hide paid offers — 2026-09-28
 
 The user accepted the alternative of hiding broken real-money offers and
 cancelling checkout, preserving in-game rewards/exchanges and their save. This
@@ -226,7 +226,7 @@ work; retain user AVD and diagnostic artifacts.
 
 Original-context checkpoints below remain historical evidence.
 
-## Latest user confirmation and billing investigation â€” 2026-09-28
+## Latest user confirmation and billing investigation — 2026-09-28
 
 Published [v1.31.1](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.31.1):
 implementation commit `de4d708`, automated release commit `bf05114`.
@@ -252,7 +252,7 @@ the same APK opens the shop and the stock checkout with this renderer. User data
 and accounts have not been cleared or reinstalled. Debug AVD was closed cleanly.
 Current billing evidence is under ignored `artifacts/billing-20260928`.
 
-## Validated application checkpoint â€” 2026-09-28, 14:46 UTC
+## Validated application checkpoint — 2026-09-28, 14:46 UTC
 
 The final candidate is `artifacts/session-20260928/pizza-accepted-activity.apk`
 (SHA-256 `21c0e913150194d710152fc16db807893fed099fa062a11e2ff0eb99a1bf7b63`).
