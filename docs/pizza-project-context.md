@@ -41,7 +41,18 @@ are under E:/Codex-Morphe-Pizza-1000-20261024; original clean5.59.0 input and
 account backups stay under E:/Codex-Morphe-Pizza-5590-20261020. The smoke reports
 retain both setup failures and the passing smoke-ready run. See
 pizza-pnn-1000.md for installation, behavior, source and test limits.
-Publication is authorized; release status will be recorded after verification.
+Published v1.37.0: https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.37.0
+PR38 merged as79563d1; release commit b17cced. All three PR checks pass on
+e37be4e and release40139396465, including attestation, passes. Downloaded MPP
+SHA256:615a7a06c226145bc39d8feb922ad2ad5b6479971b6942bee93ba236b0fbae6d.
+SHA256SUMS, ZIP integrity and GitHub attestation verification pass. All38 scoped
+Pizza/Android-dex entries match the tested local bundle. Published metadata
+selects the sponsor patch by default for only5.59.0(2322) ARM64. Release notes
+state the per-layer counter,10-gem behavior, billing and runtime-test limits.
+The disposable Debug AVD5556 is stopped; original account5554 remains running.
+The previous signing key is still missing, so a same-key update of5554 remains
+untested; recover that key before attempting one. No APK or account data was
+published. The user's unrelated earlier working edits and named stash remain.
 
 ## Pizza 5.59.0 official support - 2026-10-20
 
