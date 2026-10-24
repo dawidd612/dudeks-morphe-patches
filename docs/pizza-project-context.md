@@ -2,6 +2,47 @@
 
 Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
+## Restored PNN sponsor patch - 2026-10-25
+
+The user requested restoration for the latest local supported Pizza,5.59.0
+(2322) ARM64, then increased each completed sponsor reward to10 gems and
+explicitly authorized immediate publication. The default-selected optional
+1000 PNN sponsor rewards patch supports only that reviewed profile. It uses
+999 PNN completions plus the original final PNN2 offer, per NewsLayer rather
+than a persistent daily quota. Skipping, final close, saved daily statistics,
+other placements and paid-checkout cancellation remain unchanged.
+
+Source build and clean-XAPK patch pass with all four Pizza patches selected.
+Both actual emitted native variants pass ARM64 instruction tests for the
+999-to-PNN2 boundary, success-only counter,10-gem payout/animation and original
+state/register preservation. The original native input fails the counter test.
+The emitted APK preserves all8162 shared non-signature entries except the
+reviewed native library; unsigned signature-stamp metadata is excluded. The
+combined native output SHA256 is
+9f62c45affc8c0757bbf5d66863907f5a5a139910ef2b0a43d6418e3cdfdaefe.
+Review found an older-Android InputStream API issue; it was fixed using the
+existing DataInputStream/readFully idiom and the final build passes.
+
+The previous artifacts/pizza-test.keystore is missing from this machine's
+searched project/user/E: locations. Do not replace it, uninstall account5554,
+or claim a same-key update was tested. Original account5554 stays unchanged.
+For runtime only, the separate E: Debug API35 AVD5556 was backed up, installed
+with a new disposable-only signing key and restored from the retained verified
+account app-data archive. The APK has its normal manifest, without instrumentation.
+Initial startup was blocked by MicroG's add-account page, then a seasonal
+Monster Mash banner; both were dismissed without credentials or event entry.
+The prepared running process passes startup, linked TapBlaze UI and actual day
+clock in60.9s,10 in-memory OCR frames,0 saved images and0 app fatal markers.
+This is --reuse-running acceptance after those setup dialogs, not a fresh
+same-key account update or proof of1000 real ads/reward persistence.
+
+Private evidence, unsigned/disposable APKs, both emitted ELFs and backup/key
+are under E:/Codex-Morphe-Pizza-1000-20261024; original clean5.59.0 input and
+account backups stay under E:/Codex-Morphe-Pizza-5590-20261020. The smoke reports
+retain both setup failures and the passing smoke-ready run. See
+pizza-pnn-1000.md for installation, behavior, source and test limits.
+Publication is authorized; release status will be recorded after verification.
+
 ## Pizza 5.59.0 official support - 2026-10-20
 
 PR37 now contains the complete, validated ARM64 profile for5.59.0(2322),
