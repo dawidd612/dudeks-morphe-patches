@@ -15,6 +15,8 @@ internal class PizzaProfile(val directory: String) {
     val version: String = properties.getProperty("version")
     val versionCode: String = properties.getProperty("versionCode")
     val startupProgram: String = properties.getProperty("startupProgram")
+    val pnnDeltas: List<String> = properties.getProperty("pnnDeltas")
+        ?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
     val target = AppTarget(version = version,
         versionCodes = mapOf(SupportedAbi.ARM64_V8A to versionCode.toInt()),
         isExperimental = properties.getProperty("experimental").toBooleanStrict(),
