@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.36.0** (`main`) - **15 patches** across **8 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.37.0** (`main`) - **16 patches** across **8 apps** - back to [README](README.md)
 
 ---
 
@@ -39,10 +39,11 @@
 
 ## Good Pizza, Great Pizza (com.tapblaze.pizzabusiness)
 
-**Supported versions:** `5.57.3` `5.58.0` `5.59.0`
+**Supported versions:** `5.59.0`
 
 | Patch | Details |
 |---|---|
+| **1000 PNN sponsor rewards** | Extends the day-start sponsor sequence to 1000 offers, with 10 gems per completed reward. Preserves skipping and the final PNN2 close flow. Works with Skip rewarded ads. |
 | **Google Play Games via MicroG-RE** | Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+ and suppresses obsolete stock Play services update prompts. Requires app.revanced.android.gms. |
 | **Hide paid offers** | Hides real-money storefront sections and cancels Google Play checkout. Keeps in-game currency exchanges and existing purchase processing. Requires a supported ARM64 Pizza build. |
 | **Skip rewarded ads** | Completes the game's rewarded-video flow without playing an ad, keeping the requested placement and normal reward. Includes re-signed startup support. |

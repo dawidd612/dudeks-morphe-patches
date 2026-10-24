@@ -1,3 +1,9 @@
+## [1.37.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.36.0...v1.37.0) (2026-10-24)
+
+### ✨ New Features
+
+* **pizza:** restore 1000 PNN rewards with 10 gems on 5.59.0 ([e37be4e](https://github.com/dawidd612/dudeks-morphe-patches/commit/e37be4e1547ea9f004e7331ca4e819984efb2041))
+
 ## [1.36.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.35.4...v1.36.0) (2026-10-20)
 
 ### ✨ New Features
