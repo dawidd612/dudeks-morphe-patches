@@ -45,7 +45,19 @@ No real account credentials or charge were used. Same-key existing-user update,
 Google/TapBlaze sign-in/cloud restoration, physical ARM64/API36 and checkout are
 not established. JNI attach/detach/local-frame-error paths are not covered by
 the instruction fixture. See coffee-1260-update.md for behavior and reproduction.
-Publication pending; retain prior unrelated Pizza edits outside this feature.
+Published as [v1.38.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.38.0)
+through PR #39, merge e2e6fa259197977ef5d58ea366d00d34dd1713d9 and release
+commit c8de250. All three PR workflows and release run 40757657181 passed.
+Downloaded release MPP SHA256:
+960881b7ab325b49685794cc51212f7a4f440350e968758b2a1efb602b7be60f.
+SHA256SUMS, ZIP integrity and GitHub attestation verification passed. All 46
+scoped Coffee/Android DEX entries match the tested bundle; six text resources
+require CRLF/LF normalization, with no logical differences. Binary entries match
+exactly. Published metadata enables the notice patch by default for
+non-experimental 1.26.0 / 1504 ARM64. Detailed release notes preserve the runtime
+limits and excluded failed instrumentation probe above. Verification is saved
+as release-verification.json beside the private evidence. Retain prior unrelated
+Pizza edits outside this feature.
 
 Targets: `com.tapblaze.coffeebusiness` **1.24.0 (1397)** and **1.25.1 (1454)**,
 complete APKM, ARM64. The 1.25.1 profile is officially non-experimental, promoted
