@@ -1,7 +1,8 @@
 """Generate version-specific resources from reviewed private evidence.
 
-Inputs: two equal string snapshots, two-run reconstructed native libraries,
-recovered startup/SDK DEX, and audited split APKs. Does not register compatibility.
+Protected inputs: two equal string snapshots, two-run reconstructed native
+libraries and recovered startup/SDK DEX. Unprotected builds need only the audited
+split set. Does not register compatibility.
 """
 import argparse
 import base64
@@ -14,21 +15,23 @@ import zipfile
 from build_pizza_native_delta import encode
 
 
-def build(evidence, splits, output, first, second):
-    values = json.loads((evidence / (first + '-values.json')).read_text())
-    if values != json.loads((evidence / (second + '-values.json')).read_text()):
-        raise ValueError('Independent string snapshots differ')
+def build(evidence, splits, output, first, second, protected_initialization=True):
     rows = []
-    for owner, fields in values.items():
-        for field, value in fields.items():
-            if value is None:
-                raise ValueError('Uninitialized constant: ' + owner + '.' + field)
-            rows.append('L' + owner.replace('.', '/') + ';\t' + field + '\t' + base64.b64encode(value.encode()).decode())
-    generated = {'strings.tsv.gz': gzip.compress(('\n'.join(rows) + '\n').encode(), mtime=0)}
-    for name in ('libunity.so', 'libil2cpp.so'):
-        generated[name + '.delta.gz'] = encode((evidence / name).read_bytes(), (evidence / (name + '-restored')).read_bytes())
-    for name in ('startup-methods.dex', 'sdk-receivers.dex'):
-        generated[name] = (evidence / name).read_bytes()
+    generated = {}
+    if protected_initialization:
+        values = json.loads((evidence / (first + '-values.json')).read_text())
+        if values != json.loads((evidence / (second + '-values.json')).read_text()):
+            raise ValueError('Independent string snapshots differ')
+        for owner, fields in values.items():
+            for field, value in fields.items():
+                if value is None:
+                    raise ValueError('Uninitialized constant: ' + owner + '.' + field)
+                rows.append('L' + owner.replace('.', '/') + ';\t' + field + '\t' + base64.b64encode(value.encode()).decode())
+        generated['strings.tsv.gz'] = gzip.compress(('\n'.join(rows) + '\n').encode(), mtime=0)
+        for name in ('libunity.so', 'libil2cpp.so'):
+            generated[name + '.delta.gz'] = encode((evidence / name).read_bytes(), (evidence / (name + '-restored')).read_bytes())
+        for name in ('startup-methods.dex', 'sdk-receivers.dex'):
+            generated[name] = (evidence / name).read_bytes()
     # Extract the SDK's original embedded classes, without changing any JNI code.
     firebase = list((splits.parent / 'inputs').glob('libFirebaseCppApp-*.so'))
     if len(firebase) != 1:
@@ -64,5 +67,6 @@ if __name__ == '__main__':
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--first', default='native-2')
     parser.add_argument('--second', default='native-3')
+    parser.add_argument('--unprotected', action='store_true', help='Generate only common resources; no initialization capture is required')
     args = parser.parse_args()
-    build(args.evidence, args.splits, args.output, args.first, args.second)
+    build(args.evidence, args.splits, args.output, args.first, args.second, not args.unprotected)

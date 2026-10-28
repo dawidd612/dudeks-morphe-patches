@@ -7,7 +7,11 @@ param(
 $ErrorActionPreference = 'Stop'
 $adb = Join-Path $Sdk 'platform-tools\adb.exe'
 $serial = "emulator-$Port"
-$config = Join-Path $env:USERPROFILE ".android\avd\$Avd.avd\config.ini"
+$avdHome = if ($env:ANDROID_AVD_HOME) { $env:ANDROID_AVD_HOME } else { Join-Path $env:USERPROFILE '.android\avd' }
+$registration = Join-Path $avdHome "$Avd.ini"
+$avdPath = @(Get-Content -LiteralPath $registration | Where-Object { $_ -match '^path=' })
+if ($avdPath.Count -ne 1) { throw 'Expected one absolute path in the named AVD registration' }
+$config = Join-Path $avdPath[0].Substring(5) 'config.ini'
 $processes = @(Get-CimInstance Win32_Process -Filter "name='emulator.exe'" |
     Where-Object { $_.CommandLine -match "-avd\s+$([regex]::Escape($Avd))(\s|$)" })
 if (!$processes.Count) {

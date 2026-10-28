@@ -23,8 +23,14 @@ val coffeeStartupSupport = bytecodePatch(
     // Exact Firebase C++ SDK classes embedded in this version's native library.
     // Keeping their JNI callbacks in the app class loader avoids Android 15's
     // cross-class-loader native-bridge registration bug (AOSP b/393035780).
-    extendWith("coffeebusiness/1.24.0/firebase-app.dex")
+    extendWith(CoffeeProfiles.firebaseResource)
     execute {
+        // Newer unprotected builds already contain their original SDK/startup
+        // implementations. Their sideloaded Unity packs still need the bridge.
+        if (!CoffeeProfiles.forPackage(packageMetadata).protectedInitialization) {
+            restoreCoffeeAssetPacks()
+            return@execute
+        }
         val context = "Landroid/content/Context;"
         val signature = "Lcom/pairip/SignatureCheck;"
         val launcher = "Lcom/pairip/StartupLauncher;"

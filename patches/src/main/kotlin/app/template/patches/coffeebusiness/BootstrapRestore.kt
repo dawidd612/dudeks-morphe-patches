@@ -72,9 +72,11 @@ internal val coffeeNativeBootstrap = rawResourcePatch {
         listOf("libunity.so", "libil2cpp.so").forEach { name ->
             val library = get("lib/arm64-v8a/$name")
             if (!library.isFile) throw PatchException("Coffee startup requires the complete ARM64 APKM.")
-            library.writeBytes(profile.resource("$name.delta.gz").use {
-                CoffeeBootstrap.restoreNative(library.readBytes(), it)
-            })
+            if (profile.protectedInitialization) {
+                library.writeBytes(profile.resource("$name.delta.gz").use {
+                    CoffeeBootstrap.restoreNative(library.readBytes(), it)
+                })
+            }
         }
     }
 }

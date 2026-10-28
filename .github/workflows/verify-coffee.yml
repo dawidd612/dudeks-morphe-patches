@@ -2,9 +2,9 @@ name: Verify Coffee profiles and update workflow
 on:
   push:
     branches: [main]
-    paths: ['patches/src/**/coffeebusiness/**', 'extensions/coffeebusiness/**', 'scripts/*coffee*', 'scripts/*Coffee*', '.github/workflows/verify-coffee.yml']
+    paths: ['patches/src/**/coffeebusiness/**', 'extensions/coffeebusiness/**', 'native/coffeebusiness/**', 'scripts/*coffee*', 'scripts/*Coffee*', '.github/workflows/verify-coffee.yml']
   pull_request:
-    paths: ['patches/src/**/coffeebusiness/**', 'extensions/coffeebusiness/**', 'scripts/*coffee*', 'scripts/*Coffee*', '.github/workflows/verify-coffee.yml']
+    paths: ['patches/src/**/coffeebusiness/**', 'extensions/coffeebusiness/**', 'native/coffeebusiness/**', 'scripts/*coffee*', 'scripts/*Coffee*', '.github/workflows/verify-coffee.yml']
 permissions:
   contents: read
   packages: read
@@ -35,5 +35,6 @@ jobs:
       - name: Verify preparation, recovery and preservation checks
         run: |
           python3 scripts/test_prepare_coffee_update.py
+          python3 scripts/test_build_coffee_profile.py
           python3 scripts/test_verify_apkm.py
           python3 scripts/test_pizza_assets.py
