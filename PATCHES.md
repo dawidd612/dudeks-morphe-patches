@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.37.0** (`main`) - **16 patches** across **8 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.38.0** (`main`) - **17 patches** across **8 apps** - back to [README](README.md)
 
 ---
 
@@ -27,12 +27,13 @@
 
 ## Good Coffee, Great Coffee (com.tapblaze.coffeebusiness)
 
-**Supported versions:** `1.24.0` `1.25.1`
+**Supported versions:** `1.24.0` `1.25.1` `1.26.0`
 
 | Patch | Details |
 |---|---|
 | **Coffee startup support** | Restores version-specific Unity startup after re-signing. |
 | **Google Play Games via MicroG-RE** | Routes Google Play Games sign-in and player/server authorization through MicroG-RE 7.1.0+. Requires app.revanced.android.gms. |
+| **Non-blocking update notice** | Replaces Coffee's blocking update/install notice with one short toast and continues loading the game. |
 | **Skip rewarded ads** | Completes the requested rewarded-video flow locally using the game's callbacks. |
 
 ---

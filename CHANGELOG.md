@@ -1,3 +1,9 @@
+## [1.38.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.37.0...v1.38.0) (2026-10-28)
+
+### ✨ New Features
+
+* **coffee:** support 1.26.0 with non-blocking update notices ([b21a5f9](https://github.com/dawidd612/dudeks-morphe-patches/commit/b21a5f9758c35939a8653f2603821b78ea2e4657))
+
 ## [1.37.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.36.0...v1.37.0) (2026-10-24)
 
 ### ✨ New Features
