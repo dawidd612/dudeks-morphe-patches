@@ -1,6 +1,9 @@
 # Coffee update workflow
 
-The last fully identified input is Coffee **1.25.1 / 1454**, APKM SHA256
+The latest identified input is Coffee **1.26.0 / 1504**, APKM SHA256
+`106e6dd9c21ce50e16c4a64945f8211feb542dc6bfab4eab50c82b0739cf4793`.
+It has no PairIP and uses `protectedInitialization=false`. The older protected
+1.25.1 /1454 input remains SHA256
 `7172bcfad15a35bef16f93f2da91f13675c1f22a790d969a3fbceaf1e6c081d3`.
 Preserve each version's profile; never reuse native deltas merely because Unity
 has the same version. APKs, captures, saves, system libraries and keys stay under
@@ -41,6 +44,15 @@ CoffeeApplication). The old Ad Quality callback has incompatible references.
 The 1.25.1 profile explicitly maps `mg6`, `wg5`, parent `wi1`, resolution `fl5`
 and retry holder `hk5`. These are evidence for this build, not future defaults.
 
+Choose the startup mode from this input before attempting capture. If all DEX
+lack PairIP/VM calls and constant holders, use an unprotected profile: skip the
+two native captures and recovered wrapper/SDK resources below. Generate its
+actual Firebase/asset-pack resources with `build_coffee_profile.py <evidence>
+--splits <cache>/splits --output <profile> --unprotected`. Keep pack/native
+completeness checks and verify the embedded Firebase against the shared class
+loader resource. Derive Games clients, base class, resolution owner and retry
+field from the new DEX. Do not create empty initialization deltas to fill slots.
+
 ## 2. Enforce silence before every game launch
 
 Use an existing disposable, debuggable Google APIs ARM-translation AVD, or create
@@ -55,8 +67,12 @@ a new one. Never reset a user's AVD. The launcher verifies the named AVD/serial,
 Do not launch the game if the verification command fails. Recheck after reboot.
 The script may restart adbd as root on the named debuggable test AVD to control
 its media volume. It does not clear or uninstall apps.
+It follows `ANDROID_AVD_HOME` and the named registration's absolute path. The
+prepared 1.26.0 environment is `E:/Codex-Morphe-Coffee-1260-20261028/avds`,
+AVD `Morphe_Coffee_1260_API35`, port5562; reuse its retained disposable signer
+and data for subsequent test updates.
 
-## 3. Capture original initialization twice
+## 3. Capture protected original initialization twice
 
 Install the original publisher-signed **complete split set** on the disposable
 capture AVD. Start the matching local Frida server. Python needs `frida`,
@@ -120,13 +136,17 @@ SDK rescans or decompiles when hashes and targeted checks already answer a quest
 
 ## 6. Runtime and publication evidence
 
-After the mute check: clean install in a disposable profile, real gameplay,
-isolated reward callback contract plus a requested in-game reward, repeated
-force-stop starts, Home/resume, offline/online and reboot. Back up private and
-external files before a same-key upgrade of an existing test save. Verify its
-day, balances and inventory through the UI. Keep raw logs and exact input/output
-hashes with every failure. Slow or black intermediate screens need observation
-and diagnosis; they are not a pass.
+After the mute check, routine updates reuse the prepared copied/disposable
+environment and check startup, entry to a day and the existing account session
+when one is already available. Add a focused check for changed patch behavior:
+1.26.0's notice patch forces the existing version callback to status0 in memory,
+observes the actual short-toast shown/hidden callbacks, then verifies the same
+process can enter a day. Keep test instrumentation out of the published APK.
+Do not repeat reward, billing, cooking, reboot or broad lifecycle matrices for
+unchanged behavior. Back up private/external files before a same-key test-save
+upgrade. Keep logs and input/output hashes for every failure; black intermediate
+screens and instrumented crashes are not a pass. Prefer text/local OCR and at
+most one private image for an otherwise unreadable control.
 
 Real TapBlaze/Google credentials and verification codes remain user actions.
 Opening a login form does not prove account restoration. Publish only the patch

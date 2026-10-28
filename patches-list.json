@@ -65,6 +65,15 @@
               "isExperimental": false,
               "minSdk": null,
               "description": "Requires complete ARM64 APKM/XAPK initialization resources."
+            },
+            {
+              "version": "1.26.0",
+              "versionCodes": {
+                "ARM64_V8A": 1504
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": "Requires complete ARM64 APKM/XAPK initialization resources."
             }
           ]
         }
@@ -135,6 +144,15 @@
               "version": "1.25.1",
               "versionCodes": {
                 "ARM64_V8A": 1454
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": "Requires complete ARM64 APKM/XAPK initialization resources."
+            },
+            {
+              "version": "1.26.0",
+              "versionCodes": {
+                "ARM64_V8A": 1504
               },
               "isExperimental": false,
               "minSdk": null,
@@ -374,6 +392,37 @@
       "options": []
     },
     {
+      "name": "Non-blocking update notice",
+      "description": "Replaces Coffee's blocking update/install notice with one short toast and continues loading the game.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch",
+        "RawResourcePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.tapblaze.coffeebusiness",
+          "name": "Good Coffee, Great Coffee",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#98704C",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "1.26.0",
+              "versionCodes": {
+                "ARM64_V8A": 1504
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": "Requires complete ARM64 APKM/XAPK initialization resources."
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Play Store Fix",
       "description": "Removes the Google Play installation check that blocks patched APKs at startup.",
       "default": true,
@@ -492,6 +541,15 @@
               "version": "1.25.1",
               "versionCodes": {
                 "ARM64_V8A": 1454
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": "Requires complete ARM64 APKM/XAPK initialization resources."
+            },
+            {
+              "version": "1.26.0",
+              "versionCodes": {
+                "ARM64_V8A": 1504
               },
               "isExperimental": false,
               "minSdk": null,

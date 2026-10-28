@@ -1,5 +1,52 @@
 # Good Coffee, Great Coffee - patch context
 
+## Latest checkpoint - Coffee1.26.0 / update toast, 2026-10-28
+
+The user's new request is implemented for1.26.0(1504) ARM64: update support and
+an optional default-selected Non-blocking update notice patch. The original
+1.26 input has no PairIP (0VM/holder references in all4DEX), so the profile now
+explicitly sets protectedInitialization=false. Original SDK/native startup is
+retained, while common Unity packs/Firebase support remains. The three Firebase
+resources are byte-identical. New Games client/base/retry mappings were recovered
+from actual DEX. Older profile resources remain unchanged.
+
+Final build and clean-input FULL patch pass. Input APKM SHA256:
+106e6dd9c21ce50e16c4a64945f8211feb542dc6bfab4eab50c82b0739cf4793.
+Publisher certificate SHA256 remains
+bab9079ab6c5f2e6d636cf2fe5d40526df4f7d47b64eda713f58a6b70b4d3989.
+Final private APK SHA256:
+3c5d7407c88f5860c0ae54f42065d4ae4a846c524a137cd6c4e012b83a6213aa.
+Its signature and all16splits/44native libs/2519assets pass. Only libil2cpp is
+changed, to SHA2563fdaad295351379630c1b264020d1bca84261d946bf63231123eee709763ea4b.
+Native gate tests pass12 scenarios plus repeated iterator completion; original
+ELF reproduces the blocking-dialog failure. Generator RED/GREEN2tests and all3
+packaged profile selections plus mismatches pass. One Test Automation Engineer
+review is closed; its async-toast exception finding was fixed and rebuilt.
+
+Runtime on the fresh muted/windowless E: API35 Google APIs AVD passes normal
+menu and Day1/Maisie. A memory-only forced-status0 test shows/hides the real
+short toast in2.633s, reaches Start, then records Day1 start/Maisie in the same
+PID6586 with no app fatal markers. A separate null-base ContextWrapper produces
+a caught UI-thread NullPointerException without killing PID6000. An earlier
+Frida framework-method exception probe caused a native SIGSEGV in PID5037; it
+is not counted as pass and its root cause is unestablished. All failure evidence
+is retained. Total12 local OCR frames and1 private age-slider image; no gallery.
+
+Private evidence: E:/Codex-Morphe-Coffee-1260-20261028, including evidence.json,
+runtime-verification.json, APKs, native sources/dumps and raw logs. AVD registration
+is under its avds/; fresh device is Morphe_Coffee_1260_API35, port5562. Reuse this
+prepared AVD and coffee-1260-disposable.p12 for future test updates. Prior C: AVD
+directories/ignored Coffee artifacts were absent; no original user's save or key
+was replaced. Mute launcher now follows ANDROID_AVD_HOME and the registration's
+absolute path. The original publisher install's prelaunch data was backed up
+before replacement in this fresh disposable AVD.
+
+No real account credentials or charge were used. Same-key existing-user update,
+Google/TapBlaze sign-in/cloud restoration, physical ARM64/API36 and checkout are
+not established. JNI attach/detach/local-frame-error paths are not covered by
+the instruction fixture. See coffee-1260-update.md for behavior and reproduction.
+Publication pending; retain prior unrelated Pizza edits outside this feature.
+
 Targets: `com.tapblaze.coffeebusiness` **1.24.0 (1397)** and **1.25.1 (1454)**,
 complete APKM, ARM64. The 1.25.1 profile is officially non-experimental, promoted
 at the user's request on 2026-10-16. This changes release classification only;

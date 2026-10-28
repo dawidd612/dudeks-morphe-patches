@@ -29,7 +29,6 @@ private const val GAME = "com.tapblaze.coffeebusiness"
 // SHA-1 of the verified APK signing certificate, not of the APK contents.
 private const val SIGNER = "aa6e781863cdfb8d32b8f7b368534ace25a0ae7e"
 private const val GAME_ACTIVITY = "Lcom/tapblaze/coffeebusiness/MyUnityActivity;"
-private const val GMS_CLIENT = "Lyt;"
 
 private val coffeeMicroGResources = resourcePatch {
     execute {
@@ -86,7 +85,7 @@ val coffeeMicroGSupportPatch = bytecodePatch(
             "requiresGooglePlayServices" to ("Z" to "const/4 v0, 0x0\nreturn v0"),
         )
         overrides.forEach { (name, shape) ->
-            val inherited = coffeeMethod(GMS_CLIENT, name, emptyList(), shape.first, static = false)
+            val inherited = coffeeMethod(profile.gamesBase, name, emptyList(), shape.first, static = false)
             checkCoffee(!AccessFlags.FINAL.isSet(inherited.accessFlags), "$name cannot be overridden")
         }
         val actions = gamesClients.map { (owner, action) ->
@@ -135,7 +134,7 @@ val coffeeMicroGSupportPatch = bytecodePatch(
         val keep = resolutionCode.take(start).withIndex().filter { (_, instruction) ->
             val ref = (instruction as? ReferenceInstruction)?.reference
             (ref is FieldReference && ((ref.definingClass == resolutionOwner && ref.name == "a") ||
-                (ref.definingClass == profile.retryOwner && ref.name == "d"))) ||
+                (ref.definingClass == profile.retryOwner && ref.name == profile.retryField))) ||
                 (ref is StringReference && ref.string == "GamesApiManager") ||
                 (instruction.opcode == Opcode.CONST_4 && (instruction as OneRegisterInstruction).registerA == 3)
         }.map { it.index }.toSet()
