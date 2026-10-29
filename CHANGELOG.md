@@ -1,3 +1,9 @@
+## [1.39.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.39.0...v1.39.1) (2026-10-29)
+
+### 🐛 Bug Fixes
+
+* **pizza:** remove extended sponsor rewards ([3254a52](https://github.com/dawidd612/dudeks-morphe-patches/commit/3254a523d2ccc8a1959e7f117bac68755cbb5d86))
+
 ## [1.39.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.38.0...v1.39.0) (2026-10-29)
 
 ### ✨ New Features
