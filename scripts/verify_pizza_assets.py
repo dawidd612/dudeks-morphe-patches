@@ -7,8 +7,8 @@ import argparse
 import gzip
 import hashlib
 import json
-import tempfile
 import zipfile
+from verify_apkm import apk_inputs
 
 
 def digest(stream):
@@ -26,25 +26,16 @@ def main():
     args = parser.parse_args()
     expected = {}
     split_count = 0
-    with zipfile.ZipFile(args.original_apkm) as package:
-        for entry in package.infolist():
-            if not entry.filename.endswith(".apk"):
+    for _, split in apk_inputs(args.original_apkm):
+        split_count += 1
+        for item in split.infolist():
+            if item.is_dir() or not item.filename.startswith(("lib/", "assets/")):
                 continue
-            split_count += 1
-            # Seekable temporary storage avoids loading the asset pack into RAM.
-            with tempfile.TemporaryFile() as temp, package.open(entry) as source:
-                while chunk := source.read(1024 * 1024):
-                    temp.write(chunk)
-                temp.seek(0)
-                with zipfile.ZipFile(temp) as split:
-                    for item in split.infolist():
-                        if item.is_dir() or not item.filename.startswith(("lib/", "assets/")):
-                            continue
-                        with split.open(item) as stream:
-                            value = digest(stream)
-                        if item.filename in expected and expected[item.filename] != value:
-                            raise AssertionError(f"Conflicting input asset: {item.filename}")
-                        expected[item.filename] = value
+            with split.open(item) as stream:
+                value = digest(stream)
+            if item.filename in expected and expected[item.filename] != value:
+                raise AssertionError(f"Conflicting input asset: {item.filename}")
+            expected[item.filename] = value
     if not split_count or not any(name.startswith("lib/") for name in expected):
         raise AssertionError("Input has no APK splits/native libraries")
     if not any(name.startswith("assets/") for name in expected):

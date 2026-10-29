@@ -15,7 +15,7 @@ import subprocess
 import tempfile
 import zipfile
 
-from verify_apkm import audit
+from verify_apkm import audit, apk_inputs
 
 ROOT = Path(__file__).resolve().parents[1]
 RESOURCES = ROOT / "patches/src/main/resources/pizzabusiness"
@@ -34,50 +34,56 @@ def inspect(path, cli):
                         str(ROOT / "scripts/InspectPizzaUpdate.java")], check=True, capture_output=True)
         base = None
         libraries = {}
-        with zipfile.ZipFile(path) as bundle:
-            for entry in bundle.infolist():
-                if not entry.filename.lower().endswith(".apk"):
-                    continue
-                split_path = folder / "split.apk"
-                with bundle.open(entry) as source, split_path.open("wb") as target:
-                    shutil.copyfileobj(source, target)
-                with zipfile.ZipFile(split_path) as split:
-                    if "classes.dex" in split.namelist():
-                        output = subprocess.run(["java", "-cp", f"{folder}{os.pathsep}{cli}",
-                                                 "InspectPizzaUpdate", str(split_path)], check=True, capture_output=True, text=True)
-                        current = json.loads(output.stdout)
-                        # Base split owns version and StartupLauncher; feature DEX is retained by the archive audit.
-                        if "startupProgram" in current["roles"]:
-                            if base is not None:
-                                raise ValueError("Multiple base splits with StartupLauncher")
-                            base = current
-                    for item in split.infolist():
-                        if item.filename.startswith("lib/"):
-                            with split.open(item) as source:
-                                value = hashlib.file_digest(source, "sha256").hexdigest()
-                            if item.filename in libraries and libraries[item.filename] != value:
-                                raise ValueError(f"Conflicting input library: {item.filename}")
-                            libraries[item.filename] = value
+        for _, split in apk_inputs(path):
+            split_path = folder / "split.apk"
+            split.fp.seek(0)
+            with split_path.open("wb") as target:
+                shutil.copyfileobj(split.fp, target)
+            with zipfile.ZipFile(split_path) as split:
+                if "classes.dex" in split.namelist():
+                    output = subprocess.run(["java", "-cp", f"{folder}{os.pathsep}{cli}",
+                                             "InspectPizzaUpdate", str(split_path)], check=True, capture_output=True, text=True)
+                    current = json.loads(output.stdout)
+                    # The real game Activity identifies base inputs with or without PairIP.
+                    if "gameActivity" in current["roles"]:
+                        if base is not None:
+                            raise ValueError("Multiple base splits with the game Activity")
+                        base = current
+                for item in split.infolist():
+                    if item.filename.startswith("lib/"):
+                        with split.open(item) as source:
+                            value = hashlib.file_digest(source, "sha256").hexdigest()
+                        if item.filename in libraries and libraries[item.filename] != value:
+                            raise ValueError(f"Conflicting input library: {item.filename}")
+                        libraries[item.filename] = value
         if base is None:
-            raise ValueError("Pizza base split/StartupLauncher missing")
+            raise ValueError("Pizza base APK/game Activity missing")
         base["native_sha256"] = libraries.get("lib/arm64-v8a/libcocos2dcpp.so")
         matches = []
         for directory in (RESOURCES / "profiles.txt").read_text().splitlines():
             if not directory or directory.startswith("#"):
                 continue
             profile = properties(RESOURCES / directory / "profile.properties")
-            with gzip.open(RESOURCES / directory / "arm64-init.delta.gz", "rb") as source:
-                header = source.read(68)
-            if len(header) != 68 or header[:4] != b"PZB2":
-                raise ValueError(f"Invalid bootstrap profile: {directory}")
-            native_match = base["native_sha256"] == header[4:36].hex()
+            protected = profile.get("protectedInitialization", "true") == "true"
+            if protected:
+                with gzip.open(RESOURCES / directory / "arm64-init.delta.gz", "rb") as source:
+                    header = source.read(68)
+                if len(header) != 68 or header[:4] != b"PZB2":
+                    raise ValueError(f"Invalid bootstrap profile: {directory}")
+                native_match = base["native_sha256"] == header[4:36].hex()
+                startup_match = base["roles"].get("startupProgram") == profile["startupProgram"]
+            else:
+                native_match = base["native_sha256"] == profile["nativeSha256"]
+                startup_match = not base["protected_methods"] and not base["uninitialized_strings"]
             matches.append({"profile": directory, "version_matches": (base["version"], str(base["version_code"])) ==
                             (profile["version"], profile["versionCode"]), "native_matches": native_match,
-                            "startup_matches": base["roles"]["startupProgram"] == profile["startupProgram"]})
+                            "startup_matches": startup_match})
         return {"archive": archive, "input": base, "libraries": libraries, "profiles": matches,
                 "decision": "Run DEX/asset and runtime checks" if any(all(p[k] for k in
                     ("version_matches", "native_matches", "startup_matches")) for p in matches) else
-                    "Capture new initialization; never reuse a delta for a different native hash"}
+                    "Capture new initialization; never reuse a delta for a different native hash" if
+                    base["protected_methods"] or base["uninitialized_strings"] else
+                    "Unprotected input: preserve original SDK/native startup and review version-specific native edits"}
 
 
 def main():

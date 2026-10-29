@@ -31,6 +31,17 @@ class ArchiveIntegrityTest(unittest.TestCase):
         self.assertEqual(report["splits"][0]["name"], "base.apk")
         self.assertEqual(report["splits"][0]["entries"], 1)
 
+    def test_standalone_apk_is_a_single_input(self):
+        output = io.BytesIO()
+        with zipfile.ZipFile(output, "w") as apk:
+            apk.writestr("AndroidManifest.xml", b"manifest")
+            apk.writestr("classes.dex", b"dex")
+            apk.writestr("assets/test", b"payload")
+        report = self.check_archive(output.getvalue())
+        self.assertEqual(report["status"], "PASS")
+        self.assertEqual(len(report["splits"]), 1)
+        self.assertEqual(report["splits"][0]["entries"], 3)
+
     def test_invalid_stored_deflate_block(self):
         data = bytearray(archive("base.apk", archive("assets/test", b"payload"),
                                  zipfile.ZIP_DEFLATED))

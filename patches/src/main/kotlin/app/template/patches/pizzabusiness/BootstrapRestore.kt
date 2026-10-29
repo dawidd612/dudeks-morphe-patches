@@ -64,6 +64,13 @@ internal val pizzaNativeBootstrap = rawResourcePatch {
         val library = get("lib/arm64-v8a/libcocos2dcpp.so")
         if (!library.isFile) throw PatchException("Pizza startup repair requires the complete ARM64 APKM.")
         val profile = PizzaProfiles.forPackage(packageMetadata)
+        if (!profile.protectedInitialization) {
+            require(MessageDigest.getInstance("SHA-256").digest(library.readBytes())
+                .joinToString("") { "%02x".format(it) } == profile.nativeSha256) {
+                "Pizza native library differs from the verified unprotected profile"
+            }
+            return@execute
+        }
         val restored = profile.resource("arm64-init.delta.gz").use {
             PizzaBootstrap.restoreNative(library.readBytes(), it)
         }

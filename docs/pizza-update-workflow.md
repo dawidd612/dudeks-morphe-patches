@@ -2,6 +2,24 @@
 
 Keep compatibility changes small, but only publish a target after its initialization resources and runtime behavior are verified. Adding a version number does not port the existing native bootstrap.
 
+## Automatic intake and unprotected inputs (2026-10-29)
+
+Use [the APKMirror download procedure](apkmirror-download.md) and
+`scripts/apkmirror_download.py` before asking for a manual download. Its HTTP
+fallback means the agent must complete the normal browser flow and verify the
+actual file; it is not a request for the user to download it. The procedure was
+verified on the complete standalone 5.59.2 (2337) APK, including the intercepted
+Google vignette and a successful download event.
+
+The inspector and preservation audit accept full standalone APKs as well as
+APKM/XAPK. In an explicitly unprotected profile such as 5.59.2, retain the
+original SDK/native startup. Zero protected callers/string holders and absent
+PairIP classes must be established from the actual input; do not attempt an
+unnecessary capture or supply another version's bootstrap. Old protected
+profiles still require their matching recovered initialization. The optional
+short-notice patch adds one focused forced-update check to the normal smoke;
+it does not revive the historical full runtime matrix.
+
 ## Shared profiles (5.57.3 and 5.58.0)
 
 All three Pizza patches obtain their Morphe targets and bootstrap selection from

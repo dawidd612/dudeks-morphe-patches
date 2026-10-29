@@ -6,9 +6,17 @@ on:
       - 'patches/src/main/kotlin/app/template/patches/pizzabusiness/**'
       - 'patches/src/main/resources/pizzabusiness/**'
       - 'scripts/VerifyPizzaRewardDex.java'
+      - 'scripts/VerifyPizzaDexParity.java'
       - 'scripts/VerifyPizzaIntegrationDex.java'
       - 'scripts/VerifyPizzaPlayServicesDex.java'
       - 'scripts/verify_pizza_assets.py'
+      - 'scripts/verify_apkm.py'
+      - 'scripts/test_verify_apkm.py'
+      - 'scripts/apkmirror_download.py'
+      - 'scripts/test_apkmirror_download.py'
+      - 'native/pizzabusiness/**'
+      - 'scripts/*pizza*arm64.py'
+      - 'scripts/build_pizza_*'
       - 'scripts/test_pizza_assets.py'
       - 'scripts/VerifyPizzaBootstrap.java'
       - 'scripts/VerifyPizzaProfiles.java'
@@ -45,14 +53,18 @@ jobs:
         run: |
           curl -fL --retry 2 https://github.com/MorpheApp/morphe-desktop/releases/download/v1.17.0/morphe-desktop-1.17.0-all.jar -o "$RUNNER_TEMP/morphe-cli.jar"
           echo "8cf6a9eab4ee9dab146bddc24681897851564f53116baec11f36ba2fa2f589be  $RUNNER_TEMP/morphe-cli.jar" | sha256sum -c -
-          javac -cp "$RUNNER_TEMP/morphe-cli.jar" -d "$RUNNER_TEMP/pizza-verifiers" scripts/VerifyPizzaRewardDex.java scripts/VerifyPizzaIntegrationDex.java scripts/VerifyPizzaPlayServicesDex.java
+          javac -cp "$RUNNER_TEMP/morphe-cli.jar" -d "$RUNNER_TEMP/pizza-verifiers" scripts/VerifyPizzaRewardDex.java scripts/VerifyPizzaDexParity.java scripts/VerifyPizzaIntegrationDex.java scripts/VerifyPizzaPlayServicesDex.java
+          java -cp "$RUNNER_TEMP/pizza-verifiers:$RUNNER_TEMP/morphe-cli.jar" VerifyPizzaDexParity
           javac -cp "patches/build/classes/kotlin/main:$RUNNER_TEMP/morphe-cli.jar" -d "$RUNNER_TEMP/pizza-verifiers" scripts/VerifyPizzaBootstrap.java scripts/VerifyPizzaProfiles.java
           java -cp "$RUNNER_TEMP/pizza-verifiers:patches/build/classes/kotlin/main:patches/build/resources/main:$RUNNER_TEMP/morphe-cli.jar" VerifyPizzaBootstrap
           java -cp "$RUNNER_TEMP/pizza-verifiers:patches/build/classes/kotlin/main:patches/build/resources/main:$RUNNER_TEMP/morphe-cli.jar" VerifyPizzaProfiles
           javac -cp "$RUNNER_TEMP/morphe-cli.jar" -d "$RUNNER_TEMP/pizza-verifiers" scripts/InspectPizzaUpdate.java scripts/ExtractPizzaSdkReceivers.java
           javac -cp "$RUNNER_TEMP/morphe-cli.jar:$RUNNER_TEMP/pizza-verifiers" -d "$RUNNER_TEMP/pizza-verifiers" scripts/RecoverPizzaProviderSdk.java
       - name: Check split asset preservation verifier
-        run: python3 scripts/test_pizza_assets.py
+        run: |
+          python3 scripts/test_pizza_assets.py
+          python3 scripts/test_verify_apkm.py
+          python3 scripts/test_apkmirror_download.py
       - uses: actions/upload-artifact@v4
         with:
           name: dudeks-pizzabusiness-candidate

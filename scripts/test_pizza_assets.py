@@ -22,7 +22,7 @@ def archive(entries):
 
 
 class AssetPreservationTests(unittest.TestCase):
-    def verify(self, patched_entries, extra_split=None, delta=None, visibility=None, native_deltas=None):
+    def verify(self, patched_entries, extra_split=None, delta=None, visibility=None, native_deltas=None, standalone=False):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             splits = {"base.apk": archive({"assets/base": b"base"}),
@@ -30,7 +30,8 @@ class AssetPreservationTests(unittest.TestCase):
                       "split_assets.apk": archive({"assets/save-template": b"initial"})}
             if extra_split:
                 splits["split_conflict.apk"] = archive(extra_split)
-            (root / "original.apkm").write_bytes(archive(splits))
+            original = archive({"AndroidManifest.xml": b"manifest", **self.originals()}) if standalone else archive(splits)
+            (root / "original.apkm").write_bytes(original)
             (root / "patched.apk").write_bytes(archive(patched_entries))
             arguments = [sys.executable, str(Path(__file__).with_name("verify_pizza_assets.py")),
                          str(root / "original.apkm"), str(root / "patched.apk")]
@@ -55,6 +56,13 @@ class AssetPreservationTests(unittest.TestCase):
         result = self.verify(self.originals())
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn('"verified_assets": 2', result.stdout)
+
+    def test_standalone_full_apk_preserves_assets_and_native(self):
+        result = self.verify(self.originals(), standalone=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('"input_apks": 1', result.stdout)
+        entries = self.originals() | {LIBRARY: b"wrong"}
+        self.assertNotEqual(self.verify(entries, standalone=True).returncode, 0)
 
     def test_changed_native_library_fails(self):
         entries = self.originals()

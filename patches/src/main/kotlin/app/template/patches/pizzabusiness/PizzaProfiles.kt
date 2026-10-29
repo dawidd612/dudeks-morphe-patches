@@ -14,13 +14,20 @@ internal class PizzaProfile(val directory: String) {
     private val properties = Properties().apply { resource("profile.properties").use { load(it) } }
     val version: String = properties.getProperty("version")
     val versionCode: String = properties.getProperty("versionCode")
-    val startupProgram: String = properties.getProperty("startupProgram")
+    val protectedInitialization: Boolean = properties.getProperty("protectedInitialization", "true").toBooleanStrict()
+    val startupProgram: String? = properties.getProperty("startupProgram").also {
+        require(!protectedInitialization || !it.isNullOrBlank()) { "Pizza $version requires its startup program" }
+    }
+    val nativeSha256: String? = properties.getProperty("nativeSha256")
     val pnnDeltas: List<String> = properties.getProperty("pnnDeltas")
+        ?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
+    val updateNoticeDeltas: List<String> = properties.getProperty("updateNoticeDeltas")
         ?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
     val target = AppTarget(version = version,
         versionCodes = mapOf(SupportedAbi.ARM64_V8A to versionCode.toInt()),
         isExperimental = properties.getProperty("experimental").toBooleanStrict(),
-        description = "Requires complete ARM64 APKM/XAPK initialization resources.")
+        description = if (protectedInitialization) "Requires complete ARM64 APKM/XAPK initialization resources."
+            else "Requires the complete verified ARM64 APK/APKM/XAPK, including game assets.")
 
     fun resource(name: String): InputStream = PizzaProfiles::class.java
         .getResourceAsStream("/pizzabusiness/$directory/$name")

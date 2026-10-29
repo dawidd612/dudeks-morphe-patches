@@ -77,13 +77,14 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
         "com.android.vending.derived.apk.id");
 
     public static void main(String[] args) throws Exception {
-        check((args.length >= 3 && args.length <= 5) && Set.of("microg","stock").contains(args[2]) &&
-            (args.length < 5 || args[4].equals("hide-paid")),
-            "Usage: VerifyPizzaIntegrationDex patched.apk original.apk microg|stock [bootstrap-resource-directory [hide-paid]]");
+        check((args.length >= 3 && args.length <= 6) && Set.of("microg","stock").contains(args[2]) &&
+            (args.length < 5 || Set.of("hide-paid", "keep-paid").contains(args[4])) && (args.length < 6 || args[5].matches("[0-9a-f]{64}")),
+            "Usage: VerifyPizzaIntegrationDex patched.apk original.apk microg|stock [profile-directory [hide-paid|keep-paid [reviewed-native-output-sha256]]]");
         boolean microg = args[2].equals("microg");
-        boolean hidePaid = args.length == 5;
+        boolean hidePaid = args.length >= 5 && args[4].equals("hide-paid");
         var patched = classes(args[0]);
         var original = classes(args[1]);
+        boolean protectedInput = original.containsKey(LICENSE);
         var clients = gamesClients(original);
         var transportHierarchy = new HashSet<String>();
         var legacyPackages = new HashSet<String>();
@@ -93,35 +94,59 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
             while (original.containsKey(owner) && transportHierarchy.add(owner)) owner = original.get(owner).getSuperclass();
         }
         Map<String, Method> sdkRestorations = new HashMap<>();
-        if (args.length >= 4) {
+        if (args.length >= 4 && protectedInput) {
             for (ClassDef cls : classes(java.nio.file.Path.of(args[3], "sdk-receivers.dex").toString()).values())
                 for (Method m : cls.getMethods()) sdkRestorations.put(key(m), m);
         }
-        List<Method> blocked = List.of(
-            method(patched, LICENSE, "checkLicense", "V", "Landroid/content/Context;"),
-            method(patched, LICENSE, "stopTrial", "V", "Landroid/content/Context;"),
-            method(patched, LICENSE, "handleTrialEnd", "V"),
-            method(patched, LICENSE, "initializeLicenseCheck", "V"),
-            method(patched, LICENSE, "bindToLicensingService", "V", "Z"),
-            method(patched, LICENSE, "processResponse", "V", "I", "Landroid/os/Bundle;"),
-            method(patched, LICENSE, "scheduleRepeatedLicenseCheck", "V", "Lcom/pairip/licensecheck/RepeatedCheckMetadata;"),
-            method(patched, LICENSE, "startPaywallActivity", "V", "Landroid/app/PendingIntent;"),
-            method(patched, LICENSE, "startErrorDialogActivity", "V"),
-            method(patched, LICENSE, "scheduleAppShutdown", "V"));
-        blocked.forEach(VerifyPizzaIntegrationDex::noEffect);
-        Method screen = method(patched, SCREEN, "onStart", "V");
-        validateRegistersAndBranches(screen);
-        var sc = code(screen);
-        check(sc.size() == 3 && sc.get(0).getOpcode() == Opcode.INVOKE_SUPER &&
-            key(call(sc.get(0))).equals("Landroid/app/Activity;->onStart()V") &&
-            sc.get(1).getOpcode() == Opcode.INVOKE_VIRTUAL &&
-            key(call(sc.get(1))).equals("Landroid/app/Activity;->finish()V") &&
-            registers(sc.get(0)).equals(List.of(screen.getImplementation().getRegisterCount()-1)) &&
-            registers(sc.get(1)).equals(registers(sc.get(0))) && sc.get(2).getOpcode() == Opcode.RETURN_VOID &&
-            screen.getImplementation().getTryBlocks().isEmpty(), "Restored screen can open Play or close game tasks");
+        if (protectedInput) {
+            List<Method> blocked = List.of(
+                method(patched, LICENSE, "checkLicense", "V", "Landroid/content/Context;"),
+                method(patched, LICENSE, "stopTrial", "V", "Landroid/content/Context;"),
+                method(patched, LICENSE, "handleTrialEnd", "V"),
+                method(patched, LICENSE, "initializeLicenseCheck", "V"),
+                method(patched, LICENSE, "bindToLicensingService", "V", "Z"),
+                method(patched, LICENSE, "processResponse", "V", "I", "Landroid/os/Bundle;"),
+                method(patched, LICENSE, "scheduleRepeatedLicenseCheck", "V", "Lcom/pairip/licensecheck/RepeatedCheckMetadata;"),
+                method(patched, LICENSE, "startPaywallActivity", "V", "Landroid/app/PendingIntent;"),
+                method(patched, LICENSE, "startErrorDialogActivity", "V"),
+                method(patched, LICENSE, "scheduleAppShutdown", "V"));
+            blocked.forEach(VerifyPizzaIntegrationDex::noEffect);
+            Method screen = method(patched, SCREEN, "onStart", "V");
+            validateRegistersAndBranches(screen);
+            var sc = code(screen);
+            check(sc.size() == 3 && sc.get(0).getOpcode() == Opcode.INVOKE_SUPER &&
+                key(call(sc.get(0))).equals("Landroid/app/Activity;->onStart()V") &&
+                sc.get(1).getOpcode() == Opcode.INVOKE_VIRTUAL &&
+                key(call(sc.get(1))).equals("Landroid/app/Activity;->finish()V") &&
+                registers(sc.get(0)).equals(List.of(screen.getImplementation().getRegisterCount()-1)) &&
+                registers(sc.get(1)).equals(registers(sc.get(0))) && sc.get(2).getOpcode() == Opcode.RETURN_VOID &&
+                screen.getImplementation().getTryBlocks().isEmpty(), "Restored screen can open Play or close game tasks");
+
+        }
 
         Set<String> allowed = new HashSet<>();
         allowed.addAll(VerifyPizzaPlayServicesDex.verify(patched, original, microg));
+        if (!microg && code(method(patched, ACTIVITY, "onCreate", "V", "Landroid/os/Bundle;")).stream().anyMatch(i ->
+            key(call(i)).equals("Lpl/dudek/extension/pizzabusiness/PizzaUpdateNotice;->initialize(Landroid/content/Context;)V"))) {
+            Method oldCreate = method(original, ACTIVITY, "onCreate", "V", "Landroid/os/Bundle;");
+            Method newCreate = method(patched, ACTIVITY, "onCreate", "V", "Landroid/os/Bundle;");
+            var instructions = code(newCreate);
+            var additions = new ArrayList<Integer>();
+            for (int i = 0; i < instructions.size(); i++) if (key(call(instructions.get(i))).equals(
+                "Lpl/dudek/extension/pizzabusiness/PizzaUpdateNotice;->initialize(Landroid/content/Context;)V")) additions.add(i);
+            check(additions.size() == 1, "Expected exactly one notice context initialization");
+            int index = additions.get(0);
+            check(instructions.get(index).getOpcode() == Opcode.INVOKE_STATIC &&
+                registers(instructions.get(index)).equals(List.of(newCreate.getImplementation().getRegisterCount() - 2)),
+                "Notice initialization must receive the existing Activity");
+            var trimmed = new com.android.tools.smali.dexlib2.builder.MutableMethodImplementation(newCreate.getImplementation());
+            trimmed.removeInstruction(index);
+            var withoutNotice = new com.android.tools.smali.dexlib2.immutable.ImmutableMethod(newCreate.getDefiningClass(),
+                newCreate.getName(), newCreate.getParameters(), newCreate.getReturnType(), newCreate.getAccessFlags(),
+                newCreate.getAnnotations(), newCreate.getHiddenApiRestrictions(), trimmed);
+            check(canonical(oldCreate).equals(canonical(withoutNotice)), "Notice changed the original Activity startup");
+            allowed.add(key(newCreate));
+        }
         if (hidePaid) {
             Method checkout = method(patched, "Lcom/tapblaze/pizzabusiness/PurchasesManager;", "purchase", "V", STRING);
             validateRegistersAndBranches(checkout);
@@ -200,7 +225,7 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
         expectedVmCallers.removeAll(sdkRestorations.keySet());
         check(actualVmCallers.equals(expectedVmCallers), "Protected caller set changed outside the recovered SDK receivers");
         check(restored == sdkRestorations.size(), "SDK restoration missing from emitted APK");
-        if (args.length >= 4) {
+        if (args.length >= 4 && protectedInput) {
             int constants = 0;
             try (var reader = new java.io.BufferedReader(new java.io.InputStreamReader(new java.util.zip.GZIPInputStream(
                     java.nio.file.Files.newInputStream(java.nio.file.Path.of(args[3], "strings.tsv.gz"))), java.nio.charset.StandardCharsets.UTF_8))) {
@@ -243,11 +268,20 @@ public class VerifyPizzaIntegrationDex extends VerifyPizzaRewardDex {
             for (var entries = oldZip.entries(); entries.hasMoreElements();) {
                 var e = entries.nextElement();
                 if (!(e.getName().startsWith("lib/") || e.getName().startsWith("assets/"))) continue;
+                if (e.getName().equals("lib/arm64-v8a/libcocos2dcpp.so") && args.length == 6) {
+                    try (var stream = newZip.getInputStream(newZip.getEntry(e.getName()))) {
+                        var digest = MessageDigest.getInstance("SHA-256");
+                        byte[] buffer = new byte[1024 * 1024];
+                        for (int n; (n = stream.read(buffer)) != -1;) digest.update(buffer, 0, n);
+                        check(HexFormat.of().formatHex(digest.digest()).equals(args[5]), "Native output differs from reviewed reconstruction");
+                    }
+                    continue;
+                }
                 check(newZip.getEntry(e.getName()) != null && Arrays.equals(oldZip.getInputStream(e).readAllBytes(),
                     newZip.getInputStream(newZip.getEntry(e.getName())).readAllBytes()), "Native code/assets changed: " + e.getName());
             }
         }
-        System.out.println("PASS: 10 licensing entry/retry/remediation/shutdown bodies have no side effects; restored screen only finishes itself");
+        System.out.println(protectedInput ? "PASS: 10 licensing entry/retry/remediation/shutdown bodies have no side effects; restored screen only finishes itself" : "PASS: unprotected SDK/native initialization retained without synthetic VM resources");
         System.out.println("PASS: " + preserved + " unchanged authentication/SDK methods; " + restored + " SDK methods restored from upstream libraries");
         System.out.println("PASS: " + billingMethods + " executable billing methods unchanged; " +
             (hidePaid ? "checkout cancellation requires runtime test; " : "checkout preserved; ") +
