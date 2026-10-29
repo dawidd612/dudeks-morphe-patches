@@ -9,9 +9,8 @@ the game's local update screen with one Android short toast and resumes the
 existing loading continuation. The server version status is preserved. This
 does not make an incompatible backend protocol work with an older client.
 
-The existing **1000 PNN sponsor rewards** patch still provides 999 PNN offers
-followed by the original final PNN2 offer, with 10 gems per completed reward.
-Skipping and the final close flow remain. **Skip rewarded ads**, **Google Play
+The extended sponsor reward patch has been removed at the user's request.
+Sponsor limits and gem quantities now come from the original game. **Skip rewarded ads**, **Google Play
 Games via MicroG-RE** and **Hide paid offers** retain their roles. Real-money
 checkout still cancels; no purchase success or verification is fabricated.
 
@@ -38,12 +37,17 @@ update statuses, it requests the Java toast and invokes the existing loading
 continuation and cleanup. Other statuses follow the original path. The patch
 does not alter account, authentication, wallet or purchase fields.
 
-Native PZB2 variants compose the optional paid-offer, PNN and notice transforms
-using exact input/output hashes. Either finalizer order produces the same
-canonical native output. Unknown or already modified binaries fail with a
+Native PZB2 variants compose the optional paid-offer and notice transforms
+using exact input/output hashes. Unknown or already modified binaries fail with a
 specific diagnosis rather than receiving a different version's delta.
 
 ## Verification record
+
+The following records the original 1.39.0 implementation, including the sponsor
+extension that has since been removed. Current releases do not include its
+patch, payload, generator or metadata entry. Repatch the clean input with the
+current bundle and keep the existing signing key to remove it from an installed
+APK; refreshing the patch bundle alone cannot rewrite an already installed game.
 
 Original complete APK SHA256:
 `ea0fd7c38af20c4f8e8c083f2991db4ee18c3d5cd8c2ec8f347d1fcca029ae39`.

@@ -10,8 +10,6 @@
   "segment": "0x2154000",
   "inputs": {
     "update-notice.delta.gz": "26754db303989954d3f4a9364359943ebfa20ac14c2c2d4fc7c9c35bfe4480ef",
-    "update-notice-hidden.delta.gz": "e944101a3274c3c8ae5d0aaac3846dbe819ae6b3559d6090003458ae7c61ed5d",
-    "update-notice-pnn-original.delta.gz": "0856371552a20de93c395361fac93cee3b3fbf98c362bf8333f19a4ff8862ec9",
-    "update-notice-pnn-hidden.delta.gz": "dd66cc182923ad73ba836b0418c19ec95e7027505265428f2ec150419ae8bf98"
+    "update-notice-hidden.delta.gz": "e944101a3274c3c8ae5d0aaac3846dbe819ae6b3559d6090003458ae7c61ed5d"
   }
 }

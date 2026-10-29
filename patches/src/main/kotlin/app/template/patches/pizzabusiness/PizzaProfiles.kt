@@ -19,8 +19,6 @@ internal class PizzaProfile(val directory: String) {
         require(!protectedInitialization || !it.isNullOrBlank()) { "Pizza $version requires its startup program" }
     }
     val nativeSha256: String? = properties.getProperty("nativeSha256")
-    val pnnDeltas: List<String> = properties.getProperty("pnnDeltas")
-        ?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
     val updateNoticeDeltas: List<String> = properties.getProperty("updateNoticeDeltas")
         ?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
     val target = AppTarget(version = version,
