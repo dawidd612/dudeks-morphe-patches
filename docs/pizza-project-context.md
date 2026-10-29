@@ -21,8 +21,16 @@ remaining native-transform parity with the previously verified variant. The
 normal counter, payout, animation and allocation instruction ranges match the
 original game. Only the removed profile property and related source-line debug
 metadata change. Prior unchanged notice/runtime evidence is reused; no new
-Android runtime test is claimed for this deletion-only change. Publication
-pending CI and downloaded release verification. Private evidence:
+Android runtime test is claimed for this deletion-only change. Published [v1.39.1](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.39.1)
+through PR #41, merge40d7edf and release commit d3a92da. All three PR workflows
+and release40936927885 pass. Downloaded MPP SHA256:
+d373b369ce3541389317262e89948560d87d354b92fa9b65961dee8715de5882.
+SHA256SUMS, ZIP integrity and GitHub attestation pass. All43 scoped entries
+match the tested bundle (two text resources require CRLF/LF normalization).
+Both desktop and Android code contain no sponsor patch/payload/settings, and
+published metadata has only the four retained Pizza patches. Existing balances
+were not edited; repatch clean input and install with the same key to remove
+old code from an already installed game. Private evidence:
 E:/Codex-Morphe-Pizza-Remove-PNN-20261029.
 
 ## Pizza 5.59.2 / automatic intake / short update toast - 2026-10-29
