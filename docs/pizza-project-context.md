@@ -1,5 +1,30 @@
 # Pizza: persistent project context
 
+## Sponsor extension removed at user request - 2026-10-29
+
+The user explicitly withdrew only the 1000 PNN offers / 10 gems-per-reward patch.
+Remove it from all supported Pizza targets, including 5.59.0 and 5.59.2. Do not
+restore this feature during future version updates. The game now owns its normal
+sponsor cap and reward quantities. Skip rewarded ads, MicroG, Hide paid offers
+and Non-blocking update notice retain their existing behavior.
+
+The sponsor patch class, profile settings, native payloads, generator and its
+specific instruction test are removed. Notice variants that consumed PNN output
+are removed too; the previously verified original/hidden notice variants remain
+byte-identical. Existing saved balances are not edited. Already installed APKs
+need repatching from clean input and a same-key update to remove the old code.
+Historical release notes/evidence below describe older bundles.
+
+Local verification passes: build (24s), four remaining default Pizza patches,
+no sponsor class/payload/metadata entry, 36 unchanged scoped entries and exact
+remaining native-transform parity with the previously verified variant. The
+normal counter, payout, animation and allocation instruction ranges match the
+original game. Only the removed profile property and related source-line debug
+metadata change. Prior unchanged notice/runtime evidence is reused; no new
+Android runtime test is claimed for this deletion-only change. Publication
+pending CI and downloaded release verification. Private evidence:
+E:/Codex-Morphe-Pizza-Remove-PNN-20261029.
+
 ## Pizza 5.59.2 / automatic intake / short update toast - 2026-10-29
 
 The latest verified live APKMirror release is 5.59.2 (2337), ARM64. The agent

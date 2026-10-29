@@ -1,5 +1,10 @@
 # Pizza 5.59.0: 1000 PNN sponsor rewards
 
+**Withdrawn on 2026-10-29 at the user's request.** Current bundles no longer
+include this patch or its native payloads. This document is historical evidence
+for older releases. Repatch the clean input with the current bundle and the same
+signing key to restore the game's original sponsor limits and gem quantities.
+
 The optional, default-selected **1000 PNN sponsor rewards** patch supports Good
 Pizza, Great Pizza 5.59.0 (2322), ARM64. Each completed PNN/PNN2 sponsor reward
 grants **10 gems**, with the reward animation using the same quantity.

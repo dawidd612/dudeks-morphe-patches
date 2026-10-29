@@ -19,7 +19,7 @@ private val pizzaUpdateNoticeNative = rawResourcePatch {
         val library = get("lib/arm64-v8a/libcocos2dcpp.so")
         val original = library.readBytes()
         val hash = MessageDigest.getInstance("SHA-256").digest(original)
-        // Exact variants cover either order with the optional PNN finalizer.
+        // Exact variants cover the original and optional paid-offer visibility inputs.
         val delta = profile.updateNoticeDeltas.singleOrNull { name ->
             profile.resource(name).use { stream ->
                 DataInputStream(GZIPInputStream(stream)).use { input ->
