@@ -1,3 +1,9 @@
+## [1.39.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.38.0...v1.39.0) (2026-10-29)
+
+### ✨ New Features
+
+* **pizza:** support 5.59.2 with short update notices ([bdccc38](https://github.com/dawidd612/dudeks-morphe-patches/commit/bdccc38a4cf3b1eb6f15d5787100da2117107ac2))
+
 ## [1.38.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.37.0...v1.38.0) (2026-10-28)
 
 ### ✨ New Features
