@@ -71,7 +71,18 @@ Local-only tools/morphe-local-env.ps1 sets the discovered JDK/SDK and, with
 -ForBuild, obtains existing gh credentials only in the process environment.
 No real Google sign-in/cloud restoration, phone ARM64/API36, ARM32 patch runtime
 or paid checkout is established. Real-money checkout remains cancelled.
-All local gates pass. Publication is pending CI and release-artifact verification.
+Published [v1.39.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.39.0)
+through PR #40, feature bdccc38, merge c9ef703 and release commit 7855ccc.
+All three PR checks and release run 40932244602 passed. Downloaded MPP SHA256:
+485c0b501dfd7bb2ba01710030144436e75eca25f874e5eebce2be6fc68d56b4.
+SHA256SUMS, ZIP integrity and GitHub attestation verification pass. All 52 scoped
+Pizza/Android DEX entries match the tested bundle; only two text resources need
+CRLF/LF normalization. Every binary entry is identical. Published metadata has
+five default, non-experimental 5.59.2 / 2337 ARM64 targets and latest-only notice
+support. Release notes preserve the actual runtime scope and limits. The Debug
+AVD and its temporary Frida server are stopped; original account5554 is untouched.
+Detailed verification: release-verification.json beside the private evidence.
+Earlier unrelated working edits and the existing named stash remain preserved.
 
 Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
