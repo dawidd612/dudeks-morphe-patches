@@ -25,22 +25,41 @@ def build(original, layout):
     phoff=struct.unpack_from('<Q',original,32)[0]
     size,count=struct.unpack_from('<HH',original,54)
     assert original[:6]==b'\x7fELF\x02\x01' and struct.unpack_from('<H',original,18)[0]==183
-    assert phoff==64 and size==56 and count==14
-    extra=phoff+size*count;assert original[extra:extra+size]==bytes(size)
     offset=(len(original)+0x3fff)&~0x3fff
-    output=bytearray(original)+bytearray(offset+len(payload)-len(original))
+    segment=int(layout.get('segment',layout['entry']),0)
+    payload_offset=entry-segment
+    assert phoff==64 and size==56 and (1<=count<=17 if payload_offset else count==14)
+    extra=phoff+size*count
+    if payload_offset:
+        assert (count+1)*size<=payload_offset
+    else:
+        assert original[extra:extra+size]==bytes(size)
+    output=bytearray(original)+bytearray(offset+payload_offset+len(payload)-len(original))
+    table=bytearray(original[phoff:extra])
     phdr=False
     for i in range(count):
         at=phoff+i*size;kind=struct.unpack_from('<I',original,at)[0]
         if kind==1:
             va=struct.unpack_from('<Q',original,at+16)[0];mem=struct.unpack_from('<Q',original,at+40)[0]
-            assert va+mem<=entry
+            assert va+mem<=segment
+            file_offset=struct.unpack_from('<Q',original,at+8)[0]
+            assert va%0x4000==file_offset%0x4000
         elif kind==6:
-            phdr=True;struct.pack_into('<QQ',output,at+32,(count+1)*size,(count+1)*size)
+            phdr=True
+            if payload_offset:
+                struct.pack_into('<QQQQQ',table,i*size+8,offset,segment,segment,(count+1)*size,(count+1)*size)
+            else:
+                struct.pack_into('<QQ',output,at+32,(count+1)*size,(count+1)*size)
     assert phdr
     struct.pack_into('<H',output,56,count+1)
-    struct.pack_into('<IIQQQQQQ',output,extra,1,5,offset,entry,entry,len(payload),len(payload),0x4000)
-    output[offset:]=payload
+    descriptor=struct.pack('<IIQQQQQQ',1,5,offset,segment,segment,payload_offset+len(payload),payload_offset+len(payload),0x4000)
+    if payload_offset:
+        struct.pack_into('<Q',output,32,offset)
+        table.extend(descriptor)
+        output[offset:offset+len(table)]=table
+    else:
+        output[extra:extra+size]=descriptor
+    output[offset+payload_offset:]=payload
 
     def edit(at,before,after):
         assert original[at:at+len(before)]==before,hex(at)
@@ -52,7 +71,7 @@ def build(original, layout):
         edit(int(at,0),old,new)
     for key,destination in [('count_hook',entry),('select_hook',entry+32),('animation_hook',entry+64)]:
         at=addr(key)
-        expected={'count_hook':bytes.fromhex('02040011'),'select_hook':bytes.fromhex('01a0fff0'),'animation_hook':bytes.fromhex('e80300b2')}[key]
+        expected={'count_hook':bytes.fromhex('02040011'),'select_hook':bytes.fromhex(layout.get('select_expected','01a0fff0')),'animation_hook':bytes.fromhex('e80300b2')}[key]
         edit(at,expected,bytes(assembler.asm(f'b #{destination}',at)[0]))
     edit(addr('reward_amount'),bytes(assembler.asm('mov w1, #1')[0]),bytes(assembler.asm(f'mov w1, #{layout["gems"]}')[0]))
     return bytes(output),name
@@ -61,9 +80,10 @@ def build(original, layout):
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('input',type=Path);p.add_argument('output',type=Path)
+    p.add_argument('--layout',type=Path,default=ROOT/'native/pizzabusiness/pnn-5590.json')
     p.add_argument('--delta-dir',type=Path,required=True)
     args=p.parse_args();source=args.input.read_bytes()
-    layout=json.loads((ROOT/'native/pizzabusiness/pnn-5590.json').read_text(encoding='utf-8'))
+    layout=json.loads(args.layout.read_text(encoding='utf-8'))
     output,name=build(source,layout)
     args.output.write_bytes(output);args.delta_dir.mkdir(parents=True,exist_ok=True)
     delta=args.delta_dir/name;delta.write_bytes(encode(source,output))

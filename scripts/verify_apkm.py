@@ -1,4 +1,4 @@
-"""Read-only APKM integrity audit, including every embedded APK's CRC.
+"""Read-only APK/APKM/XAPK integrity audit, including every embedded APK's CRC.
 
 Usage: python scripts/verify_apkm.py game.apkm
 Uses at most one extracted split in temporary storage. Never repairs or rewrites
@@ -13,6 +13,22 @@ import zipfile
 from pathlib import Path
 
 
+def apk_inputs(path):
+    """Yield one seekable APK at a time; retain ownership until the next yield."""
+    with zipfile.ZipFile(path) as package:
+        if "AndroidManifest.xml" in package.namelist():
+            yield Path(path).name, package
+            return
+        for entry in package.infolist():
+            if entry.is_dir() or not entry.filename.lower().endswith(".apk"):
+                continue
+            with tempfile.TemporaryFile() as temp, package.open(entry) as source:
+                shutil.copyfileobj(source, temp, 1024 * 1024)
+                temp.seek(0)
+                with zipfile.ZipFile(temp) as split:
+                    yield entry.filename, split
+
+
 def audit(path):
     path = Path(path)
     with path.open("rb") as source:
@@ -20,12 +36,13 @@ def audit(path):
     result = {"file": path.name, "bytes": path.stat().st_size,
               "sha256": identity, "splits": []}
     with zipfile.ZipFile(path) as bundle:
+        standalone = "AndroidManifest.xml" in bundle.namelist()
         for entry in bundle.infolist():
             if entry.is_dir():
                 continue
             try:
                 with bundle.open(entry) as source:
-                    if not entry.filename.lower().endswith(".apk"):
+                    if standalone or not entry.filename.lower().endswith(".apk"):
                         while source.read(1024 * 1024):
                             pass
                         continue
@@ -45,6 +62,9 @@ def audit(path):
                                                      "entries": len(split.infolist())})
             except Exception as error:
                 raise ValueError(f"{entry.filename}: {error}") from error
+        if standalone:
+            result["splits"].append({"name": path.name, "bytes": path.stat().st_size,
+                                     "entries": len(bundle.infolist())})
     if not result["splits"]:
         raise ValueError("Archive contains no APK splits")
     result["status"] = "PASS"

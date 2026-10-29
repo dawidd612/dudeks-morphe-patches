@@ -10,8 +10,8 @@ from unicorn.arm64_const import UC_ARM64_REG_X0, UC_ARM64_REG_X1, UC_ARM64_REG_X
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def verify(library):
-    layout = json.loads((ROOT/'native/pizzabusiness/pnn-5590.json').read_text(encoding='utf-8'))
+def verify(library, layout_path=ROOT/'native/pizzabusiness/pnn-5590.json'):
+    layout = json.loads(layout_path.read_text(encoding='utf-8'))
     addr = lambda name: int(layout[name], 0)
     machine = Uc(UC_ARCH_ARM64, UC_MODE_ARM)
     machine.mem_map(0, 0x2500000)
@@ -60,4 +60,6 @@ def verify(library):
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--library',required=True,type=Path)
-    verify(p.parse_args().library)
+    p.add_argument('--layout',type=Path,default=ROOT/'native/pizzabusiness/pnn-5590.json')
+    args=p.parse_args()
+    verify(args.library,args.layout)

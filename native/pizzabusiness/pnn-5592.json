@@ -1,0 +1,29 @@
+{
+  "version": "5.59.2",
+  "offers": 1000,
+  "gems": 10,
+  "entry": "0x2150400",
+  "counter_offset": "0x520",
+  "count_hook": "0x1317a24",
+  "count_return": "0x1317a28",
+  "select_hook": "0x1314fec",
+  "select_return": "0x1314ff4",
+  "pnn": "0x7e89c6",
+  "pnn2": "0x7adab1",
+  "reward_amount": "0x131302c",
+  "animation_hook": "0x13130c0",
+  "animation_return": "0x13130c4",
+  "allocation": [
+    "0x1309f6c",
+    "0x1309f80",
+    "0x130a07c",
+    "0x130a470",
+    "0x130a49c"
+  ],
+  "inputs": {
+    "pnn-1000.delta.gz": "26754db303989954d3f4a9364359943ebfa20ac14c2c2d4fc7c9c35bfe4480ef",
+    "pnn-1000-hidden.delta.gz": "e944101a3274c3c8ae5d0aaac3846dbe819ae6b3559d6090003458ae7c61ed5d"
+  },
+  "segment": "0x2150000",
+  "select_expected": "c1a4ffb0"
+}

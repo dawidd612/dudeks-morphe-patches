@@ -190,16 +190,34 @@ public class VerifyPizzaRewardDex {
         StringBuilder result = new StringBuilder(key(method)).append(':').append(method.getAccessFlags());
         if (method.getImplementation() == null) return result.toString();
         result.append(':').append(method.getImplementation().getRegisterCount());
-        for (Instruction instruction : code(method)) {
-            result.append('|').append(instruction.getOpcode()).append(registers(instruction));
+        var instructions = code(method);
+        var positions = new HashMap<Integer, Integer>();
+        int address = 0;
+        for (int i = 0; i < instructions.size(); i++) {
+            positions.put(address, i);
+            address += instructions.get(i).getCodeUnits();
+        }
+        positions.put(address, instructions.size());
+        address = 0;
+        for (Instruction instruction : instructions) {
+            Opcode opcode = instruction.getOpcode();
+            if (opcode == Opcode.CONST_STRING_JUMBO) opcode = Opcode.CONST_STRING;
+            if (opcode == Opcode.GOTO_16 || opcode == Opcode.GOTO_32) opcode = Opcode.GOTO;
+            result.append('|').append(opcode).append(registers(instruction));
             if (instruction instanceof ReferenceInstruction reference) result.append(':').append(reference.getReference());
             if (instruction instanceof WideLiteralInstruction literal) result.append(':').append(literal.getWideLiteral());
-            if (instruction instanceof OffsetInstruction offset) result.append(':').append(offset.getCodeOffset());
+            if (instruction instanceof OffsetInstruction offset) {
+                Integer target = positions.get(address + offset.getCodeOffset());
+                check(target != null, "Invalid instruction target in " + key(method));
+                result.append(':').append(target);
+            }
+            address += instruction.getCodeUnits();
         }
         for (TryBlock<? extends ExceptionHandler> block : method.getImplementation().getTryBlocks()) {
-            result.append("|try:").append(block.getStartCodeAddress()).append(':').append(block.getCodeUnitCount());
+            result.append("|try:").append(positions.get(block.getStartCodeAddress())).append(':')
+                .append(positions.get(block.getStartCodeAddress() + block.getCodeUnitCount()));
             for (ExceptionHandler handler : block.getExceptionHandlers()) {
-                result.append(':').append(handler.getExceptionType()).append('@').append(handler.getHandlerCodeAddress());
+                result.append(':').append(handler.getExceptionType()).append('@').append(positions.get(handler.getHandlerCodeAddress()));
             }
         }
         return result.toString();
@@ -272,7 +290,7 @@ public class VerifyPizzaRewardDex {
         check(code(method(patched, SDK_READY, "run", "V")).size() == 1 &&
             code(method(patched, SDK_READY, "run", "V")).get(0).getOpcode() == Opcode.RETURN_VOID,
             "Background SDK readiness can still compete with local completion timers");
-        for (Method startup : List.of(
+        if (input.containsKey("Lcom/pairip/StartupLauncher;")) for (Method startup : List.of(
             method(patched, "Lcom/pairip/SignatureCheck;", "verifyIntegrity", "V", "Landroid/content/Context;"),
             method(patched, "Lcom/pairip/StartupLauncher;", "launch", "V"),
             method(patched, "Lcom/pairip/licensecheck/LicenseClient;", "checkLicense", "V", "Landroid/content/Context;"))) {
@@ -327,6 +345,10 @@ public class VerifyPizzaRewardDex {
             Set<String> expected = Set.of(key(show), key(ready), key(initialize), key(runner));
             int unchanged = 0;
             for (String owner : List.of(BASE, NATIVE, REQUEST, "Lcom/pairip/VMRunner;")) {
+                if (owner.equals("Lcom/pairip/VMRunner;") && !original.containsKey(owner)) {
+                    check(!patched.containsKey(owner), "Unprotected input acquired a VM replacement");
+                    continue;
+                }
                 check(original.containsKey(owner), "Original APK missing bridge " + owner);
                 Map<String, Method> outputMethods = new HashMap<>();
                 for (Method candidate : patched.get(owner).getMethods()) outputMethods.put(key(candidate), candidate);

@@ -1,5 +1,78 @@
 # Pizza: persistent project context
 
+## Pizza 5.59.2 / automatic intake / short update toast - 2026-10-29
+
+The latest verified live APKMirror release is 5.59.2 (2337), ARM64. The agent
+obtained the complete original itself: browser download completed after closing
+the actual Google vignette Close ad control and awaiting the final here-link
+download event. No cookie export, CAPTCHA solving or manual user download was
+required. Canonical procedure: [apkmirror-download.md](apkmirror-download.md),
+helper scripts/apkmirror_download.py. BROWSER_REQUIRED is an agent browser
+handoff, not a request for the user. This workflow also has a local project
+memory pointer at .serena/memories/workflow/apkmirror-intake.md.
+
+Original SHA256: ea0fd7c38af20c4f8e8c083f2991db4ee18c3d5cd8c2ec8f347d1fcca029ae39.
+The TapBlaze signer is verified. A checked copy is in Downloads as
+Good-Pizza-Great-Pizza-5.59.2-2337-original.apk. Originals/provenance remain private
+under E:/Codex-Morphe-Pizza-20261029/intake. The intake helper verifies ZIP,
+manifest identity, each publisher signature and declared APK inventory from
+XAPK split_apks or APKM MANIFEST.MF. Ten tests cover missing asset splits,
+incorrect signatures, HTML and other failures. Three real APK/APKM/XAPK inputs
+pass. Container metadata consistency alone does not authenticate XAPK metadata;
+version-specific game preservation checks remain necessary.
+
+5.59.2 contains no PairIP classes, protected VM callers or uninitialized string
+holders. The explicit unprotected profile retains original SDK/native startup
+and exact native-hash guards. Older profiles retain their bootstrap resources.
+All five default patches target 5.59.2, including 1000 PNN rewards with 10 gems
+and the new optional short update notice. The notice changes only the UI branch
+and invokes the existing continuation/cleanup; server status and account,
+authentication, billing and purchase results remain intact.
+
+Native tests pass all four notice variants (16 scenarios each, repeated), PNN
+999-to-final-PNN2/10-gem behavior and both finalizer orders. Legacy 5.59.0 PNN
+output is byte-identical. Final build and clean FULL patch pass after correcting
+the copied Coffee single-return assumption to Pizza's accepted-Activity store.
+Retain patch-failure-activity* evidence. Native output with all options:
+454720c8fe82345d45fb689b6317d106b244036152e99e5d470ac408fb47032a.
+All 6736 assets/32 libraries are preserved except that exact reviewed library.
+DEX checks preserve 70 bridge, 3360 auth/SDK and 2137 executable billing methods,
+plus 23 availability/result/activity methods. A real const-string/jumbo repool
+false positive prompted width-independent branch/handler parity; its fixture
+passes RED/GREEN and still rejects changed values/targets. One independent
+review is closed, including narrow reviews of these reproduced corrections.
+
+The retained disposable Debug key supports install-r from 5.59.0 without wiping
+data. Before update, the copied account's 334-entry archive was verified and
+retained. Original Account AVD5554 was not started or modified; its older missing
+signing key was not replaced. API35 Debug5556 normal APK acceptance passes
+startup, linked TapBlaze UI and actual day clock in54.9s, 11 memory-only OCR
+frames, zero saved images and zero app fatal markers. This is reuse-running
+AFTER separately observed Google/MicroG setup (cancelled with Back), a genuine
+free New Update gift overlay (Claim), and Monster Mash (Back, no event entry).
+The initial three setup-blocked attempts are preserved; do not claim54.9s as
+total install/cold-start time or as uninterrupted fresh-process Google login.
+Future agents should inspect known foreground/modal state once and close the
+recognized setup overlays before starting the short acceptance, rather than
+waiting out the same menu timeout repeatedly. No ad/purchase/order test was run.
+
+The focused forced-update gate passes: real toast shown and hidden in2.558s,
+then the same process7300 reaches the actual game menu, with zero app fatal
+markers. The game caches last_update_check for720s. The successful private probe
+bypasses only that cache branch and forces callback register3, without changing
+stored status/account fields. APK-backed mappings require exact ELF-header
+discovery. The first two probe observations (filename mapping and cached query)
+are excluded from successful toast evidence. Normal installed APK bytes and
+manifest remain unchanged; probes are not distributed. See runtime-verification.json
+and notice/native-verification.json for actual evidence and reproduction.
+
+Private evidence, keys, original/final APKs and logs: E:/Codex-Morphe-Pizza-20261029.
+Local-only tools/morphe-local-env.ps1 sets the discovered JDK/SDK and, with
+-ForBuild, obtains existing gh credentials only in the process environment.
+No real Google sign-in/cloud restoration, phone ARM64/API36, ARM32 patch runtime
+or paid checkout is established. Real-money checkout remains cancelled.
+All local gates pass. Publication is pending CI and release-artifact verification.
+
 Working agreement: see the root `AGENTS.md` (authoritative instructions).
 
 ## Restored PNN sponsor patch - 2026-10-25

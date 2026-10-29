@@ -28,6 +28,8 @@ public class InspectPizzaUpdate {
         var dex = DexFileFactory.loadDexContainer(new File(args[0]), Opcodes.getDefault());
         for (String entry : dex.getDexEntryNames()) for (var cls : dex.getEntry(entry).getDexFile().getClasses()) classes.put(cls.getType(), cls);
         var roles = new TreeMap<String, String>();
+        if (classes.containsKey("Lcom/tapblaze/pizzabusiness/BaseAppActivity;"))
+            roles.put("gameActivity", "Lcom/tapblaze/pizzabusiness/BaseAppActivity;");
         var versions = new TreeMap<String, String>();
         var protectedMethods = new TreeSet<String>();
         var stringHolderClasses = new TreeSet<String>();
