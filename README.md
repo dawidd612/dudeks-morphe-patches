@@ -21,7 +21,7 @@ Hogwarts Mystery 7.3.4 has experimental, opt-in QoL patches for ARM64 and x86-64
 ## Patches
 
 <!-- PATCHES_START -->
-> **[v1.39.1](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.39.1)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**17 patches** across **8 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+> **[v1.40.0](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.40.0)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**26 patches** across **9 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
 
 | # | App | Patches | Version | Package |
 |---|---|---|---|---|
@@ -30,9 +30,10 @@ Hogwarts Mystery 7.3.4 has experimental, opt-in QoL patches for ARM64 and x86-64
 | 3 | [**Good Coffee, Great Coffee**](PATCHES.md#good-coffee-great-coffee-comtapblazecoffeebusiness) | 4 | `1.24.0`, `1.25.1`, `1.26.0` | [`com.tapblaze.coffeebusiness`](https://play.google.com/store/apps/details?id=com.tapblaze.coffeebusiness) |
 | 4 | [**Good Pizza, Great Pizza**](PATCHES.md#good-pizza-great-pizza-comtapblazepizzabusiness) | 4 | `5.57.3`, `5.58.0`, `5.59.0`, `5.59.2` | [`com.tapblaze.pizzabusiness`](https://play.google.com/store/apps/details?id=com.tapblaze.pizzabusiness) |
 | 5 | [**Google Calendar**](PATCHES.md#google-calendar-comgoogleandroidcalendar) | 2 | `2026.37.0-984865732-release` | [`com.google.android.calendar`](https://play.google.com/store/apps/details?id=com.google.android.calendar) |
-| 6 | [**Instagram**](PATCHES.md#instagram-cominstagramandroid) | 1 | `experimental 447.0.0.55.81`, `experimental 439.0.0.37.89` | [`com.instagram.android`](https://play.google.com/store/apps/details?id=com.instagram.android) |
-| 7 | [**Mapa Turystyczna**](PATCHES.md#mapa-turystyczna-plmapa_turystycznaapp) | 2 | `1.16.6` | [`pl.mapa_turystyczna.app`](https://play.google.com/store/apps/details?id=pl.mapa_turystyczna.app) |
-| 8 | [**TikTok**](PATCHES.md#tiktok-comzhiliaoappmusically) | 1 | `47.0.3` | [`com.zhiliaoapp.musically`](https://play.google.com/store/apps/details?id=com.zhiliaoapp.musically) |
+| 6 | [**Harry Potter: Hogwarts Mystery**](PATCHES.md#harry-potter-hogwarts-mystery-comtinycopotter) | 9 | `experimental 7.3.4` | [`com.tinyco.potter`](https://play.google.com/store/apps/details?id=com.tinyco.potter) |
+| 7 | [**Instagram**](PATCHES.md#instagram-cominstagramandroid) | 1 | `experimental 447.0.0.55.81`, `experimental 439.0.0.37.89` | [`com.instagram.android`](https://play.google.com/store/apps/details?id=com.instagram.android) |
+| 8 | [**Mapa Turystyczna**](PATCHES.md#mapa-turystyczna-plmapa_turystycznaapp) | 2 | `1.16.6` | [`pl.mapa_turystyczna.app`](https://play.google.com/store/apps/details?id=pl.mapa_turystyczna.app) |
+| 9 | [**TikTok**](PATCHES.md#tiktok-comzhiliaoappmusically) | 1 | `47.0.3` | [`com.zhiliaoapp.musically`](https://play.google.com/store/apps/details?id=com.zhiliaoapp.musically) |
 <!-- PATCHES_END -->
 
 ### Mapa Turystyczna

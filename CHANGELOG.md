@@ -1,3 +1,15 @@
+## [1.40.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.39.1...v1.40.0) (2026-11-04)
+
+### 🐛 Bug Fixes
+
+* **hogwarts:** suppress observed automatic starter offers ([4927cba](https://github.com/dawidd612/dudeks-morphe-patches/commit/4927cba05678b35a3dbc13b0401b96bf052329f3))
+
+### ✨ New Features
+
+* **hogwarts:** add experimental quality-of-life patches ([9eca223](https://github.com/dawidd612/dudeks-morphe-patches/commit/9eca2238fcdd5bc90212cb7cfe2d5785a16667a4))
+* **hogwarts:** make ordinary interactions energy-free ([6dda6dd](https://github.com/dawidd612/dudeks-morphe-patches/commit/6dda6dd8121a13d29b0dce76c126a91faa1e3b18))
+* **hogwarts:** shorten quest waits and lesson feedback ([c78502c](https://github.com/dawidd612/dudeks-morphe-patches/commit/c78502caaf682eb94f8d7480c66b427d299f1bd3))
+
 ## [1.39.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.39.0...v1.39.1) (2026-10-29)
 
 ### 🐛 Bug Fixes

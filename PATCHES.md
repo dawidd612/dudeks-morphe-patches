@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.39.1** (`main`) - **17 patches** across **8 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.40.0** (`main`) - **26 patches** across **9 apps** - back to [README](README.md)
 
 ---
 
@@ -59,6 +59,24 @@
 |---|---|
 | **Google Calendar authentication via MicroG-RE** | Routes Calendar token requests and invalidation through MicroG-RE 7.1.1+. Requires Google Play services and the same account in Android and MicroG-RE. |
 | **Stabilize schedule widget** | Rebuilds schedule widget row contents on Android 16+ to work around missing tiles, deformed tile backgrounds and recycled layout corruption. Intended for Realme UI 7. Does not reset the widget. |
+
+---
+
+## Harry Potter: Hogwarts Mystery (com.tinyco.potter)
+
+**Supported versions:** `experimental 7.3.4`
+
+| Patch | Details |
+|---|---|
+| **Faster action feedback** | Shortens the action button's local progress feedback from 0.3 to 0.125 seconds. |
+| **Faster dialogue text** | Reveals dialogue text at 100 characters per second. Dialogue choices and manual advancement remain available. |
+| **Faster interaction fades** | Speeds up the brief pause and fade in the action-button completion animation.<br><sub>Options: Interaction fade speed</sub> |
+| **Faster lesson feedback** | Shortens the pauses after focus minigames and lesson banners while keeping earned grades and lesson progress. |
+| **Hide automatic paid greeting** | Hides the paid greeting and two verified automatic starter offers. The shop and manually opened offers remain available. |
+| **No energy consumption** | Makes normal interactions cost zero energy while preserving their action progress. |
+| **Quicker outfit previews** | Shortens avatar preview camera transitions when changing clothing categories or slots. |
+| **Quicker reward reveals** | Shortens three pauses in the reward reveal screen while keeping the original reward and collection flow. |
+| **Skip local quest waits** | Experimental. Finishes the local countdown for an already eligible quest through its normal expiry path. Objective cooldowns and event schedules still apply. |
 
 ---
 
