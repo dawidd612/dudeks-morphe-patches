@@ -134,19 +134,26 @@ val quickerHogwartsCosmeticPreview = hogwartsPatch(
 }
 
 @Suppress("unused")
-val fasterHogwartsEnergyRegeneration = hogwartsPatch(
-    name = "Faster energy regeneration",
-    description = "Experimental. Regenerates normal energy about eight times faster below the cap. Actions still spend energy.",
+val noHogwartsEnergyConsumption = hogwartsPatch(
+    name = "No energy consumption",
+    description = "Makes normal interactions cost zero energy while preserving their action progress.",
 ) {
     execute {
-        // EnergyPool::refreshSettings scales the configured interval after booster calculation.
-        // ARM64 converts fixed-point seconds directly. x86_64 rounds up to a whole second
-        // before conversion so a valid positive interval cannot become zero.
+        // Ask the checked pool whether the action can afford zero energy.
+        // Route the action through the existing free-action path. The original
+        // cost still determines action progress, but no debit or spend event runs.
+        // Skip the HUD subscriber that shows a debit and increments spend
+        // counters from those action points. Other tap subscribers still run.
         editPotterLibraries(
-            arm64 = listOf(PotterEdit(0x0285f7a0, "0800221e", "08f4021e")),
+            arm64 = listOf(
+                PotterEdit(0x0318debc, "21008052", "01008052"),
+                PotterEdit(0x0367807c, "eb0e0054", "77000014"),
+                PotterEdit(0x0368a8b8, "fd7bbea9", "c0035fd6"),
+            ),
             x64 = listOf(
-                PotterEdit(0x0279a0c0, "0f57c0f30f2ac0f30f1145d4", "f7d8c1f803f7d88945d46690"),
-                PotterEdit(0x0279a0d1, "f30f1055d4", "f30f2a55d4"),
+                PotterEdit(0x031456d8, "be01000000", "be00000000"),
+                PotterEdit(0x0369bd66, "0f8e4e020000", "e94f02000090"),
+                PotterEdit(0x036af6a0, "55", "c3"),
             ),
         )
     }
