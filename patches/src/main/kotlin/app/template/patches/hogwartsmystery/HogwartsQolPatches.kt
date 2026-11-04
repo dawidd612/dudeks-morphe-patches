@@ -151,3 +151,43 @@ val fasterHogwartsEnergyRegeneration = hogwartsPatch(
         )
     }
 }
+
+@Suppress("unused")
+val fasterHogwartsLessonFeedback = hogwartsPatch(
+    name = "Faster lesson feedback",
+    description = "Shortens the pauses after focus minigames and lesson banners while keeping earned grades and lesson progress.",
+) {
+    execute {
+        // FocusVC::onTap has already stored the earned grade when it schedules
+        // the result pause. The two ProjectCompleteViewController waits follow
+        // the banner fades, before the original close or button-init callback.
+        editPotterLibraries(
+            arm64 = listOf(
+                PotterEdit(0x02a0d280, "0010201e", "00102e1e"),
+                PotterEdit(0x034a3410, "0001271e", "00102c1e"),
+                PotterEdit(0x034a37f8, "00102f1e", "00102c1e"),
+            ),
+            x64 = listOf(
+                PotterEdit(0x02967359, "f30f100557b9dcfe", "f30f100517b7dcfe"),
+                PotterEdit(0x0349b0e8, "f30f1005bc7c29fe", "f30f10059c7b29fe"),
+                PotterEdit(0x0349b548, "f30f1005407629fe", "f30f10053c7729fe"),
+            ),
+        )
+    }
+}
+
+@Suppress("unused")
+val skipHogwartsLocalQuestWaits = hogwartsPatch(
+    name = "Skip local quest waits",
+    description = "Experimental. Finishes the local countdown for an already eligible quest through its normal expiry path. Objective cooldowns and event schedules still apply.",
+) {
+    execute {
+        // HPGoalProgress::passTime reaches this subtraction only with a positive
+        // whole-goal countdown. Zero selects the existing quest-available branch.
+        // Leave the elapsed-time argument intact for the separate timer paths.
+        editPotterLibraries(
+            arm64 = listOf(PotterEdit(0x02d9b3b8, "080114eb", "080108eb")),
+            x64 = listOf(PotterEdit(0x02d2554b, "4c29f0", "4829c0")),
+        )
+    }
+}
