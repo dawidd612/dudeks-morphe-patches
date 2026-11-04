@@ -108,14 +108,10 @@ val quickerHogwartsRewardReveals = hogwartsPatch(
 @Suppress("unused")
 val hideHogwartsPaidGreeting = hogwartsPatch(
     name = "Hide automatic paid greeting",
-    description = "Hides the automatic paid greeting pop-up. The shop and manually opened offers remain available.",
+    description = "Hides the paid greeting and two verified automatic starter offers. The shop and manually opened offers remain available.",
 ) {
     execute {
-        // The void wrapper only queues the paid greeting. Callers do not wait for a result.
-        editPotterLibraries(
-            arm64 = listOf(PotterEdit(0x02ab2cdc, "e20301aa", "c0035fd6")),
-            x64 = listOf(PotterEdit(0x02a1eaa0, "4889f2", "c36690")),
-        )
+        hidePotterPaidGreetings()
     }
 }
 
