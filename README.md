@@ -16,6 +16,8 @@ https://github.com/dawidd612/dudeks-morphe-patches
 
 Choose a supported app version, select the patches you want and patch a clean APK or XAPK. After a source update, rebuild the app to apply the changes.
 
+Hogwarts Mystery 7.3.4 has experimental, opt-in QoL patches for ARM64 and x86-64. See the [Hogwarts Mystery guide](docs/hogwarts-mystery.md) for APKM installation, save handling and test coverage.
+
 ## Patches
 
 <!-- PATCHES_START -->
