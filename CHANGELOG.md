@@ -1,3 +1,9 @@
+## [1.40.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.40.0...v1.40.1) (2026-11-05)
+
+### 🐛 Bug Fixes
+
+* **hogwarts:** preserve energy prices without debiting the balance ([eff9807](https://github.com/dawidd612/dudeks-morphe-patches/commit/eff98071a03e36c8c884c35b1e1e738cdc841c91))
+
 ## [1.40.0](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.39.1...v1.40.0) (2026-11-04)
 
 ### 🐛 Bug Fixes

@@ -1,6 +1,6 @@
 # Patches
 
-> Generated from `patches-list.json` - **v1.40.0** (`main`) - **26 patches** across **9 apps** - back to [README](README.md)
+> Generated from `patches-list.json` - **v1.40.1** (`main`) - **26 patches** across **9 apps** - back to [README](README.md)
 
 ---
 
@@ -73,7 +73,7 @@
 | **Faster interaction fades** | Speeds up the brief pause and fade in the action-button completion animation.<br><sub>Options: Interaction fade speed</sub> |
 | **Faster lesson feedback** | Shortens the pauses after focus minigames and lesson banners while keeping earned grades and lesson progress. |
 | **Hide automatic paid greeting** | Hides the paid greeting and two verified automatic starter offers. The shop and manually opened offers remain available. |
-| **No energy consumption** | Makes normal interactions cost zero energy while preserving their action progress. |
+| **No energy consumption** | Keeps the original energy prices and action progress without debiting energy, even at an empty balance. |
 | **Quicker outfit previews** | Shortens avatar preview camera transitions when changing clothing categories or slots. |
 | **Quicker reward reveals** | Shortens three pauses in the reward reveal screen while keeping the original reward and collection flow. |
 | **Skip local quest waits** | Experimental. Finishes the local countdown for an already eligible quest through its normal expiry path. Objective cooldowns and event schedules still apply. |
