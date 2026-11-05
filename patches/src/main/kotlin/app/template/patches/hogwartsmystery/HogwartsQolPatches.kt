@@ -132,24 +132,22 @@ val quickerHogwartsCosmeticPreview = hogwartsPatch(
 @Suppress("unused")
 val noHogwartsEnergyConsumption = hogwartsPatch(
     name = "No energy consumption",
-    description = "Makes normal interactions cost zero energy while preserving their action progress.",
+    description = "Keeps the original energy prices and action progress without debiting energy, even at an empty balance.",
 ) {
     execute {
-        // Ask the checked pool whether the action can afford zero energy.
-        // Route the action through the existing free-action path. The original
-        // cost still determines action progress, but no debit or spend event runs.
-        // Skip the HUD subscriber that shows a debit and increments spend
-        // counters from those action points. Other tap subscribers still run.
+        // EnergyPool::checkRemoveEnergy accepts any nonnegative balance after validating it.
+        // EnergyPool::tryRemoveEnergy preserves the balance while keeping the original cost
+        // and spend flow. onTryFinishAction uses the remaining price even at an empty balance.
         editPotterLibraries(
             arm64 = listOf(
-                PotterEdit(0x0318debc, "21008052", "01008052"),
-                PotterEdit(0x0367807c, "eb0e0054", "77000014"),
-                PotterEdit(0x0368a8b8, "fd7bbea9", "c0035fd6"),
+                PotterEdit(0x028685fc, "730208eb0d030054", "1f0100f10a030054"),
+                PotterEdit(0x028688c8, "160113cb", "f60308aa"),
+                PotterEdit(0x0318c808, "35b1889a", "f50309aa"),
             ),
             x64 = listOf(
-                PotterEdit(0x031456d8, "be01000000", "be00000000"),
-                PotterEdit(0x0369bd66, "0f8e4e020000", "e94f02000090"),
-                PotterEdit(0x036af6a0, "55", "c3"),
+                PotterEdit(0x027a351c, "4829cb7e5a", "4885c9795a"),
+                PotterEdit(0x027a37d9, "4929df", "909090"),
+                PotterEdit(0x03143f03, "4c0f4de0", "0f1f4000"),
             ),
         )
     }
