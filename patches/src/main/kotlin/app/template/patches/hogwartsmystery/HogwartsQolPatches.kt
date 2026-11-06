@@ -132,23 +132,43 @@ val quickerHogwartsCosmeticPreview = hogwartsPatch(
 @Suppress("unused")
 val noHogwartsEnergyConsumption = hogwartsPatch(
     name = "No energy consumption",
-    description = "Keeps the original energy prices and action progress without debiting energy, even at an empty balance.",
+    description = "Keeps action costs without debiting energy. By default, each tap advances one point, even at an empty balance.",
 ) {
+    val tapMode = stringOption(
+        key = "tapMode",
+        default = "manual",
+        values = mapOf("One point per tap" to "manual", "Game default" to "game"),
+        title = "Interaction taps",
+        description = "Advance one point per tap and show progress out of the original cost, or follow the game's tap setting.",
+        required = true,
+    )
+
     execute {
         // EnergyPool::checkRemoveEnergy accepts any nonnegative balance after validating it.
         // EnergyPool::tryRemoveEnergy preserves the balance while keeping the original cost
         // and spend flow. onTryFinishAction uses the remaining price even at an empty balance.
+        // Manual taps use onTryAction from both touch handlers and show the segmented progress.
+        // Scripted progression and the explicit hold callback keep their own dispatch.
+        val manual = tapMode.value == "manual"
         editPotterLibraries(
             arm64 = listOf(
                 PotterEdit(0x028685fc, "730208eb0d030054", "1f0100f10a030054"),
                 PotterEdit(0x028688c8, "160113cb", "f60308aa"),
                 PotterEdit(0x0318c808, "35b1889a", "f50309aa"),
-            ),
+            ) + if (manual) listOf(
+                PotterEdit(0x0318c6f4, "a0000036", "05000014"),
+                PotterEdit(0x03192650, "a0000036", "05000014"),
+                PotterEdit(0x0318ec44, "20010036", "09000014"),
+            ) else emptyList(),
             x64 = listOf(
                 PotterEdit(0x027a351c, "4829cb7e5a", "4885c9795a"),
                 PotterEdit(0x027a37d9, "4929df", "909090"),
                 PotterEdit(0x03143f03, "4c0f4de0", "0f1f4000"),
-            ),
+            ) + if (manual) listOf(
+                PotterEdit(0x03143dff, "7407", "eb07"),
+                PotterEdit(0x0314a020, "7407", "eb07"),
+                PotterEdit(0x0314657e, "742a", "eb2a"),
+            ) else emptyList(),
         )
     }
 }
