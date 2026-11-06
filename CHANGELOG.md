@@ -1,3 +1,9 @@
+## [1.40.2](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.40.1...v1.40.2) (2026-11-06)
+
+### 🐛 Bug Fixes
+
+* **hogwarts:** keep manual interaction taps with free energy ([6fd20b0](https://github.com/dawidd612/dudeks-morphe-patches/commit/6fd20b08eafe7ae551d40fdf41267024e6a2a82c))
+
 ## [1.40.1](https://github.com/dawidd612/dudeks-morphe-patches/compare/v1.40.0...v1.40.1) (2026-11-05)
 
 ### 🐛 Bug Fixes

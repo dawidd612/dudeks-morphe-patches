@@ -21,7 +21,7 @@ Hogwarts Mystery 7.3.4 has experimental, opt-in QoL patches for ARM64 and x86-64
 ## Patches
 
 <!-- PATCHES_START -->
-> **[v1.40.1](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.40.1)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**26 patches** across **9 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
+> **[v1.40.2](https://github.com/dawidd612/dudeks-morphe-patches/releases/tag/v1.40.2)**&nbsp;&nbsp;&middot;&nbsp;&nbsp;`main`&nbsp;&nbsp;&middot;&nbsp;&nbsp;**26 patches** across **9 apps**&nbsp;&nbsp;&middot;&nbsp;&nbsp;[Full details](PATCHES.md)
 
 | # | App | Patches | Version | Package |
 |---|---|---|---|---|
